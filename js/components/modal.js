@@ -81,6 +81,15 @@ export class ModalService {
             </button>
           </div>
         </form>
+
+        <div class="pt-4 border-t border-outline-variant/30 mt-4 space-y-2">
+          <label class="block text-xs font-bold text-red-600">Kosongkan Data Inventaris</label>
+          <p class="text-[11px] text-on-surface-variant">Hapus semua stok bahan makanan, riwayat masak, dan catatan belanja di perangkat ini untuk memulai dari awal.</p>
+          <button type="button" id="btn-reset-all-data" class="w-full h-10 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95">
+            <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+            <span>Kosongkan Semua Data Sekarang</span>
+          </button>
+        </div>
       `;
 
       ModalService.open(content);
@@ -101,6 +110,14 @@ export class ModalService {
 
         ModalService.close();
         if (onSave) onSave({ userName, apiKey, bumbuDasar });
+      });
+
+      document.getElementById('btn-reset-all-data')?.addEventListener('click', () => {
+        if (confirm('Apakah kamu yakin ingin mengosongkan semua data inventaris kulkas dan dapur?')) {
+          StorageService.clearAllData();
+          ModalService.close();
+          window.location.reload();
+        }
       });
     });
   }

@@ -33,84 +33,8 @@ export function renderIdeMasakPage() {
     (i.catatan && (i.catatan.includes('layu') || i.catatan.includes('kering')))
   );
 
-  const defaultRecipes = [
-    {
-      id: 'resep-1',
-      nama: 'Tumis Sawi Tahu Gurih',
-      isHero: true,
-      badge: '100% Cocok',
-      badgeClass: 'bg-emerald-100 text-emerald-800',
-      waktu_masak: '15 Menit',
-      tingkat_kesulitan: 'Mudah',
-      porsi: '2-3 Porsi',
-      image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80',
-      alasan: 'Memanfaatkan Sawi Hijau (mulai layu) & Tahu Putih agar bebas food waste.',
-      bahan_terpakai: [
-        { nama: 'Sawi Hijau', jumlah: 1, satuan: 'ikat' },
-        { nama: 'Tahu Putih', jumlah: 1, satuan: 'bungkus' }
-      ],
-      bahan_bumbu: ['Bawang putih', 'Bawang merah', 'Kecap manis', 'Minyak goreng', 'Garam'],
-      langkah: [
-        'Potong tahu dadu kecil, goreng sebentar setengah matang.',
-        'Iris bawang merah dan bawang putih, tumis di wajan hingga harum.',
-        'Masukkan potongan sawi hijau dan bumbui kecap manis serta garam secukupnya.',
-        'Aduk cepat dengan api sedang selama 3 menit hingga sawi layu pas. Sajikan selagi hangat!'
-      ],
-      tips: 'Gunakan api besar saat menumis agar sawi tetap hijau cerah dan renyah.'
-    },
-    {
-      id: 'resep-2',
-      nama: 'Sup Telur Tomat Segar',
-      isHero: false,
-      badge: '95% Cocok',
-      badgeClass: 'bg-emerald-100 text-emerald-800',
-      waktu_masak: '12 Menit',
-      tingkat_kesulitan: 'Sangat Mudah',
-      porsi: '2 Porsi',
-      image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=80',
-      alasan: 'Menghabiskan tomat merah sisa 2 hari dengan kuah kaldu segar.',
-      bahan_terpakai: [
-        { nama: 'Telur Ayam', jumlah: 2, satuan: 'butir' },
-        { nama: 'Tomat Merah', jumlah: 2, satuan: 'buah' },
-        { nama: 'Daun Bawang', jumlah: 1, satuan: 'batang' }
-      ],
-      bahan_bumbu: ['Bawang putih', 'Garam', 'Merica', 'Minyak goreng'],
-      langkah: [
-        'Potong tomat menjadi 4 bagian. Kocok lepas telur.',
-        'Tumis bawang putih cincang dan tomat hingga lembut dan mengeluarkan sari merah.',
-        'Tuang 500ml air, beri garam dan merica, tunggu mendidih.',
-        'Tuang telur kocok perlahan memutar sambil diaduk untuk membentuk serabut. Taburi daun bawang.'
-      ],
-      tips: 'Beri sedikit minyak wijen atau kecap asin bila suka aroma lebih harum.'
-    },
-    {
-      id: 'resep-3',
-      nama: 'Nasi Goreng Kampung Praktis',
-      isHero: false,
-      badge: '100% Cocok',
-      badgeClass: 'bg-emerald-100 text-emerald-800',
-      waktu_masak: '15 Menit',
-      tingkat_kesulitan: 'Mudah',
-      porsi: '1-2 Porsi',
-      image: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=400&auto=format&fit=crop&q=80',
-      alasan: 'Menu favorit keluarga dari stok beras, telur ayam, dan bumbu dapur.',
-      bahan_terpakai: [
-        { nama: 'Telur Ayam', jumlah: 2, satuan: 'butir' },
-        { nama: 'Daun Bawang', jumlah: 1, satuan: 'batang' }
-      ],
-      bahan_bumbu: ['Bawang merah', 'Bawang putih', 'Kecap manis', 'Minyak goreng', 'Garam'],
-      langkah: [
-        'Orak-arik telur dengan sedikit minyak lalu sisihkan.',
-        'Tumis irisan bawang merah dan bawang putih hingga harum kecokelatan.',
-        'Masukkan nasi putih dingin, orak-arik telur, dan bumbui kecap manis serta garam.',
-        'Aduk rata dengan api besar hingga bumbu meresap. Masukkan daun bawang di akhir.'
-      ],
-      tips: 'Gunakan nasi dingin atau nasi kemarin agar butiran nasi goreng tidak lembek.'
-    }
-  ];
-
-  let currentRecipes = defaultRecipes;
-  let activeSelectedRecipe = currentRecipes[0]; // Hero default
+  let currentRecipes = store.getState().generatedRecipes || [];
+  let activeSelectedRecipe = currentRecipes[0] || null;
 
   function renderContent() {
     mainEl.innerHTML = `
@@ -125,17 +49,20 @@ export function renderIdeMasakPage() {
               <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
               <span class="text-[11px] font-bold uppercase tracking-wide">Penyelamat Dapur Pintar</span>
             </div>
-            <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-full font-bold">
+            <span class="text-xs ${totalBahan > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'} px-2.5 py-0.5 rounded-full font-bold">
               ${totalBahan} Bahan Siap Pakai
             </span>
           </div>
 
           <div class="space-y-0.5">
             <h2 class="text-sm font-bold text-slate-900 leading-snug">
-              Dianalisis dari ${totalBahan} bahan di kulkas & dapurmu
+              ${totalBahan > 0 ? `Dianalisis dari ${totalBahan} bahan di kulkas & dapurmu` : 'Belum Ada Stok Bahan'}
             </h2>
             <p class="text-xs text-slate-500 leading-relaxed">
-              ${userName}, mari olah bahan yang butuh perhatian hari ini agar tetap lezat & bebas sampah makanan.
+              ${totalBahan > 0
+                ? `${userName}, mari olah bahan yang butuh perhatian hari ini agar tetap lezat & bebas sampah makanan.`
+                : 'Pindai kulkas atau tambah bahan terlebih dahulu untuk membuat ide menu otomatis.'
+              }
             </p>
           </div>
 
@@ -143,60 +70,105 @@ export function renderIdeMasakPage() {
           <div class="bg-amber-50/90 text-amber-900 border border-amber-200/70 rounded-xl p-3 flex items-start gap-2.5 transition active:scale-[0.99]">
             <span class="material-symbols-outlined text-amber-600 text-[20px] flex-shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">eco</span>
             <div class="flex-1 min-w-0">
-              <span class="text-xs block font-bold text-amber-950">💡 Prioritas Cegah Food Waste:</span>
+              <span class="text-xs block font-bold text-amber-950">💡 Status Kesegaran Stok:</span>
               <span class="text-xs text-amber-900/90 leading-relaxed">
                 ${
                   expiringItems.length > 0
-                    ? `Memanfaatkan <strong>${expiringItems.map(i => i.nama).slice(0, 2).join(' & ')}</strong> sebelum kesegarannya hilang.`
-                    : 'Semua bahan dalam kondisi prima. Rekomendasi disusun berdasarkan variasi nutrisi seimbang.'
+                    ? `Prioritas olah <strong>${expiringItems.map(i => i.nama).slice(0, 2).join(' & ')}</strong> sebelum kesegarannya hilang.`
+                    : (totalBahan > 0
+                        ? 'Semua bahan dalam kondisi prima. Rekomendasi disusun berdasarkan variasi nutrisi seimbang.'
+                        : 'Inventaris kosong. Tambahkan bahan untuk memantau masa simpan dan kesegaran.')
                 }
               </span>
             </div>
           </div>
         </section>
 
-        <!-- Recipes Section Header & Refresh AI Button -->
+        <!-- Recipes Section Header & Refresh Button -->
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-base font-bold text-slate-900">Rekomendasi Menu</h2>
-            <p class="text-[11px] text-slate-500">Tergantung stok nyata saat ini</p>
+            <p class="text-[11px] text-slate-500">Disesuaikan dengan stok nyata saat ini</p>
           </div>
-          <button id="btn-request-ai-recipe" class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-800 active:scale-95 transition">
-            <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
-            <span>Ide Menu Baru</span>
-          </button>
+          ${totalBahan > 0 ? `
+            <button id="btn-request-ai-recipe" class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-800 active:scale-95 transition">
+              <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
+              <span>Racik Menu Baru</span>
+            </button>
+          ` : ''}
         </div>
 
-        <!-- Recipe List -->
-        <div id="recipe-cards-container" class="space-y-4">
-          <!-- Hero Card -->
-          ${renderHeroCard(currentRecipes[0])}
-
-          <!-- Compact Cards -->
-          <div class="space-y-3 pt-1">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Alternatif Menu Lain</h3>
-            ${currentRecipes.slice(1).map(r => renderCompactCard(r)).join('')}
+        <!-- Recipe Content / Empty State -->
+        ${currentRecipes.length === 0 ? `
+          <div class="bg-surface-container-lowest rounded-3xl p-6 text-center border border-slate-100 shadow-sm space-y-4">
+            <div class="w-16 h-16 rounded-full ${totalBahan > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-400'} flex items-center justify-center mx-auto">
+              <span class="material-symbols-outlined text-[32px]">${totalBahan > 0 ? 'skillet' : 'kitchen'}</span>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-900">
+                ${totalBahan > 0 ? 'Siap Meracik Ide Menu Lezat?' : 'Stok Bahan Belum Tersedia'}
+              </h3>
+              <p class="text-xs text-slate-500 mt-1 leading-relaxed max-w-xs mx-auto">
+                ${totalBahan > 0
+                  ? `Ada ${totalBahan} bahan di kulkasmu. Tekan tombol di bawah untuk membuat 3 rekomendasi menu praktis sesuai stok saat ini.`
+                  : 'Pindai kulkas dengan kamera atau tambahkan bahan secara manual untuk mendapatkan resep otomatis.'
+                }
+              </p>
+            </div>
+            ${totalBahan > 0 ? `
+              <button id="btn-trigger-generate-recipes" class="w-full h-12 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+                <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                <span>Buat Rekomendasi Menu Sekarang</span>
+              </button>
+            ` : `
+              <div class="flex items-center gap-2 pt-1">
+                <a href="#/pindai" class="flex-1 h-11 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+                  <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                  <span>Pindai Kulkas</span>
+                </a>
+                <a href="#/stok" class="flex-1 h-11 rounded-xl bg-slate-100 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+                  <span class="material-symbols-outlined text-[18px]">inventory_2</span>
+                  <span>Input Stok</span>
+                </a>
+              </div>
+            `}
           </div>
-        </div>
+        ` : `
+          <!-- Recipe List -->
+          <div id="recipe-cards-container" class="space-y-4">
+            <!-- Hero Card -->
+            ${renderHeroCard(currentRecipes[0])}
+
+            <!-- Compact Cards -->
+            ${currentRecipes.length > 1 ? `
+              <div class="space-y-3 pt-1">
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Alternatif Menu Lain</h3>
+                ${currentRecipes.slice(1).map(r => renderCompactCard(r)).join('')}
+              </div>
+            ` : ''}
+          </div>
+        `}
 
       </div>
 
       <!-- Floating Cooking Dock -->
-      <div id="cooking-dock" class="fixed bottom-16 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 p-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-        <div class="max-w-md mx-auto flex items-center justify-between gap-3">
-          <div class="min-w-0 flex-1">
-            <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Menu Terpilih</span>
-            <h4 id="dock-recipe-title" class="text-xs font-extrabold text-slate-900 truncate">${activeSelectedRecipe.nama}</h4>
-            <p class="text-[10px] text-slate-500 truncate mt-0.5">
-              Bahan: ${activeSelectedRecipe.bahan_terpakai.map(b => `${b.nama} (${b.jumlah} ${b.satuan})`).join(', ')}
-            </p>
+      ${activeSelectedRecipe ? `
+        <div id="cooking-dock" class="fixed bottom-16 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 p-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
+          <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Menu Terpilih</span>
+              <h4 id="dock-recipe-title" class="text-xs font-extrabold text-slate-900 truncate">${activeSelectedRecipe.nama}</h4>
+              <p class="text-[10px] text-slate-500 truncate mt-0.5">
+                Bahan: ${(activeSelectedRecipe.bahan_terpakai || []).map(b => `${b.nama} (${b.jumlah} ${b.satuan})`).join(', ')}
+              </p>
+            </div>
+            <button id="btn-dock-cook" type="button" class="h-11 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition flex-shrink-0">
+              <span class="material-symbols-outlined text-[18px]">skillet</span>
+              <span>Sudah Masak Ini 🍳</span>
+            </button>
           </div>
-          <button id="btn-dock-cook" type="button" class="h-11 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition flex-shrink-0">
-            <span class="material-symbols-outlined text-[18px]">skillet</span>
-            <span>Sudah Masak Ini 🍳</span>
-          </button>
         </div>
-      </div>
+      ` : ''}
     `;
 
     setupEvents();
@@ -331,8 +303,12 @@ export function renderIdeMasakPage() {
       });
     });
 
-    // Request new AI recipes
-    document.getElementById('btn-request-ai-recipe')?.addEventListener('click', async () => {
+    const handleGenerateRecipes = async () => {
+      if (totalBahan === 0) {
+        showToast('Stok bahan kosong. Tambahkan atau pindai bahan terlebih dahulu.', 'warning');
+        return;
+      }
+
       ModalService.open(`
         <div class="py-8 flex flex-col items-center text-center">
           <div class="w-16 h-16 rounded-3xl bg-primary text-on-primary flex items-center justify-center animate-bounce shadow-lg">
@@ -348,13 +324,13 @@ export function renderIdeMasakPage() {
       try {
         const bumbuDasar = settings.bumbuDasar || [];
         const prompt = buildPromptRekomendasiMasak(allStok, bumbuDasar);
-        const aiResult = await GeminiService.generateRecipes(prompt);
+        const result = await GeminiService.generateRecipes(prompt);
 
         ModalService.close();
 
-        if (aiResult.rekomendasi && aiResult.rekomendasi.length > 0) {
-          currentRecipes = aiResult.rekomendasi.map((r, idx) => ({
-            id: `ai-resep-${idx + 1}`,
+        if (result.rekomendasi && result.rekomendasi.length > 0) {
+          currentRecipes = result.rekomendasi.map((r, idx) => ({
+            id: `resep-${idx + 1}`,
             nama: r.nama,
             isHero: idx === 0,
             badge: r.badge || (idx === 0 ? '100% Cocok' : 'Rekomendasi Cepat'),
@@ -372,17 +348,22 @@ export function renderIdeMasakPage() {
             tips: r.tips || 'Sajikan selagi hangat.'
           }));
           activeSelectedRecipe = currentRecipes[0];
-          showToast('Rekomendasi menu baru berhasil didapatkan!', 'success');
+          store.setState({ generatedRecipes: currentRecipes });
+          showToast('Rekomendasi menu baru berhasil diracik!', 'success');
           renderContent();
         } else {
-          showToast('Tidak ada menu baru yang cocok. Menampilkan menu andalan.', 'info');
+          showToast('Tidak ada menu yang cocok. Coba tambahkan lebih banyak bahan.', 'info');
         }
       } catch (err) {
         ModalService.close();
-        console.error('AI Recipe generation error:', err);
+        console.error('Recipe generation error:', err);
         showToast(`Gagal meracik menu: ${err.message}`, 'error', 4000);
       }
-    });
+    };
+
+    // Request new recipes buttons
+    document.getElementById('btn-request-ai-recipe')?.addEventListener('click', handleGenerateRecipes);
+    document.getElementById('btn-trigger-generate-recipes')?.addEventListener('click', handleGenerateRecipes);
 
     // Cooking Dock Button
     document.getElementById('btn-dock-cook')?.addEventListener('click', () => {

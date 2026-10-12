@@ -122,31 +122,46 @@ export function renderBerandaPage() {
         </section>
 
         <!-- Rekomendasi Cepat Hari Ini -->
+        <!-- Rekomendasi Cepat / Panduan Awal -->
         <section>
-          <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm hover:border-emerald-300 transition">
-            <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-amber-500 text-[18px]">skillet</span>
-                <span class="text-xs font-bold text-slate-800">Rekomendasi Cepat Hari Ini</span>
+          ${totalBahan === 0 ? `
+            <div class="rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/50 p-4 text-center">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center mx-auto mb-2">
+                <span class="material-symbols-outlined text-[24px]">kitchen</span>
               </div>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">100% Cocok</span>
+              <h3 class="text-sm font-bold text-slate-800">Inventaris Kulkas Masih Kosong</h3>
+              <p class="text-xs text-slate-600 mt-1 max-w-xs mx-auto leading-relaxed">
+                Mulai dengan memotret isi kulkas atau catat barang belanjaan Anda untuk mendata bahan secara otomatis.
+              </p>
+              <a href="#pindai?type=kulkas" class="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-sm active:scale-95 transition">
+                <span class="material-symbols-outlined text-[16px]">add_a_photo</span> Pindai Kulkas Sekarang
+              </a>
             </div>
-            <div class="mt-2.5 flex items-start gap-3">
-              <div class="w-16 h-16 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0 relative">
-                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200&auto=format&fit=crop&q=80"
-                  alt="Tumis Sawi Tahu" class="w-full h-full object-cover">
+          ` : `
+            <div class="rounded-2xl border border-slate-200/80 bg-white p-3.5 shadow-sm hover:border-emerald-300 transition">
+              <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-amber-500 text-[18px]">skillet</span>
+                  <span class="text-xs font-bold text-slate-800">Rekomendasi Menu dari Stok</span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">${totalBahan} Bahan Siap</span>
               </div>
-              <div class="flex-1 min-w-0">
-                <h3 class="text-sm font-bold text-slate-900 truncate">Tumis Sawi Tahu Gurih</h3>
-                <p class="text-[11px] text-slate-500 line-clamp-1 mt-0.5">Solusi tepat menghabiskan sawi hijau & tahu putih segar.</p>
-                <div class="mt-1.5 flex items-center gap-3 text-[11px] text-slate-500">
-                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-slate-400">schedule</span>15 mnt</span>
-                  <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-slate-400">eco</span>Zero-waste</span>
-                  <a href="#ide-masak" class="ml-auto font-bold text-emerald-700 hover:text-emerald-800 text-[11px]">Masak →</a>
+              <div class="mt-2.5 flex items-start gap-3">
+                <div class="w-14 h-14 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center flex-shrink-0">
+                  <span class="material-symbols-outlined text-[28px]">restaurant_menu</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-sm font-bold text-slate-900 truncate">Rekomendasi Masakan Harian</h3>
+                  <p class="text-[11px] text-slate-500 line-clamp-1 mt-0.5">Dapatkan 3 menu yang disesuaikan khusus dengan stok bahan Anda saat ini.</p>
+                  <div class="mt-1.5 flex items-center gap-3 text-[11px] text-slate-500">
+                    <a href="#ide-masak" class="font-bold text-emerald-700 hover:text-emerald-800 text-[11px] inline-flex items-center gap-1">
+                      Buka Ide Masak <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          `}
         </section>
 
         <!-- Inventaris Bahan -->

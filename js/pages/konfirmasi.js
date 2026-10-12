@@ -13,19 +13,7 @@ export function renderKonfirmasiPage() {
   const scanState = store.getState();
   const detectionData = scanState.detectionResults;
 
-  // Fallback sample items if navigated directly without camera capture
-  const defaultItems = [
-    { id: 'c-1', nama: 'Telur Ayam', jumlah: 10, satuan: 'butir', kategori: 'protein', lokasi: 'kulkas', confidence: 98, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: '' },
-    { id: 'c-2', nama: 'Sawi Hijau', jumlah: 1, satuan: 'ikat', kategori: 'sayur', lokasi: 'kulkas', confidence: 85, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: 'Mulai layu di ujung daun' },
-    { id: 'c-3', nama: 'Tomat Merah', jumlah: 4, satuan: 'buah', kategori: 'sayur', lokasi: 'kulkas', confidence: 92, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: '' },
-    { id: 'c-4', nama: 'Susu UHT Segar', jumlah: 1, satuan: 'liter', kategori: 'minuman', lokasi: 'pintu_kulkas', confidence: 60, yakin: false, status: 'Perlu Cek', statusClass: 'bg-amber-100 text-amber-800', catatan: 'Sisa sekitar separuh botol' },
-    { id: 'c-5', nama: 'Kecap Asin / Manis', jumlah: 1, satuan: 'botol', kategori: 'bumbu_dasar', lokasi: 'pintu_kulkas', confidence: 50, yakin: false, status: 'Kurang Jelas', statusClass: 'bg-rose-100 text-rose-800', catatan: 'Label botol agak terhalang' },
-    { id: 'c-6', nama: 'Tahu Putih Sutra', jumlah: 1, satuan: 'bungkus', kategori: 'protein', lokasi: 'kulkas', confidence: 94, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: '' },
-    { id: 'c-7', nama: 'Daun Bawang', jumlah: 2, satuan: 'batang', kategori: 'sayur', lokasi: 'laci_sayur', confidence: 75, yakin: false, status: 'Perlu Cek', statusClass: 'bg-amber-100 text-amber-800', catatan: 'Sebagian ujung agak kering' },
-    { id: 'c-8', nama: 'Wortel Impor', jumlah: 3, satuan: 'buah', kategori: 'sayur', lokasi: 'laci_sayur', confidence: 95, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: '' },
-  ];
-
-  let rawItems = detectionData?.items || defaultItems;
+  let rawItems = detectionData?.items || [];
 
   // Normalize items
   let confirmedItems = rawItems.map((item, idx) => {
@@ -72,6 +60,25 @@ export function renderKonfirmasiPage() {
   });
 
   function renderContent() {
+    if (confirmedItems.length === 0) {
+      mainEl.innerHTML = `
+        <div class="page-enter flex flex-col items-center justify-center min-h-[55vh] max-w-md mx-auto px-6 text-center gap-3">
+          <div class="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center text-slate-400">
+            <span class="material-symbols-outlined text-[36px]">no_photography</span>
+          </div>
+          <h2 class="text-base font-bold text-slate-800">Belum Ada Hasil Pemindaian</h2>
+          <p class="text-xs text-slate-500 max-w-xs leading-relaxed">
+            Silakan ambil foto kulkas atau barang belanjaan terlebih dahulu untuk mendeteksi bahan makanan.
+          </p>
+          <a href="#pindai" class="mt-2 px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm active:scale-95 transition">
+            <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+            <span>Buka Kamera Pemindai</span>
+          </a>
+        </div>
+      `;
+      return;
+    }
+
     const photos = detectionData?.photos || [];
     const filteredItems = confirmedItems.filter(item => {
       if (activeFilter === 'perlu-cek') return item.status === 'Perlu Cek' || item.status === 'Kurang Jelas';
