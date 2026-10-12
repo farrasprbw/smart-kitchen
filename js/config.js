@@ -12,6 +12,16 @@ export const CONFIG = {
   ],
   GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent',
 
+  FIREBASE: {
+    projectId: 'dapur-pintar-ai',
+    appId: '1:859328494560:web:369293bf46989477e0c985',
+    storageBucket: 'dapur-pintar-ai.firebasestorage.app',
+    apiKey: 'AIzaSyCIVDH0oXGFjWjWa630gt4H5iHX9-TyFLA',
+    authDomain: 'dapur-pintar-ai.firebaseapp.com',
+    messagingSenderId: '859328494560',
+    enabled: true
+  },
+
   STORAGE_KEYS: {
     STOK: 'dapur_pintar_stok',
     LOG_MASAK: 'dapur_pintar_log_masak',
@@ -38,8 +48,15 @@ export const CONFIG = {
   PHOTO_SLOTS: [
     { id: 'rak-utama', label: 'Rak Utama', icon: 'shelves' },
     { id: 'laci-sayur', label: 'Laci Sayur', icon: 'grass' },
-    { id: 'freezer', label: 'Freezer / Daging', icon: 'ac_unit' },
+    { id: 'freezer', label: 'Freezer / Daging', icon: 'kitchen' },
     { id: 'pintu', label: 'Pintu Samping', icon: 'door_sliding' },
+  ],
+
+  // Belanja photo slot labels
+  BELANJA_SLOTS: [
+    { id: 'belanja-1', label: 'Bahan Segar', icon: 'nutrition' },
+    { id: 'belanja-2', label: 'Kemasan / Bumbu', icon: 'inventory_2' },
+    { id: 'belanja-3', label: 'Struk / Total', icon: 'receipt_long' },
   ],
 };
 

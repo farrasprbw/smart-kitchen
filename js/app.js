@@ -7,7 +7,7 @@ import { ModalService } from './components/modal.js';
 import { showToast } from './components/toast.js';
 
 import { renderBerandaPage } from './pages/beranda.js';
-import { renderPindaiPage } from './pages/pindai.js';
+import { renderPindaiPage, stopPindaiCamera } from './pages/pindai.js';
 import { renderKonfirmasiPage } from './pages/konfirmasi.js';
 import { renderIdeMasakPage } from './pages/ide-masak.js';
 import { renderCatatanPage } from './pages/catatan.js';
@@ -53,6 +53,13 @@ class App {
       }
     });
 
+    this.router.setBeforeNavigate((targetRoute) => {
+      if (targetRoute !== 'pindai') {
+        stopPindaiCamera();
+      }
+      return true;
+    });
+
     // 3. Global Settings Listener
     document.addEventListener('click', (e) => {
       const settingsBtn = e.target.closest('#btn-open-settings');
@@ -80,23 +87,150 @@ class App {
     if (!modal) return;
     modal.classList.remove('hidden');
 
-    const btnStart = document.getElementById('btn-start-app');
-    const inputName = document.getElementById('input-name');
+    let currentStep = 1;
+    let selectedBumbu = [...CONFIG.DEFAULT_BUMBU_DASAR];
+    let userName = 'Sari';
 
-    btnStart?.addEventListener('click', () => {
-      const name = inputName?.value.trim() || 'Sari';
+    const renderWizard = () => {
+      if (currentStep === 1) {
+        modal.innerHTML = `
+          <div class="bg-surface-container-lowest rounded-t-3xl p-6 flex flex-col gap-4 shadow-2xl max-w-lg mx-auto w-full">
+            <div class="w-12 h-1.5 rounded-full bg-surface-container-highest mx-auto"></div>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">Langkah 1 dari 3</span>
+              <span class="text-xs text-slate-400 font-semibold">Setup 30 Detik</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-on-primary">
+                <span class="material-symbols-outlined text-[28px]">kitchen</span>
+              </div>
+              <div>
+                <h2 class="font-headline-md text-base font-bold text-on-surface">Selamat Datang di Dapur Pintar!</h2>
+                <p class="text-xs text-on-surface-variant">Kelola stok kulkas & ide masak cerdas.</p>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-on-surface mb-1">Siapa nama panggilanmu?</label>
+              <input id="wizard-name" type="text" value="${userName}" class="w-full h-11 px-4 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+            </div>
+            <button id="btn-next-step-1" type="button" class="w-full h-12 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+              <span>Lanjut: Pilih Stok Dasar</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+        `;
 
-      const curSettings = StorageService.getSettings();
-      StorageService.saveSettings({
-        ...curSettings,
-        userName: name,
-        onboardingDone: true
-      });
+        document.getElementById('btn-next-step-1')?.addEventListener('click', () => {
+          userName = document.getElementById('wizard-name')?.value.trim() || 'Sari';
+          currentStep = 2;
+          renderWizard();
+        });
+      } else if (currentStep === 2) {
+        modal.innerHTML = `
+          <div class="bg-surface-container-lowest rounded-t-3xl p-6 flex flex-col gap-4 shadow-2xl max-w-lg mx-auto w-full">
+            <div class="w-12 h-1.5 rounded-full bg-surface-container-highest mx-auto"></div>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">Langkah 2 dari 3</span>
+              <button id="btn-back-step-2" class="text-xs text-slate-400 font-bold hover:underline">Kembali</button>
+            </div>
+            <div>
+              <h2 class="font-headline-md text-base font-bold text-on-surface">Bumbu & Bahan Selalu Ada</h2>
+              <p class="text-xs text-on-surface-variant">Centang bumbu yang biasanya selalu tersedia di dapurmu:</p>
+            </div>
+            <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
+              ${CONFIG.DEFAULT_BUMBU_DASAR.map(b => `
+                <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 text-xs font-semibold cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary/5 has-[:checked]:text-primary">
+                  <input type="checkbox" class="bumbu-check rounded text-primary focus:ring-primary" value="${b}" ${selectedBumbu.includes(b) ? 'checked' : ''}>
+                  <span class="capitalize">${b}</span>
+                </label>
+              `).join('')}
+            </div>
+            <button id="btn-next-step-2" type="button" class="w-full h-12 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+              <span>Lanjut: Selesai Setup</span>
+              <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </button>
+          </div>
+        `;
 
-      modal.classList.add('hidden');
-      showToast(`Selamat datang di Dapur Pintar, ${name}!`, 'success', 3500);
-      this.router.handleRoute();
-    });
+        document.getElementById('btn-back-step-2')?.addEventListener('click', () => {
+          currentStep = 1;
+          renderWizard();
+        });
+
+        document.getElementById('btn-next-step-2')?.addEventListener('click', () => {
+          selectedBumbu = Array.from(modal.querySelectorAll('.bumbu-check:checked')).map(el => el.value);
+          currentStep = 3;
+          renderWizard();
+        });
+      } else if (currentStep === 3) {
+        modal.innerHTML = `
+          <div class="bg-surface-container-lowest rounded-t-3xl p-6 flex flex-col gap-4 shadow-2xl max-w-lg mx-auto w-full">
+            <div class="w-12 h-1.5 rounded-full bg-surface-container-highest mx-auto"></div>
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Langkah 3 dari 3</span>
+              <span class="text-xs text-emerald-600 font-bold">Siap Digunakan!</span>
+            </div>
+            <div class="text-center py-2">
+              <div class="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-3 shadow-xs">
+                <span class="material-symbols-outlined text-[36px]">verified</span>
+              </div>
+              <h2 class="font-headline-md text-base font-bold text-on-surface">Dapur Pintar Siap, ${userName}!</h2>
+              <p class="text-xs text-on-surface-variant max-w-xs mx-auto mt-1 leading-relaxed">
+                Kamu bisa langsung memotret isi kulkasmu sekarang atau masuk ke dashboard dapur.
+              </p>
+            </div>
+            <div class="flex flex-col gap-2 mt-2">
+              <button id="btn-finish-scan" type="button" class="w-full h-12 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
+                <span class="material-symbols-outlined text-[18px]">photo_camera</span>
+                <span>Pindai Kulkas Sekarang</span>
+              </button>
+              <button id="btn-finish-dashboard" type="button" class="w-full h-11 rounded-xl bg-surface-container text-on-surface font-bold text-xs flex items-center justify-center active:scale-95 transition">
+                <span>Masuk ke Beranda Dulu</span>
+              </button>
+            </div>
+          </div>
+        `;
+
+        const finishWizard = (goToScan = false) => {
+          const curSettings = StorageService.getSettings();
+          StorageService.saveSettings({
+            ...curSettings,
+            userName,
+            bumbuDasar: selectedBumbu,
+            onboardingDone: true
+          });
+
+          // Isi bumbu dasar ke stok dapur jika dapur kosong
+          const curStok = StorageService.getStok();
+          if (curStok.dapur.length === 0) {
+            const initialBumbuItems = selectedBumbu.map(b => ({
+              nama: b.charAt(0).toUpperCase() + b.slice(1),
+              jumlah: 1,
+              satuan: 'botol',
+              kategori: 'bumbu_dasar',
+              lokasi: 'dapur',
+              catatan: 'Bumbu dasar dapur',
+              status: 'Segar'
+            }));
+            StorageService.addItemsToStok(initialBumbuItems, 'dapur');
+          }
+
+          modal.classList.add('hidden');
+          showToast(`Selamat datang di Dapur Pintar, ${userName}!`, 'success', 3500);
+
+          if (goToScan) {
+            window.location.hash = '#pindai?type=kulkas';
+          } else {
+            this.router.handleRoute();
+          }
+        };
+
+        document.getElementById('btn-finish-scan')?.addEventListener('click', () => finishWizard(true));
+        document.getElementById('btn-finish-dashboard')?.addEventListener('click', () => finishWizard(false));
+      }
+    };
+
+    renderWizard();
   }
 }
 

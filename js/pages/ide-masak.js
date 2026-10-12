@@ -451,17 +451,38 @@ export function renderIdeMasakPage() {
           </div>
         ` : ''}
 
-        <!-- Bottom Modal Action -->
-        <div class="pt-2">
+        <!-- Bottom Modal Action: Cook & Share -->
+        <div class="pt-2 space-y-2">
           <button id="modal-btn-cook" class="w-full h-12 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
             <span class="material-symbols-outlined text-[18px]">skillet</span>
             <span>Sudah Masak Menu Ini 🍳</span>
+          </button>
+
+          <button id="modal-btn-share" type="button" class="w-full h-10 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition">
+            <span class="material-symbols-outlined text-[18px]">share</span>
+            <span>Bagikan Resep (WhatsApp / Salin)</span>
           </button>
         </div>
       </div>
     `;
 
     ModalService.open(modalContent);
+
+    document.getElementById('modal-btn-share')?.addEventListener('click', async () => {
+      const shareText = `🍲 Resep ${recipe.nama} (Dapur Pintar)\n⏱️ Waktu: ${recipe.waktu_masak} | Porsi: ${recipe.porsi}\n\n🥗 Bahan yang Digunakan:\n${recipe.bahan_terpakai.map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('\n')}\n\n👨‍🍳 Langkah Memasak:\n${(recipe.langkah || []).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n\n💡 Tips: ${recipe.tips || 'Sajikan selagi hangat!'}`;
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: `Resep ${recipe.nama}`,
+            text: shareText
+          });
+        } catch (e) {}
+      } else {
+        await navigator.clipboard.writeText(shareText);
+        showToast('Resep berhasil disalin ke clipboard!', 'success');
+      }
+    });
 
     document.getElementById('modal-btn-cook')?.addEventListener('click', () => {
       ModalService.close();

@@ -1,4 +1,20 @@
-// Header component (Tab variant vs Stack variant)
+// Header component with Online/Offline detector
+
+let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    isOnline = true;
+    const badge = document.getElementById('header-offline-badge');
+    if (badge) badge.classList.add('hidden');
+  });
+
+  window.addEventListener('offline', () => {
+    isOnline = false;
+    const badge = document.getElementById('header-offline-badge');
+    if (badge) badge.classList.remove('hidden');
+  });
+}
 
 export function renderHeader({
   type = 'tab', // 'tab' | 'stack'
@@ -11,6 +27,13 @@ export function renderHeader({
   const container = document.getElementById('app-header');
   if (!container) return;
 
+  const offlineBadgeHtml = `
+    <span id="header-offline-badge" class="${isOnline ? 'hidden' : ''} px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-800 text-[10px] font-bold flex items-center gap-1 shadow-xs">
+      <span class="material-symbols-outlined text-[13px]">cloud_off</span>
+      <span>Offline</span>
+    </span>
+  `;
+
   if (type === 'stack') {
     container.innerHTML = `
       <div class="flex items-center justify-between px-4 h-16 max-w-md mx-auto">
@@ -19,7 +42,10 @@ export function renderHeader({
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </a>
           <div>
-            <h1 class="text-base font-bold text-on-surface leading-tight">${title}</h1>
+            <div class="flex items-center gap-2">
+              <h1 class="text-base font-bold text-on-surface leading-tight">${title}</h1>
+              ${offlineBadgeHtml}
+            </div>
             <p class="text-xs text-on-surface-variant">${subtitle}</p>
           </div>
         </div>
@@ -47,15 +73,15 @@ export function renderHeader({
           ${subtitle.replace('Halo, ', '').charAt(0) || 'S'}
         </div>
         <div>
-          <div class="flex items-center gap-1.5">
+          <div class="flex items-center gap-2">
             <span class="text-xs font-semibold text-on-surface-variant">${subtitle}</span>
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            ${offlineBadgeHtml}
           </div>
           <h1 class="text-base font-bold text-on-surface leading-tight">${title}</h1>
         </div>
       </div>
       <div class="flex items-center gap-1">
-        <button id="btn-open-settings" aria-label="Pengaturan" class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition active:scale-95">
+        <button id="btn-open-settings" aria-label="Pengaturan" class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition active:scale-95" title="Pengaturan">
           <span class="material-symbols-outlined text-[22px]">settings</span>
         </button>
       </div>

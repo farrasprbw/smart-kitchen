@@ -1,4 +1,4 @@
-// Bottom sheet & modal manager
+// Bottom sheet & modal manager with Theme, Export/Import, & Manual Entry
 
 export class ModalService {
   static open(htmlContent, { onClose = null } = {}) {
@@ -35,10 +35,12 @@ export class ModalService {
     modalEl.innerHTML = '';
   }
 
-  // Preset: Settings Modal
+  // Preset: Settings Modal with Theme, Export/Import, and Clear Data
   static openSettings(onSave = null) {
     import('../core/storage.js').then(({ StorageService }) => {
       const settings = StorageService.getSettings();
+      const currentTheme = settings.theme || 'auto';
+
       const content = `
         <div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
           <div class="flex items-center gap-2">
@@ -57,21 +59,60 @@ export class ModalService {
               class="w-full h-11 px-3.5 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary">
           </div>
 
+          <!-- Tema Aplikasi (Dark Mode) -->
           <div>
-            <label class="block text-xs font-bold text-on-surface mb-1">Bumbu Dasar Selalu Ada (pisahkan dengan koma)</label>
-            <textarea id="setting-bumbu" rows="3"
-              class="w-full p-3 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-xs focus:outline-none focus:ring-2 focus:ring-primary">${(settings.bumbuDasar || []).join(', ')}</textarea>
-            <p class="text-[11px] text-on-surface-variant mt-1">Sistem mengasumsikan bumbu-bumbu ini selalu tersedia di dapur saat merekomendasikan resep.</p>
+            <label class="block text-xs font-bold text-on-surface mb-1.5">Tema Tampilan</label>
+            <div class="grid grid-cols-3 gap-2">
+              <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-outline-variant text-xs font-semibold cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10 has-[:checked]:text-primary">
+                <input type="radio" name="setting-theme" value="light" class="hidden" ${currentTheme === 'light' ? 'checked' : ''}>
+                <span class="material-symbols-outlined text-[16px]">light_mode</span>
+                <span>Terang</span>
+              </label>
+              <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-outline-variant text-xs font-semibold cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10 has-[:checked]:text-primary">
+                <input type="radio" name="setting-theme" value="dark" class="hidden" ${currentTheme === 'dark' ? 'checked' : ''}>
+                <span class="material-symbols-outlined text-[16px]">dark_mode</span>
+                <span>Gelap</span>
+              </label>
+              <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-outline-variant text-xs font-semibold cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10 has-[:checked]:text-primary">
+                <input type="radio" name="setting-theme" value="auto" class="hidden" ${currentTheme === 'auto' ? 'checked' : ''}>
+                <span class="material-symbols-outlined text-[16px]">devices</span>
+                <span>Sistem</span>
+              </label>
+            </div>
           </div>
 
-          <div class="pt-2">
-            <button type="submit" class="w-full h-11 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition shadow-sm">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Bumbu Dasar Selalu Ada (pisahkan dengan koma)</label>
+            <textarea id="setting-bumbu" rows="2"
+              class="w-full p-3 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-xs focus:outline-none focus:ring-2 focus:ring-primary">${(settings.bumbuDasar || []).join(', ')}</textarea>
+            <p class="text-[11px] text-on-surface-variant mt-1">Bumbu yang diasumsikan selalu tersedia di dapur saat merekomendasikan resep.</p>
+          </div>
+
+          <div class="pt-1">
+            <button type="submit" class="w-full h-11 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-sm">
               <span class="material-symbols-outlined text-[18px]">check</span>
               <span>Simpan Pengaturan</span>
             </button>
           </div>
         </form>
 
+        <!-- Backup & Restore Data (Export / Import) -->
+        <div class="pt-4 border-t border-outline-variant/30 mt-4 space-y-2">
+          <label class="block text-xs font-bold text-on-surface">Cadangkan & Pulihkan Stok (JSON)</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" id="btn-export-data" class="h-10 px-3 rounded-xl bg-surface-container text-on-surface font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition active:scale-95">
+              <span class="material-symbols-outlined text-[18px]">download</span>
+              <span>Unduh Backup</span>
+            </button>
+            <label class="h-10 px-3 rounded-xl bg-surface-container text-on-surface font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition active:scale-95 cursor-pointer">
+              <span class="material-symbols-outlined text-[18px]">upload</span>
+              <span>Pulihkan File</span>
+              <input type="file" id="input-import-data" accept=".json" class="hidden">
+            </label>
+          </div>
+        </div>
+
+        <!-- Danger Zone: Kosongkan Data -->
         <div class="pt-4 border-t border-outline-variant/30 mt-4 space-y-2">
           <label class="block text-xs font-bold text-red-600">Kosongkan Data Inventaris</label>
           <p class="text-[11px] text-on-surface-variant">Hapus semua stok bahan makanan, riwayat masak, dan catatan belanja di perangkat ini untuk memulai dari awal.</p>
@@ -84,28 +125,97 @@ export class ModalService {
 
       ModalService.open(content);
 
+      // Submit Settings Form
       document.getElementById('form-settings')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const userName = document.getElementById('setting-user-name').value.trim() || 'Sari';
         const bumbuStr = document.getElementById('setting-bumbu').value;
         const bumbuDasar = bumbuStr.split(',').map(s => s.trim()).filter(Boolean);
+        const themeRadio = document.querySelector('input[name="setting-theme"]:checked');
+        const theme = themeRadio ? themeRadio.value : 'auto';
+
+        // Apply theme
+        if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
 
         StorageService.saveSettings({
           ...settings,
           userName,
-          bumbuDasar
+          bumbuDasar,
+          theme
         });
 
         ModalService.close();
-        if (onSave) onSave({ ...settings, userName, bumbuDasar });
+        if (onSave) onSave({ ...settings, userName, bumbuDasar, theme });
       });
 
+      // Export JSON
+      document.getElementById('btn-export-data')?.addEventListener('click', () => {
+        const backupData = {
+          stok: StorageService.getStok(),
+          logMasak: StorageService.getLogMasak(),
+          logBelanja: StorageService.getLogBelanja(),
+          settings: StorageService.getSettings(),
+          exportedAt: new Date().toISOString()
+        };
+        const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.setAttribute('href', dataStr);
+        downloadAnchor.setAttribute('download', `dapur_pintar_backup_${new Date().toISOString().slice(0, 10)}.json`);
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+        downloadAnchor.remove();
+      });
+
+      // Import JSON
+      document.getElementById('input-import-data')?.addEventListener('change', (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const imported = JSON.parse(event.target.result);
+            if (imported.stok) StorageService.saveStok(imported.stok);
+            if (imported.logMasak) StorageService.set(CONFIG.STORAGE_KEYS.LOG_MASAK, imported.logMasak);
+            if (imported.logBelanja) StorageService.set(CONFIG.STORAGE_KEYS.LOG_BELANJA, imported.logBelanja);
+            alert('Data berhasil dipulihkan dari file backup!');
+            window.location.reload();
+          } catch (err) {
+            alert('File backup tidak valid: ' + err.message);
+          }
+        };
+        reader.readAsText(file);
+      });
+
+      // Clear all data with custom confirmation modal
       document.getElementById('btn-reset-all-data')?.addEventListener('click', () => {
-        if (confirm('Apakah kamu yakin ingin mengosongkan semua data inventaris kulkas dan dapur?')) {
-          StorageService.clearAllData();
-          ModalService.close();
-          window.location.reload();
-        }
+        ModalService.close();
+        setTimeout(() => {
+          ModalService.open(`
+            <div class="py-5 text-center flex flex-col items-center">
+              <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center">
+                <span class="material-symbols-outlined text-[32px]">warning</span>
+              </div>
+              <h3 class="font-headline-sm text-sm font-bold text-slate-800 mt-3.5">Hapus Semua Data?</h3>
+              <p class="text-xs text-slate-500 mt-1.5 max-w-xs leading-relaxed">
+                Tindakan ini akan mengosongkan seluruh stok kulkas, dapur, dan riwayat harian Anda. Tindakan ini tidak dapat dibatalkan.
+              </p>
+              <div class="flex gap-2 w-full mt-6">
+                <button data-close-modal class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold active:scale-95 transition">Batal</button>
+                <button id="btn-confirm-wipe" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold active:scale-95 transition shadow-sm">Ya, Hapus Semua</button>
+              </div>
+            </div>
+          `);
+
+          document.getElementById('btn-confirm-wipe')?.addEventListener('click', () => {
+            StorageService.clearAllData();
+            ModalService.close();
+            window.location.reload();
+          });
+        }, 150);
       });
     });
   }
@@ -183,7 +293,7 @@ export class ModalService {
         </div>
 
         <div class="pt-2">
-          <button type="submit" class="w-full h-11 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition shadow-sm">
+          <button type="submit" class="w-full h-11 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-sm">
             <span class="material-symbols-outlined text-[18px]">add</span>
             <span>Simpan Bahan</span>
           </button>

@@ -2,6 +2,7 @@
 
 import { CONFIG } from '../config.js';
 import { generateId } from '../utils/uuid.js';
+import { FirebaseService } from '../services/firebase.js';
 
 const INITIAL_STOK = {
   version: 2,
@@ -72,12 +73,33 @@ export class StorageService {
     if (!currentSettings) {
       StorageService.set(CONFIG.STORAGE_KEYS.SETTINGS, INITIAL_SETTINGS);
     }
+
+    // Trigger cloud synchronization in background
+    setTimeout(async () => {
+      try {
+        await FirebaseService.init();
+        const cloudStok = await FirebaseService.fetchStokFromCloud();
+        if (cloudStok && cloudStok.kulkas) {
+          const local = StorageService.getStok();
+          // Jika cloud lebih baru atau lokal masih kosong
+          const cloudTime = new Date(cloudStok.lastUpdated || 0).getTime();
+          const localTime = new Date(local.lastUpdated || 0).getTime();
+          if (cloudTime > localTime || (local.kulkas.length === 0 && local.dapur.length === 0 && cloudStok.kulkas.length > 0)) {
+            StorageService.set(CONFIG.STORAGE_KEYS.STOK, cloudStok);
+            console.log('Stok disinkronkan dari Cloud Firestore');
+          }
+        }
+      } catch (e) {
+        console.warn('Latar belakang sync Firebase:', e);
+      }
+    }, 1000);
   }
 
   static clearAllData() {
     StorageService.set(CONFIG.STORAGE_KEYS.STOK, INITIAL_STOK);
     StorageService.set(CONFIG.STORAGE_KEYS.LOG_MASAK, INITIAL_LOG_MASAK);
     StorageService.set(CONFIG.STORAGE_KEYS.LOG_BELANJA, INITIAL_LOG_BELANJA);
+    FirebaseService.syncStokToCloud(INITIAL_STOK);
   }
 
   // Stok CRUD
@@ -87,7 +109,10 @@ export class StorageService {
 
   static saveStok(stokData) {
     stokData.lastUpdated = new Date().toISOString();
-    return StorageService.set(CONFIG.STORAGE_KEYS.STOK, stokData);
+    const result = StorageService.set(CONFIG.STORAGE_KEYS.STOK, stokData);
+    // Background sync to Cloud Firestore
+    FirebaseService.syncStokToCloud(stokData);
+    return result;
   }
 
   static addItemsToStok(items, targetLocation = 'kulkas') {
@@ -190,6 +215,7 @@ export class StorageService {
       ...entry
     });
     StorageService.set(CONFIG.STORAGE_KEYS.LOG_MASAK, log);
+    FirebaseService.syncLogMasakToCloud(log);
     return log;
   }
 
@@ -206,6 +232,7 @@ export class StorageService {
       ...entry
     });
     StorageService.set(CONFIG.STORAGE_KEYS.LOG_BELANJA, log);
+    FirebaseService.syncLogBelanjaToCloud(log);
     return log;
   }
 
