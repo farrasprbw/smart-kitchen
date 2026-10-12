@@ -18,9 +18,26 @@
 ## 🛠️ Tech Stack
 
 - **Frontend**: HTML5, Vanilla JavaScript (ES Modules), Tailwind CSS (CDN), Material Symbols Outlined, Plus Jakarta Sans.
-- **AI Engine**: Google Gemini 2.0 Flash (Vision & Text Generation).
+- **AI Engine**: Google Gemini Flash (`gemini-flash-lite-latest`, `gemini-3-flash-preview`) dengan failover fallback otomatis.
+- **Dukungan Multi-AI Paralel**: Dapat diintegrasikan paralel dengan Grok (xAI Vision) atau Groq (Llama 3.2 Vision).
 - **Storage**: Browser `localStorage` (Privasi terjaga, data tersimpan di perangkat pengguna).
 - **Backend / Deployment**: Vercel Serverless Function (`/api/config`).
+
+---
+
+## 🤖 Model AI & Informasi Biaya (Gemini vs Grok vs Groq)
+
+| Provider | Model | Status Biaya | Kegunaan |
+|---|---|---|---|
+| **Google Gemini Flash** | `gemini-flash-lite-latest`, `gemini-3-flash-preview` | **Gratis** (1.500 request/hari) | Vision deteksi kulkas & rekomendasi resep |
+| **Grok (xAI)** | `grok-2-vision` | **Berbayar** (Pay-as-you-go setelah free credits) | Opsi paralel / cross-validation sekunder |
+| **Groq** | `llama-3.2-11b-vision-preview` | **Gratis** (Free tier dengan rate limit) | Opsi cadangan gratis multi-provider |
+
+### Pemrosesan Gambar Paralel:
+Aplikasi dapat menjalankan deteksi foto secara paralel antara Gemini dan provider sekunder (Grok/Groq):
+1. **Ensemble (Validasi Silang)**: Kedua AI menganalisis gambar bersamaan. Jika keduanya mendeteksi bahan yang sama, confidence level menjadi sangat tinggi (`yakin: true`).
+2. **Race Latency**: Menggunakan `Promise.any` untuk mengambil respons dari AI yang tercepat.
+3. **Failover Otomatis**: Jika satu provider limit/gangguan, otomatis dialihkan ke provider lain.
 
 ---
 
