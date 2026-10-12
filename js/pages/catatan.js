@@ -154,7 +154,7 @@ export function renderCatatanPage() {
             </div>
           </div>
           <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${item.metode === 'foto' ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-100 text-slate-700'}">
-            ${item.metode === 'foto' ? '📸 Pindai AI' : 'Manual'}
+            ${item.metode === 'foto' ? '📸 Pindai Foto' : 'Manual'}
           </span>
         </div>
 

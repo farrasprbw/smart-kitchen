@@ -19,7 +19,7 @@ export function renderKonfirmasiPage() {
     { id: 'c-2', nama: 'Sawi Hijau', jumlah: 1, satuan: 'ikat', kategori: 'sayur', lokasi: 'kulkas', confidence: 85, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: 'Mulai layu di ujung daun' },
     { id: 'c-3', nama: 'Tomat Merah', jumlah: 4, satuan: 'buah', kategori: 'sayur', lokasi: 'kulkas', confidence: 92, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: '' },
     { id: 'c-4', nama: 'Susu UHT Segar', jumlah: 1, satuan: 'liter', kategori: 'minuman', lokasi: 'pintu_kulkas', confidence: 60, yakin: false, status: 'Perlu Cek', statusClass: 'bg-amber-100 text-amber-800', catatan: 'Sisa sekitar separuh botol' },
-    { id: 'c-5', nama: 'Kecap Asin / Manis', jumlah: 1, satuan: 'botol', kategori: 'bumbu_dasar', lokasi: 'pintu_kulkas', confidence: 50, yakin: false, status: 'AI Ragu', statusClass: 'bg-rose-100 text-rose-800', catatan: 'Label botol agak terhalang' },
+    { id: 'c-5', nama: 'Kecap Asin / Manis', jumlah: 1, satuan: 'botol', kategori: 'bumbu_dasar', lokasi: 'pintu_kulkas', confidence: 50, yakin: false, status: 'Kurang Jelas', statusClass: 'bg-rose-100 text-rose-800', catatan: 'Label botol agak terhalang' },
     { id: 'c-6', nama: 'Tahu Putih Sutra', jumlah: 1, satuan: 'bungkus', kategori: 'protein', lokasi: 'kulkas', confidence: 94, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: '' },
     { id: 'c-7', nama: 'Daun Bawang', jumlah: 2, satuan: 'batang', kategori: 'sayur', lokasi: 'laci_sayur', confidence: 75, yakin: false, status: 'Perlu Cek', statusClass: 'bg-amber-100 text-amber-800', catatan: 'Sebagian ujung agak kering' },
     { id: 'c-8', nama: 'Wortel Impor', jumlah: 3, satuan: 'buah', kategori: 'sayur', lokasi: 'laci_sayur', confidence: 95, yakin: true, status: 'Yakin', statusClass: 'bg-emerald-100 text-emerald-800', catatan: '' },
@@ -33,7 +33,7 @@ export function renderKonfirmasiPage() {
     let status = 'Yakin';
     let statusClass = 'bg-emerald-100 text-emerald-800';
     if (conf < 70) {
-      status = 'AI Ragu';
+      status = 'Kurang Jelas';
       statusClass = 'bg-rose-100 text-rose-800';
     } else if (conf < 88 || !item.yakin) {
       status = 'Perlu Cek';
@@ -74,12 +74,12 @@ export function renderKonfirmasiPage() {
   function renderContent() {
     const photos = detectionData?.photos || [];
     const filteredItems = confirmedItems.filter(item => {
-      if (activeFilter === 'perlu-cek') return item.status === 'Perlu Cek' || item.status === 'AI Ragu';
+      if (activeFilter === 'perlu-cek') return item.status === 'Perlu Cek' || item.status === 'Kurang Jelas';
       if (activeFilter === 'yakin') return item.status === 'Yakin';
       return true;
     });
 
-    const countPerluCek = confirmedItems.filter(i => i.status === 'Perlu Cek' || i.status === 'AI Ragu').length;
+    const countPerluCek = confirmedItems.filter(i => i.status === 'Perlu Cek' || i.status === 'Kurang Jelas').length;
     const countYakin = confirmedItems.filter(i => i.status === 'Yakin').length;
 
     mainEl.innerHTML = `
@@ -95,10 +95,10 @@ export function renderKonfirmasiPage() {
               <div class="flex-1 min-w-0">
                 <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100/80 text-emerald-800 text-[10px] font-bold mb-1">
                   <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                  Pindai Cerdas Gemini 2.0 Flash
+                  Hasil Pemindaian Otomatis
                 </div>
                 <h2 class="text-base font-bold text-slate-900 leading-snug">
-                  AI mendeteksi ${confirmedItems.length} bahan makanan
+                  Terdeteksi ${confirmedItems.length} bahan makanan
                 </h2>
                 <p class="text-xs text-slate-600 mt-1 leading-relaxed">
                   Periksa nama, perkiraan jumlah, dan lokasi simpan sebelum dimasukkan ke stok.

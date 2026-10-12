@@ -27,7 +27,7 @@ export class GeminiService {
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-      throw new Error(`Gagal mem-parse response AI sebagai JSON: ${err.message}`);
+      throw new Error(`Gagal memproses hasil analisis data: ${err.message}`);
     }
   }
 
@@ -81,7 +81,7 @@ export class GeminiService {
       }
     }
 
-    throw lastError || new Error('Gagal menghubungi Gemini AI.');
+    throw lastError || new Error('Gagal memproses analisis gambar.');
   }
 
   /**

@@ -25,7 +25,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
   renderHeader({
     type: 'tab',
     title: pageTitle,
-    subtitle: 'Kamera Pintar AI'
+    subtitle: 'Pemindai Otomatis'
   });
 
   const slots = scanType === 'belanja'
@@ -67,13 +67,13 @@ export function renderPindaiPage(params = new URLSearchParams()) {
           </div>
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
-              <span class="font-bold text-xs text-on-surface">Panduan Multi-Sudut AI</span>
+              <span class="font-bold text-xs text-on-surface">Panduan Pemindaian Multi-Sudut</span>
               <span class="text-[10px] px-2 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed font-bold">Langkah Cepat</span>
             </div>
             <p class="text-xs text-on-surface-variant mt-0.5 leading-relaxed">
               ${scanType === 'belanja'
-                ? 'Foto bahan belanjaan dan struk agar AI dapat mendata item secara otomatis.'
-                : 'Ambil 3-4 foto bertahap agar AI melihat semua bahan tanpa terhalang kemasan lain.'}
+                ? 'Foto bahan belanjaan dan struk agar sistem dapat mendata item secara otomatis.'
+                : 'Ambil 3-4 foto bertahap agar semua bahan terlihat jelas tanpa terhalang kemasan lain.'}
             </p>
           </div>
         </div>
@@ -191,8 +191,8 @@ export function renderPindaiPage(params = new URLSearchParams()) {
         </div>
 
         <button id="btn-analyze-ai" type="button" class="w-full h-12 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-98 transition disabled:opacity-50 disabled:pointer-events-none" ${photos.filter(p => Boolean(p.dataUrl)).length === 0 ? 'disabled' : ''}>
-          <span class="material-symbols-outlined text-[20px]">psychology</span>
-          <span>Analisis Bahan dengan Gemini AI</span>
+          <span class="material-symbols-outlined text-[20px]">document_scanner</span>
+          <span>Analisis Bahan Makanan</span>
         </button>
 
         <p class="text-[11px] text-slate-500 text-center">
@@ -371,11 +371,11 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
     ModalService.open(`
       <div class="py-8 flex flex-col items-center text-center">
         <div class="w-16 h-16 rounded-3xl bg-primary text-on-primary flex items-center justify-center animate-bounce shadow-lg">
-          <span class="material-symbols-outlined text-[36px]">psychology</span>
+          <span class="material-symbols-outlined text-[36px]">document_scanner</span>
         </div>
-        <h3 class="font-headline-sm text-headline-sm text-on-surface mt-4">Menganalisis dengan Gemini 2.0 Flash...</h3>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface mt-4">Menganalisis Bahan Makanan...</h3>
         <p class="text-xs text-on-surface-variant max-w-xs mt-1.5 leading-relaxed">
-          AI sedang memindai ${validPhotos.length} foto kulkasmu untuk mengenali jenis bahan, perkiraan jumlah, dan kesegaran.
+          Sedang memindai ${validPhotos.length} foto ${scanType === 'belanja' ? 'belanjaan' : 'kulkas'} untuk mengenali jenis bahan, perkiraan kuantitas, dan kondisi kesegaran.
         </p>
         <div class="w-full max-w-xs bg-surface-container rounded-full h-2 mt-6 overflow-hidden">
           <div class="bg-primary h-full rounded-full animate-pulse w-3/4"></div>

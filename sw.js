@@ -1,6 +1,6 @@
 // Dapur Pintar Service Worker
 
-const CACHE_NAME = 'dapur-pintar-v3';
+const CACHE_NAME = 'dapur-pintar-v4';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

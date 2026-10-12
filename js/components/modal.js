@@ -71,7 +71,7 @@ export class ModalService {
             <label class="block text-xs font-bold text-on-surface mb-1">Bumbu Dasar Selalu Ada (pisahkan dengan koma)</label>
             <textarea id="setting-bumbu" rows="3"
               class="w-full p-3 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-xs focus:outline-none focus:ring-2 focus:ring-primary">${(settings.bumbuDasar || []).join(', ')}</textarea>
-            <p class="text-[11px] text-on-surface-variant mt-1">AI mengasumsikan bumbu-bumbu ini selalu ada di dapur saat merekomendasikan resep.</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Sistem mengasumsikan bumbu-bumbu ini selalu tersedia di dapur saat merekomendasikan resep.</p>
           </div>
 
           <div class="pt-2">

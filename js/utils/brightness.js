@@ -68,6 +68,6 @@ export function getBrightnessStatus(score) {
     label: 'Cahaya Optimal',
     pillClass: 'bg-primary-fixed text-on-primary-fixed',
     icon: 'brightness_5',
-    advice: 'Pencahayaan sangat baik untuk pemindaian AI.'
+    advice: 'Pencahayaan sangat baik untuk hasil pemindaian optimal.'
   };
 }

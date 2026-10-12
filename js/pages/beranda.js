@@ -82,7 +82,7 @@ export function renderBerandaPage() {
                   <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition">
                     <span class="material-symbols-outlined text-[20px]">photo_camera</span>
                   </div>
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100">AI</span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100">Auto</span>
                 </div>
                 <div>
                   <h3 class="text-xs font-bold leading-tight">Foto Kulkas</h3>

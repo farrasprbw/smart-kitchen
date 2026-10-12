@@ -163,7 +163,7 @@ export function renderIdeMasakPage() {
           </div>
           <button id="btn-request-ai-recipe" class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-800 active:scale-95 transition">
             <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
-            <span>Ide Baru AI</span>
+            <span>Ide Menu Baru</span>
           </button>
         </div>
 
@@ -336,11 +336,11 @@ export function renderIdeMasakPage() {
       ModalService.open(`
         <div class="py-8 flex flex-col items-center text-center">
           <div class="w-16 h-16 rounded-3xl bg-primary text-on-primary flex items-center justify-center animate-bounce shadow-lg">
-            <span class="material-symbols-outlined text-[36px]">psychology</span>
+            <span class="material-symbols-outlined text-[36px]">restaurant_menu</span>
           </div>
-          <h3 class="font-headline-sm text-headline-sm text-on-surface mt-4">Chef AI Meracik Resep Baru...</h3>
+          <h3 class="font-headline-sm text-headline-sm text-on-surface mt-4">Meracik Rekomendasi Menu...</h3>
           <p class="text-xs text-on-surface-variant max-w-xs mt-1.5 leading-relaxed">
-            Menghubungkan stok ${totalBahan} bahan makanan dan bumbu dasarmu ke Gemini 2.0 Flash untuk menciptakan 3 menu praktis lezat.
+            Menyesuaikan stok ${totalBahan} bahan makanan dan bumbu dasarmu untuk menciptakan 3 rekomendasi menu praktis lezat.
           </p>
         </div>
       `);
@@ -372,7 +372,7 @@ export function renderIdeMasakPage() {
             tips: r.tips || 'Sajikan selagi hangat.'
           }));
           activeSelectedRecipe = currentRecipes[0];
-          showToast('Resep AI baru berhasil didapatkan!', 'success');
+          showToast('Rekomendasi menu baru berhasil didapatkan!', 'success');
           renderContent();
         } else {
           showToast('Tidak ada menu baru yang cocok. Menampilkan menu andalan.', 'info');
