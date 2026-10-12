@@ -58,16 +58,6 @@ export class ModalService {
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-on-surface mb-1">
-              API Key Gemini
-              <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" class="text-primary font-normal text-xs ml-1 hover:underline">(Dapatkan gratis →)</a>
-            </label>
-            <input type="password" id="setting-api-key" value="${settings.apiKey || ''}" placeholder="AIzaSy..."
-              class="w-full h-11 px-3.5 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary">
-            <p class="text-[11px] text-on-surface-variant mt-1">Disimpan aman di localStorage browser perangkat kamu.</p>
-          </div>
-
-          <div>
             <label class="block text-xs font-bold text-on-surface mb-1">Bumbu Dasar Selalu Ada (pisahkan dengan koma)</label>
             <textarea id="setting-bumbu" rows="3"
               class="w-full p-3 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-xs focus:outline-none focus:ring-2 focus:ring-primary">${(settings.bumbuDasar || []).join(', ')}</textarea>
@@ -97,19 +87,17 @@ export class ModalService {
       document.getElementById('form-settings')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const userName = document.getElementById('setting-user-name').value.trim() || 'Sari';
-        const apiKey = document.getElementById('setting-api-key').value.trim();
         const bumbuStr = document.getElementById('setting-bumbu').value;
         const bumbuDasar = bumbuStr.split(',').map(s => s.trim()).filter(Boolean);
 
         StorageService.saveSettings({
           ...settings,
           userName,
-          apiKey,
           bumbuDasar
         });
 
         ModalService.close();
-        if (onSave) onSave({ userName, apiKey, bumbuDasar });
+        if (onSave) onSave({ ...settings, userName, bumbuDasar });
       });
 
       document.getElementById('btn-reset-all-data')?.addEventListener('click', () => {
