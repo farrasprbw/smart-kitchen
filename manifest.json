@@ -1,0 +1,22 @@
+{
+  "name": "Dapur Pintar — Smart Kitchen Assistant",
+  "short_name": "Dapur Pintar",
+  "description": "Asisten dapur cerdas berbasis AI untuk mengelola stok kulkas dan rekomendasi masakan",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f9f9ff",
+  "theme_color": "#00652c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://api.iconify.design/material-symbols:kitchen.svg?color=%2300652c",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://api.iconify.design/material-symbols:kitchen.svg?color=%2300652c",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# Sensitive / Docs to exclude
+implementation_plan.md
+.env
+.env.local
+.env.*.local
+
+# Vercel & build artifacts
+.vercel/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
