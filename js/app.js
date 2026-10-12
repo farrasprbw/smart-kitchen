@@ -82,21 +82,14 @@ class App {
 
     const btnStart = document.getElementById('btn-start-app');
     const inputName = document.getElementById('input-name');
-    const inputApiKey = document.getElementById('input-api-key');
-
-    if (CONFIG.DEFAULT_API_KEY && inputApiKey) {
-      inputApiKey.placeholder = 'Terhubung otomatis via Vercel Env (Opsional)';
-    }
 
     btnStart?.addEventListener('click', () => {
       const name = inputName?.value.trim() || 'Sari';
-      const key = inputApiKey?.value.trim();
 
       const curSettings = StorageService.getSettings();
       StorageService.saveSettings({
         ...curSettings,
         userName: name,
-        apiKey: key || curSettings.apiKey,
         onboardingDone: true
       });
 

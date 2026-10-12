@@ -5,7 +5,12 @@
 export const CONFIG = {
   GEMINI_API_KEY: '',
   DEFAULT_API_KEY: '',
-  GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+  GEMINI_MODELS: [
+    'gemini-flash-lite-latest',
+    'gemini-3-flash-preview',
+    'gemini-3.8-flash'
+  ],
+  GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent',
 
   STORAGE_KEYS: {
     STOK: 'dapur_pintar_stok',

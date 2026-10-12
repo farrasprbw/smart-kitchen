@@ -32,16 +32,64 @@ export class GeminiService {
   }
 
   /**
+   * Execute API call with automatic model fallback
+   */
+  static async executeApiCall(payload) {
+    const apiKey = GeminiService.getApiKey();
+    if (!apiKey) {
+      throw new Error('API Key Gemini belum disetel. Pastikan GEMINI_API_KEY terpasang di Vercel Environment Variables atau di Pengaturan.');
+    }
+
+    const models = CONFIG.GEMINI_MODELS?.length ? CONFIG.GEMINI_MODELS : ['gemini-flash-lite-latest', 'gemini-3-flash-preview', 'gemini-3.8-flash'];
+    let lastError = null;
+
+    for (const model of models) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          const candidate = result.candidates?.[0];
+          if (!candidate?.content?.parts?.[0]?.text) {
+            throw new Error('Format respon Gemini kosong.');
+          }
+          return GeminiService.parseJsonResponse(candidate.content.parts[0].text);
+        }
+
+        const errData = await response.json().catch(() => ({}));
+        const msg = errData?.error?.message || `Status HTTP: ${response.status}`;
+
+        if (response.status === 400 && msg.includes('API_KEY_INVALID')) {
+          throw new Error('API Key Gemini tidak valid. Silakan periksa kembali di Pengaturan atau Vercel Env.');
+        }
+        if (response.status === 429) {
+          throw new Error('Limit kuota Gemini tercapai (Rate limit). Tunggu sebentar lalu coba lagi.');
+        }
+
+        // Simpan error dan coba model alternatif berikutnya
+        lastError = new Error(`Model ${model}: ${msg}`);
+      } catch (err) {
+        if (err.message.includes('API Key') || err.message.includes('Limit kuota')) {
+          throw err;
+        }
+        lastError = err;
+      }
+    }
+
+    throw lastError || new Error('Gagal menghubungi Gemini AI.');
+  }
+
+  /**
    * Analyze one or multiple images with a prompt
    * @param {Array<{ mimeType: string, base64: string }>} images
    * @param {string} prompt
    */
   static async analyzeImages(images, prompt) {
-    const apiKey = GeminiService.getApiKey();
-    if (!apiKey) {
-      throw new Error('API Key Gemini belum disetel. Buka Pengaturan untuk memasukkan API Key.');
-    }
-
     const parts = [{ text: prompt }];
 
     for (const img of images) {
@@ -65,32 +113,7 @@ export class GeminiService {
       }
     };
 
-    const url = `${CONFIG.GEMINI_API_URL}?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      const msg = errData?.error?.message || `Status HTTP: ${response.status}`;
-      if (response.status === 400 && msg.includes('API_KEY_INVALID')) {
-        throw new Error('API Key Gemini tidak valid. Silakan periksa kembali di Pengaturan.');
-      }
-      if (response.status === 429) {
-        throw new Error('Limit kuota Gemini habis (Rate limit). Tunggu 1 menit lalu coba lagi.');
-      }
-      throw new Error(`Gagal menghubungi Gemini: ${msg}`);
-    }
-
-    const result = await response.json();
-    const candidate = result.candidates?.[0];
-    if (!candidate?.content?.parts?.[0]?.text) {
-      throw new Error('Format respon Gemini tidak sesuai atau kosong.');
-    }
-
-    return GeminiService.parseJsonResponse(candidate.content.parts[0].text);
+    return GeminiService.executeApiCall(payload);
   }
 
   /**
@@ -98,11 +121,6 @@ export class GeminiService {
    * @param {string} prompt
    */
   static async generateRecipes(prompt) {
-    const apiKey = GeminiService.getApiKey();
-    if (!apiKey) {
-      throw new Error('API Key Gemini belum disetel.');
-    }
-
     const payload = {
       contents: [{
         parts: [{ text: prompt }]
@@ -115,25 +133,6 @@ export class GeminiService {
       }
     };
 
-    const url = `${CONFIG.GEMINI_API_URL}?key=${apiKey}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    if (!response.ok) {
-      const errData = await response.json().catch(() => ({}));
-      const msg = errData?.error?.message || `Status HTTP: ${response.status}`;
-      throw new Error(`Gagal rekomendasi resep: ${msg}`);
-    }
-
-    const result = await response.json();
-    const candidate = result.candidates?.[0];
-    if (!candidate?.content?.parts?.[0]?.text) {
-      throw new Error('Respon resep kosong.');
-    }
-
-    return GeminiService.parseJsonResponse(candidate.content.parts[0].text);
+    return GeminiService.executeApiCall(payload);
   }
 }
