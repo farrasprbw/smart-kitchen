@@ -1,19 +1,40 @@
-// Header component with Online/Offline detector
+// Header component with Active Online/Offline verification
 
 let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
-if (typeof window !== 'undefined') {
-  window.addEventListener('online', () => {
-    isOnline = true;
-    const badge = document.getElementById('header-offline-badge');
-    if (badge) badge.classList.add('hidden');
-  });
+async function verifyConnectivity() {
+  if (typeof window === 'undefined') return;
+  // Jika browser melaporkan online, percaya online
+  if (navigator.onLine) {
+    updateOnlineState(true);
+    return;
+  }
+  // Jika browser melaporkan offline, verifikasi dengan fetch ringan sebelum menampilkan offline
+  try {
+    const res = await fetch('/favicon.ico', { method: 'HEAD', cache: 'no-store' });
+    updateOnlineState(res.ok || res.status < 500);
+  } catch (e) {
+    updateOnlineState(false);
+  }
+}
 
-  window.addEventListener('offline', () => {
-    isOnline = false;
-    const badge = document.getElementById('header-offline-badge');
-    if (badge) badge.classList.remove('hidden');
-  });
+function updateOnlineState(online) {
+  isOnline = online;
+  const badge = document.getElementById('header-offline-badge');
+  if (badge) {
+    if (isOnline) {
+      badge.classList.add('hidden');
+    } else {
+      badge.classList.remove('hidden');
+    }
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => updateOnlineState(true));
+  window.addEventListener('offline', () => verifyConnectivity());
+  // Verifikasi saat startup
+  setTimeout(verifyConnectivity, 1000);
 }
 
 export function renderHeader({

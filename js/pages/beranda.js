@@ -10,6 +10,19 @@ let lastDeletedItem = null;
 let undoTimeout = null;
 let isSyncListenerAttached = false;
 
+const TIPS_DAPUR = [
+  'Bungkus pangkal daun bawang dengan tisu basah sebelum disimpan di kulkas agar tetap renyah hingga 2 minggu!',
+  'Jangan mencuci telur sebelum dimasukkan ke kulkas agar lapisan pelindung alami (kutikula) tidak hilang.',
+  'Simpan tomat dan pisang di suhu ruangan, bukan di dalam kulkas, agar rasa manis alami dan teksturnya tetap prima.',
+  'Simpan jamur dalam kantong kertas cokelat, hindari plastik tertutup rapat agar jamur tidak cepat basah dan berlendir.',
+  'Alasi laci sayur dengan selembar tisu dapur tebal untuk menyerap kelembapan berlebih dan mencegah sayur cepat busuk.',
+  'Bekukan sisa roti tawar di freezer jika tidak habis dalam 3 hari. Saat ingin dimakan, cukup panggang langsung dari beku!',
+  'Pisahkan tempat penyimpanan kentang dan bawang bombay, karena gas yang dikeluarkan bawang mempercepat kentang bertunas.',
+  'Letakkan daging mentah dan unggas di rak kulkas paling bawah dalam wadah tertutup agar airnya tidak menetes ke makanan lain.',
+  'Bungkus keju dengan kertas baking/parchment paper lalu masukkan kantong zip longgar agar keju tetap bernapas tanpa mengering.',
+  'Simpan potongan wortel dan seledri dalam toples berisi air dingin di kulkas agar tetap renyah hingga berminggu-minggu!'
+];
+
 function ensureSyncListener() {
   if (isSyncListenerAttached) return;
   isSyncListenerAttached = true;
@@ -144,15 +157,37 @@ export function renderBerandaPage() {
                   <span class="text-xs font-medium text-slate-500">Tersimpan</span>
                 </div>
               </div>
-              <div class="inline-flex items-center gap-1.5 rounded-full ${kritisItems.length > 0 ? 'bg-amber-500 text-white animate-pulse' : 'bg-emerald-600 text-white'} px-3 py-1 shadow-sm text-xs font-bold">
-                <span class="material-symbols-outlined text-[15px]">${kritisItems.length > 0 ? 'warning' : 'check_circle'}</span>
-                <span>${kritisItems.length > 0 ? `${kritisItems.length} Segera Olah` : 'Semua Segar'}</span>
+              <div class="inline-flex items-center gap-1.5 rounded-full ${
+                totalBahan === 0
+                  ? 'bg-slate-200 text-slate-700'
+                  : kritisItems.length > 0
+                  ? 'bg-amber-500 text-white animate-pulse'
+                  : 'bg-emerald-600 text-white'
+              } px-3 py-1 shadow-sm text-xs font-bold">
+                <span class="material-symbols-outlined text-[15px]">${
+                  totalBahan === 0
+                    ? 'inventory_2'
+                    : kritisItems.length > 0
+                    ? 'warning'
+                    : 'check_circle'
+                }</span>
+                <span>${
+                  totalBahan === 0
+                    ? 'Kulkas Kosong'
+                    : kritisItems.length > 0
+                    ? `${kritisItems.length} Segera Olah`
+                    : 'Semua Segar'
+                }</span>
               </div>
             </div>
             <div class="mt-3.5 pt-3 border-t border-emerald-100/80 flex items-center justify-between text-xs text-slate-600">
               <div class="flex items-center gap-2">
-                <span class="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></span>
-                <span class="font-medium">Penyimpanan optimal • ${Math.max(10, Math.round(((totalBahan - kritisItems.length) / (totalBahan || 1)) * 100))}% siap saji</span>
+                <span class="h-2 w-2 rounded-full ${totalBahan === 0 ? 'bg-slate-400' : 'bg-emerald-500 ring-4 ring-emerald-100'}"></span>
+                <span class="font-medium">${
+                  totalBahan === 0
+                    ? 'Penyimpanan optimal • Belum ada data'
+                    : `Penyimpanan optimal • ${Math.round(((totalBahan - kritisItems.length) / totalBahan) * 100)}% siap saji`
+                }</span>
               </div>
               <div class="flex items-center gap-1.5">
                 <span class="text-[11px] text-slate-400">Update ${new Date(stokData.lastUpdated || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
@@ -300,15 +335,24 @@ export function renderBerandaPage() {
           }
         </section>
 
-        <!-- Tips Dapur Pintar -->
+        <!-- Tips Dapur Pintar Dinamis -->
         <section>
-          <div class="rounded-2xl bg-amber-50/80 border border-amber-200/60 p-4 flex items-start gap-3">
-            <span class="material-symbols-outlined text-amber-600 text-[22px] flex-shrink-0 mt-0.5">tips_and_updates</span>
-            <div>
-              <h3 class="text-xs font-bold text-amber-900">Tips Cerdas Dapur</h3>
-              <p class="text-xs text-amber-800/90 mt-0.5 leading-relaxed">
-                Bungkus pangkal daun bawang dengan tisu basah sebelum disimpan di kulkas agar tetap renyah hingga 2 minggu!
-              </p>
+          <div class="rounded-2xl bg-amber-50/80 border border-amber-200/60 p-4 flex items-start justify-between gap-3 shadow-xs">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-amber-600 text-[22px] flex-shrink-0 mt-0.5">tips_and_updates</span>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h3 class="text-xs font-bold text-amber-900">Tips Cerdas Dapur</h3>
+                  <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-200/60 text-amber-800">Tips Harian</span>
+                </div>
+                <p id="tip-text-content" class="text-xs text-amber-800/90 mt-1 leading-relaxed">
+                  ${TIPS_DAPUR[Math.floor(Math.random() * TIPS_DAPUR.length)]}
+                </p>
+                <button id="btn-next-tip" type="button" class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 hover:text-amber-950 mt-2 active:scale-95 transition">
+                  <span class="material-symbols-outlined text-[13px]">refresh</span>
+                  <span>Tips Lainnya</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -322,20 +366,28 @@ export function renderBerandaPage() {
   function renderItemsList(items) {
     if (!items || items.length === 0) {
       return `
-        <div class="p-8 text-center bg-white rounded-3xl border border-dashed border-slate-200 text-slate-500 shadow-xs">
+        <div class="p-6 sm:p-8 text-center bg-white rounded-3xl border border-dashed border-slate-200 text-slate-500 shadow-xs">
           <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto mb-3">
             <span class="material-symbols-outlined text-[36px]">inventory_2</span>
           </div>
           <h3 class="text-sm font-bold text-slate-800">Tidak ada bahan ditemukan</h3>
           <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
-            ${searchQuery ? `Tidak ada bahan yang cocok dengan kata kunci "${searchQuery}".` : 'Mulai tambahkan bahan kulkas atau dapur Anda.'}
+            ${searchQuery ? `Tidak ada bahan yang cocok dengan kata kunci "${searchQuery}".` : 'Mulai tambahkan bahan kulkas atau belanjaan Anda dengan 3 cara mudah:'}
           </p>
-          <div class="flex items-center justify-center gap-2 mt-4">
-            <a href="#pindai?type=kulkas" class="px-3 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-sm inline-flex items-center gap-1 active:scale-95 transition">
-              <span class="material-symbols-outlined text-[16px]">photo_camera</span> Pindai Kulkas
+
+          <!-- 3 Tombol Aksi Lengkap -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4 max-w-md mx-auto">
+            <a href="#pindai?type=kulkas" class="px-3 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition hover:bg-primary/90">
+              <span class="material-symbols-outlined text-[18px]">kitchen</span>
+              <span>Pindai Kulkas</span>
             </a>
-            <button id="btn-empty-add" class="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold inline-flex items-center gap-1 active:scale-95 transition">
-              <span class="material-symbols-outlined text-[16px]">add</span> Input Manual
+            <a href="#pindai?type=belanja" class="px-3 py-2.5 rounded-xl bg-amber-600 text-white text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition hover:bg-amber-700">
+              <span class="material-symbols-outlined text-[18px]">receipt_long</span>
+              <span>Pindai Belanjaan</span>
+            </a>
+            <button id="btn-empty-add" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition">
+              <span class="material-symbols-outlined text-[18px]">edit_note</span>
+              <span>Input Manual</span>
             </button>
           </div>
         </div>
@@ -532,6 +584,15 @@ export function renderBerandaPage() {
       } catch (err) {
         if (icon) icon.classList.remove('animate-spin');
         showToast('Sinkronisasi Cloud gagal.', 'error');
+      }
+    });
+
+    // Ganti Tips Acak
+    document.getElementById('btn-next-tip')?.addEventListener('click', () => {
+      const p = document.getElementById('tip-text-content');
+      if (p) {
+        const next = TIPS_DAPUR[Math.floor(Math.random() * TIPS_DAPUR.length)];
+        p.textContent = next;
       }
     });
 

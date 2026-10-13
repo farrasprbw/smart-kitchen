@@ -39,7 +39,6 @@ export class ModalService {
   static openSettings(onSave = null) {
     import('../core/storage.js').then(({ StorageService }) => {
       const settings = StorageService.getSettings();
-      const currentTheme = settings.theme || 'auto';
 
       const content = `
         <div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
@@ -71,27 +70,7 @@ export class ModalService {
               class="w-full h-11 px-3.5 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary">
           </div>
 
-          <!-- Tema Aplikasi (Dark Mode) -->
-          <div>
-            <label class="block text-xs font-bold text-on-surface mb-1.5">Tema Tampilan</label>
-            <div class="grid grid-cols-3 gap-2">
-              <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-outline-variant text-xs font-semibold cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10 has-[:checked]:text-primary">
-                <input type="radio" name="setting-theme" value="light" class="hidden" ${currentTheme === 'light' ? 'checked' : ''}>
-                <span class="material-symbols-outlined text-[16px]">light_mode</span>
-                <span>Terang</span>
-              </label>
-              <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-outline-variant text-xs font-semibold cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10 has-[:checked]:text-primary">
-                <input type="radio" name="setting-theme" value="dark" class="hidden" ${currentTheme === 'dark' ? 'checked' : ''}>
-                <span class="material-symbols-outlined text-[16px]">dark_mode</span>
-                <span>Gelap</span>
-              </label>
-              <label class="flex items-center justify-center gap-1.5 p-2 rounded-xl border border-outline-variant text-xs font-semibold cursor-pointer has-[:checked]:border-primary has-[:checked]:bg-primary-container/10 has-[:checked]:text-primary">
-                <input type="radio" name="setting-theme" value="auto" class="hidden" ${currentTheme === 'auto' ? 'checked' : ''}>
-                <span class="material-symbols-outlined text-[16px]">devices</span>
-                <span>Sistem</span>
-              </label>
-            </div>
-          </div>
+
 
           <div>
             <label class="block text-xs font-bold text-on-surface mb-1">Bumbu Dasar Selalu Ada (pisahkan dengan koma)</label>
@@ -143,25 +122,14 @@ export class ModalService {
         const userName = document.getElementById('setting-user-name').value.trim() || 'Sari';
         const bumbuStr = document.getElementById('setting-bumbu').value;
         const bumbuDasar = bumbuStr.split(',').map(s => s.trim()).filter(Boolean);
-        const themeRadio = document.querySelector('input[name="setting-theme"]:checked');
-        const theme = themeRadio ? themeRadio.value : 'auto';
-
-        // Apply theme
-        if (theme === 'dark' || (theme === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-          document.documentElement.classList.add('dark');
-        } else {
-          document.documentElement.classList.remove('dark');
-        }
-
         StorageService.saveSettings({
           ...settings,
           userName,
-          bumbuDasar,
-          theme
+          bumbuDasar
         });
 
         ModalService.close();
-        if (onSave) onSave({ ...settings, userName, bumbuDasar, theme });
+        if (onSave) onSave({ ...settings, userName, bumbuDasar });
       });
 
       // Export JSON

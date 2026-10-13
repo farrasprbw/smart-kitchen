@@ -91,30 +91,48 @@ class App {
     let selectedBumbu = [...CONFIG.DEFAULT_BUMBU_DASAR];
     let userName = 'Sari';
 
+    const renderProgressBar = (step) => `
+      <div class="flex items-center justify-between gap-1.5 w-full my-1">
+        <div class="flex-1 flex flex-col gap-1">
+          <div class="h-1.5 rounded-full ${step >= 1 ? 'bg-primary' : 'bg-surface-container-highest'} transition-all"></div>
+          <span class="text-[10px] ${step === 1 ? 'font-bold text-primary' : 'text-slate-400'}">1. Profil</span>
+        </div>
+        <div class="flex-1 flex flex-col gap-1">
+          <div class="h-1.5 rounded-full ${step >= 2 ? 'bg-primary' : 'bg-surface-container-highest'} transition-all"></div>
+          <span class="text-[10px] ${step === 2 ? 'font-bold text-primary' : 'text-slate-400'}">2. Bumbu</span>
+        </div>
+        <div class="flex-1 flex flex-col gap-1">
+          <div class="h-1.5 rounded-full ${step >= 3 ? 'bg-emerald-500' : 'bg-surface-container-highest'} transition-all"></div>
+          <span class="text-[10px] ${step === 3 ? 'font-bold text-emerald-600' : 'text-slate-400'}">3. Selesai</span>
+        </div>
+      </div>
+    `;
+
     const renderWizard = () => {
       if (currentStep === 1) {
         modal.innerHTML = `
           <div class="bg-surface-container-lowest rounded-t-3xl p-6 flex flex-col gap-4 shadow-2xl max-w-lg mx-auto w-full">
             <div class="w-12 h-1.5 rounded-full bg-surface-container-highest mx-auto"></div>
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">Langkah 1 dari 3</span>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">Langkah 1 dari 3: Profil</span>
               <span class="text-xs text-slate-400 font-semibold">Setup 30 Detik</span>
             </div>
+            ${renderProgressBar(1)}
             <div class="flex items-center gap-3">
               <div class="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-on-primary">
                 <span class="material-symbols-outlined text-[28px]">kitchen</span>
               </div>
               <div>
                 <h2 class="font-headline-md text-base font-bold text-on-surface">Selamat Datang di Dapur Pintar!</h2>
-                <p class="text-xs text-on-surface-variant">Kelola stok kulkas & ide masak cerdas.</p>
+                <p class="text-xs text-on-surface-variant">Langkah 1: Masukkan nama untuk personalisasi dapurmu.</p>
               </div>
             </div>
             <div>
               <label class="block text-xs font-bold text-on-surface mb-1">Siapa nama panggilanmu?</label>
-              <input id="wizard-name" type="text" value="${userName}" class="w-full h-11 px-4 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary">
+              <input id="wizard-name" type="text" value="${userName}" placeholder="Contoh: Sari" class="w-full h-11 px-4 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary">
             </div>
             <button id="btn-next-step-1" type="button" class="w-full h-12 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
-              <span>Lanjut: Pilih Stok Dasar</span>
+              <span>Lanjut: Atur Bumbu Dasar</span>
               <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           </div>
@@ -130,12 +148,13 @@ class App {
           <div class="bg-surface-container-lowest rounded-t-3xl p-6 flex flex-col gap-4 shadow-2xl max-w-lg mx-auto w-full">
             <div class="w-12 h-1.5 rounded-full bg-surface-container-highest mx-auto"></div>
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">Langkah 2 dari 3</span>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">Langkah 2 dari 3: Stok Bumbu</span>
               <button id="btn-back-step-2" class="text-xs text-slate-400 font-bold hover:underline">Kembali</button>
             </div>
+            ${renderProgressBar(2)}
             <div>
               <h2 class="font-headline-md text-base font-bold text-on-surface">Bumbu & Bahan Selalu Ada</h2>
-              <p class="text-xs text-on-surface-variant">Centang bumbu yang biasanya selalu tersedia di dapurmu:</p>
+              <p class="text-xs text-on-surface-variant">Langkah 2: Centang bumbu yang biasa tersedia di dapurmu agar rekomendasi resep akurat:</p>
             </div>
             <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
               ${CONFIG.DEFAULT_BUMBU_DASAR.map(b => `
@@ -146,7 +165,7 @@ class App {
               `).join('')}
             </div>
             <button id="btn-next-step-2" type="button" class="w-full h-12 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
-              <span>Lanjut: Selesai Setup</span>
+              <span>Lanjut: Selesai & Pindai Kulkas</span>
               <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </button>
           </div>
@@ -167,16 +186,17 @@ class App {
           <div class="bg-surface-container-lowest rounded-t-3xl p-6 flex flex-col gap-4 shadow-2xl max-w-lg mx-auto w-full">
             <div class="w-12 h-1.5 rounded-full bg-surface-container-highest mx-auto"></div>
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Langkah 3 dari 3</span>
-              <span class="text-xs text-emerald-600 font-bold">Siap Digunakan!</span>
+              <span class="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Langkah 3 dari 3: Siap!</span>
+              <span class="text-xs text-emerald-600 font-bold">Setup Selesai</span>
             </div>
+            ${renderProgressBar(3)}
             <div class="text-center py-2">
               <div class="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-3 shadow-xs">
                 <span class="material-symbols-outlined text-[36px]">verified</span>
               </div>
               <h2 class="font-headline-md text-base font-bold text-on-surface">Dapur Pintar Siap, ${userName}!</h2>
               <p class="text-xs text-on-surface-variant max-w-xs mx-auto mt-1 leading-relaxed">
-                Kamu bisa langsung memotret isi kulkasmu sekarang atau masuk ke dashboard dapur.
+                Setup selesai! Langkah terakhir, kamu bisa langsung memotret isi kulkasmu sekarang atau mengeksplorasi beranda.
               </p>
             </div>
             <div class="flex flex-col gap-2 mt-2">
