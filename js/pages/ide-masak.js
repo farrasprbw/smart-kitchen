@@ -316,7 +316,7 @@ export function renderIdeMasakPage() {
       }
 
       if (isGeneratingRecipes) {
-        showToast('Chef AI sedang meracik menu di latar belakang...', 'info', 2000);
+        showToast('Chef sedang meracik menu di latar belakang...', 'info', 2000);
         return;
       }
 
@@ -348,14 +348,14 @@ export function renderIdeMasakPage() {
               <span>Lanjut Menjelajah (Tutup Modal)</span>
             </button>
             <p class="text-[10px] text-slate-400">
-              Kamu bisa klik di luar kotak atau tombol di atas. Chef AI akan tetap meracik di latar belakang.
+              Kamu bisa klik di luar kotak atau tombol di atas. Chef akan tetap meracik di latar belakang.
             </p>
           </div>
         </div>
       `, {
         onClose: () => {
           if (isGeneratingRecipes) {
-            showToast('Chef AI tetap meracik di latar belakang...', 'info', 2500);
+            showToast('Chef tetap meracik di latar belakang...', 'info', 2500);
           }
         }
       });
