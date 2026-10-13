@@ -11,6 +11,7 @@ import { renderPindaiPage, stopPindaiCamera } from './pages/pindai.js';
 import { renderKonfirmasiPage } from './pages/konfirmasi.js';
 import { renderIdeMasakPage } from './pages/ide-masak.js';
 import { renderCatatanPage } from './pages/catatan.js';
+import { initAppUpdater } from './services/updater.js';
 
 class App {
   constructor() {
@@ -80,6 +81,9 @@ class App {
     if (!settings?.onboardingDone) {
       this.showOnboardingModal();
     }
+
+    // 6. Initialize Service Worker & PWA Updater
+    initAppUpdater();
   }
 
   showOnboardingModal() {

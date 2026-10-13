@@ -1,6 +1,6 @@
 // Dapur Pintar Service Worker
 
-const CACHE_NAME = 'dapur-pintar-v8';
+const CACHE_NAME = 'dapur-pintar-v9';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -15,6 +15,7 @@ const ASSETS_TO_CACHE = [
   './js/services/image.js',
   './js/services/gemini.js',
   './js/services/firebase.js',
+  './js/services/updater.js',
   './js/components/header.js',
   './js/components/bottom-nav.js',
   './js/components/toast.js',
@@ -30,6 +31,12 @@ const ASSETS_TO_CACHE = [
   './js/utils/uuid.js'
 ];
 
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -38,7 +45,10 @@ self.addEventListener('install', (event) => {
       });
     })
   );
-  self.skipWaiting();
+  // Auto-activate on first install
+  if (!self.registration.active) {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener('activate', (event) => {
