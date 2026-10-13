@@ -78,18 +78,59 @@ export class CameraService {
     }
   }
 
-  captureFrame() {
+  captureFrame(targetAspectRatio = null) {
     if (!this.videoElement || this.videoElement.readyState < 2) {
       throw new Error('Video belum siap diambil.');
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = this.videoElement.videoWidth || 640;
-    canvas.height = this.videoElement.videoHeight || 480;
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
+    const video = this.videoElement;
+    const vWidth = video.videoWidth || 640;
+    const vHeight = video.videoHeight || 480;
 
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+    // Tentukan rasio viewfinder yang dilihat pengguna (default 4/3 sesuai kontainer atau ukuran riil)
+    let ratio = targetAspectRatio;
+    if (!ratio && video.clientWidth && video.clientHeight) {
+      ratio = video.clientWidth / video.clientHeight;
+    }
+    if (!ratio || ratio <= 0) {
+      ratio = 4 / 3; // Default rasio pemindai kulkas
+    }
+
+    const currentRatio = vWidth / vHeight;
+    let sx = 0, sy = 0, sWidth = vWidth, sHeight = vHeight;
+
+    // Hitung crop region sesuai behavior CSS object-cover
+    if (currentRatio > ratio) {
+      // Video lebih lebar daripada kontainer -> crop horizontal (kiri-kanan)
+      sWidth = Math.round(vHeight * ratio);
+      sx = Math.round((vWidth - sWidth) / 2);
+    } else if (currentRatio < ratio) {
+      // Video lebih tinggi daripada kontainer (misal kamera HP potrait di frame landscape 4:3) -> crop vertikal (atas-bawah)
+      sHeight = Math.round(vWidth / ratio);
+      sy = Math.round((vHeight - sHeight) / 2);
+    }
+
+    // Resolusi output yang tajam dan optimal (maks 1200px)
+    const maxDim = 1200;
+    let outWidth = sWidth;
+    let outHeight = sHeight;
+    if (outWidth > maxDim || outHeight > maxDim) {
+      if (outWidth > outHeight) {
+        outHeight = Math.round((outHeight * maxDim) / outWidth);
+        outWidth = maxDim;
+      } else {
+        outWidth = Math.round((outWidth * maxDim) / outHeight);
+        outHeight = maxDim;
+      }
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = outWidth;
+    canvas.height = outHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, outWidth, outHeight);
+
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.88);
     const base64 = dataUrl.split(',')[1];
 
     return {

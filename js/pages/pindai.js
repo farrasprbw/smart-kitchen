@@ -129,10 +129,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
                   }">
                     ${
                       hasPhoto
-                        ? `<img src="${photos[idx].dataUrl}" class="w-full h-full object-cover">
-                           <span class="absolute inset-0 bg-emerald-900/40 flex items-center justify-center text-white">
-                             <span class="material-symbols-outlined text-[18px]">check</span>
-                           </span>`
+                        ? `<img src="${photos[idx].dataUrl}" class="w-full h-full object-cover">`
                         : `<span class="material-symbols-outlined text-[20px]">${s.icon}</span>`
                     }
                   </div>
@@ -160,21 +157,25 @@ export function renderPindaiPage(params = new URLSearchParams()) {
 
         <!-- Preview Snapshot Overlay (Saat slot terpilih sudah ada fotonya) -->
         <div id="preview-overlay" class="absolute inset-0 bg-slate-900 hidden flex flex-col items-center justify-between p-3 z-20">
-          <img id="preview-image" class="w-full h-full object-contain rounded-2xl" src="" alt="Preview">
+          <img id="preview-image" class="w-full h-full object-cover rounded-2xl" src="" alt="Preview">
           
           <div class="absolute top-4 inset-x-4 flex items-center justify-between pointer-events-none">
             <span class="text-xs font-bold text-white bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">Foto Tersimpan</span>
           </div>
 
-          <!-- Aksi di Preview: Ambil Ulang & Hapus -->
-          <div class="absolute bottom-4 inset-x-4 flex items-center justify-center gap-3">
-            <button id="btn-retake-photo" type="button" class="px-4 py-2 rounded-xl bg-white/95 text-slate-800 backdrop-blur-md text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition">
+          <!-- Aksi di Preview: Ambil Ulang, Putar 90°, & Hapus -->
+          <div class="absolute bottom-4 inset-x-4 flex items-center justify-center gap-2">
+            <button id="btn-retake-photo" type="button" class="px-3.5 py-2 rounded-xl bg-white/95 text-slate-800 backdrop-blur-md text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition">
               <span class="material-symbols-outlined text-[18px]">photo_camera</span>
               <span>Ambil Ulang</span>
             </button>
-            <button id="btn-delete-active-photo" type="button" class="px-4 py-2 rounded-xl bg-red-600/95 text-white backdrop-blur-md text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition">
+            <button id="btn-rotate-photo" type="button" class="px-3.5 py-2 rounded-xl bg-slate-800/95 text-white backdrop-blur-md text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition">
+              <span class="material-symbols-outlined text-[18px]">rotate_right</span>
+              <span>Putar</span>
+            </button>
+            <button id="btn-delete-active-photo" type="button" class="px-3.5 py-2 rounded-xl bg-red-600/95 text-white backdrop-blur-md text-xs font-bold flex items-center gap-1.5 shadow-lg active:scale-95 transition">
               <span class="material-symbols-outlined text-[18px]">delete</span>
-              <span>Hapus Foto</span>
+              <span>Hapus</span>
             </button>
           </div>
         </div>
@@ -273,6 +274,7 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
   const brightnessText = document.getElementById('brightness-text');
   const counterBadge = document.getElementById('scan-counter-badge');
   const retakeBtn = document.getElementById('btn-retake-photo');
+  const rotateBtn = document.getElementById('btn-rotate-photo');
   const deleteActiveBtn = document.getElementById('btn-delete-active-photo');
 
   // Sub-Tab Switcher Event Listeners
@@ -338,6 +340,27 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
   // Retake photo action from preview overlay
   retakeBtn?.addEventListener('click', () => {
     if (previewOverlay) previewOverlay.classList.add('hidden');
+  });
+
+  // Rotate photo action (90 degrees clockwise)
+  rotateBtn?.addEventListener('click', async () => {
+    if (!photos[activeSlotIndex]?.dataUrl) return;
+    try {
+      showToast('Memutar foto...', 'info', 1000);
+      const rotated = await ImageService.rotate90(photos[activeSlotIndex].dataUrl);
+      photos[activeSlotIndex].dataUrl = rotated.dataUrl;
+      photos[activeSlotIndex].base64 = rotated.base64;
+      store.saveDraftPhotos(scanType, photos);
+      if (previewImg) previewImg.src = rotated.dataUrl;
+      // Refresh thumbnail di slot item
+      const activeBtn = document.querySelector(`.slot-item[data-index="${activeSlotIndex}"]`);
+      const imgInSlot = activeBtn?.querySelector('img');
+      if (imgInSlot) imgInSlot.src = rotated.dataUrl;
+      showToast('Foto berhasil diputar 90°', 'success', 1500);
+    } catch (err) {
+      console.error('Rotate error:', err);
+      showToast('Gagal memutar foto.', 'error');
+    }
   });
 
   // Delete photo action from preview overlay
@@ -416,7 +439,7 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
     try {
       let captureResult = null;
       if (videoEl && videoEl.readyState >= 2) {
-        captureResult = cameraServiceInstance.captureFrame();
+        captureResult = cameraServiceInstance.captureFrame(4 / 3);
       } else {
         fileInput?.click();
         return;

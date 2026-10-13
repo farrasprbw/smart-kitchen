@@ -34,17 +34,27 @@ export class FirebaseService {
   }
 
   /**
-   * Simpan data stok ke Firestore
+   * Helper untuk mendapatkan document ID yang terisolasi per user
    */
-  static async syncStokToCloud(stokData) {
+  static getDocId(userId, type) {
+    const cleanUid = (userId || 'default').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    return `user_${cleanUid}_${type}`;
+  }
+
+  /**
+   * Simpan data stok ke Firestore per user
+   */
+  static async syncStokToCloud(stokData, userId = 'default') {
     if (!db) await FirebaseService.init();
     if (!db) return false;
 
     try {
       const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js');
-      const docRef = doc(db, 'dapur_pintar_data', 'stok_utama');
+      const docId = FirebaseService.getDocId(userId, 'stok');
+      const docRef = doc(db, 'dapur_pintar_data', docId);
       await setDoc(docRef, {
         ...stokData,
+        userId,
         syncedAt: new Date().toISOString()
       }, { merge: true });
       FirebaseService.notifyListeners('synced', 'Stok berhasil disinkronkan ke Cloud Firestore');
@@ -57,15 +67,16 @@ export class FirebaseService {
   }
 
   /**
-   * Tarik data stok dari Firestore
+   * Tarik data stok dari Firestore per user
    */
-  static async fetchStokFromCloud() {
+  static async fetchStokFromCloud(userId = 'default') {
     if (!db) await FirebaseService.init();
     if (!db) return null;
 
     try {
       const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js');
-      const docRef = doc(db, 'dapur_pintar_data', 'stok_utama');
+      const docId = FirebaseService.getDocId(userId, 'stok');
+      const docRef = doc(db, 'dapur_pintar_data', docId);
       const snapshot = await getDoc(docRef);
       if (snapshot.exists()) {
         return snapshot.data();
@@ -78,17 +89,19 @@ export class FirebaseService {
   }
 
   /**
-   * Simpan log masak ke Firestore
+   * Simpan log masak ke Firestore per user
    */
-  static async syncLogMasakToCloud(logData) {
+  static async syncLogMasakToCloud(logData, userId = 'default') {
     if (!db) await FirebaseService.init();
     if (!db) return false;
 
     try {
       const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js');
-      const docRef = doc(db, 'dapur_pintar_data', 'log_masak');
+      const docId = FirebaseService.getDocId(userId, 'log_masak');
+      const docRef = doc(db, 'dapur_pintar_data', docId);
       await setDoc(docRef, {
         ...logData,
+        userId,
         syncedAt: new Date().toISOString()
       }, { merge: true });
       return true;
@@ -99,17 +112,19 @@ export class FirebaseService {
   }
 
   /**
-   * Simpan log belanja ke Firestore
+   * Simpan log belanja ke Firestore per user
    */
-  static async syncLogBelanjaToCloud(logData) {
+  static async syncLogBelanjaToCloud(logData, userId = 'default') {
     if (!db) await FirebaseService.init();
     if (!db) return false;
 
     try {
       const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js');
-      const docRef = doc(db, 'dapur_pintar_data', 'log_belanja');
+      const docId = FirebaseService.getDocId(userId, 'log_belanja');
+      const docRef = doc(db, 'dapur_pintar_data', docId);
       await setDoc(docRef, {
         ...logData,
+        userId,
         syncedAt: new Date().toISOString()
       }, { merge: true });
       return true;
@@ -120,15 +135,16 @@ export class FirebaseService {
   }
 
   /**
-   * Pasang listener perubahan realtime dari Cloud Firestore
+   * Pasang listener perubahan realtime dari Cloud Firestore per user
    */
-  static async listenToStokChanges(callback) {
+  static async listenToStokChanges(callback, userId = 'default') {
     if (!db) await FirebaseService.init();
     if (!db) return () => {};
 
     try {
       const { doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js');
-      const docRef = doc(db, 'dapur_pintar_data', 'stok_utama');
+      const docId = FirebaseService.getDocId(userId, 'stok');
+      const docRef = doc(db, 'dapur_pintar_data', docId);
       return onSnapshot(docRef, (snapshot) => {
         if (snapshot.exists()) {
           callback(snapshot.data());

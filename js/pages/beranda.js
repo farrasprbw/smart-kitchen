@@ -8,6 +8,17 @@ import { store } from '../core/state.js';
 
 let lastDeletedItem = null;
 let undoTimeout = null;
+let isSyncListenerAttached = false;
+
+function ensureSyncListener() {
+  if (isSyncListenerAttached) return;
+  isSyncListenerAttached = true;
+  window.addEventListener('dapur-stok-synced', () => {
+    if (store.getState().activeTab === 'beranda') {
+      renderBerandaPage();
+    }
+  });
+}
 
 function hideUndoToast() {
   const toastEl = document.getElementById('app-toast');
@@ -49,6 +60,7 @@ function showUndoToast(item, onRestore) {
 }
 
 export function renderBerandaPage() {
+  ensureSyncListener();
   const mainEl = document.getElementById('app-main');
   if (!mainEl) return;
 
@@ -142,7 +154,12 @@ export function renderBerandaPage() {
                 <span class="h-2 w-2 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></span>
                 <span class="font-medium">Penyimpanan optimal • ${Math.max(10, Math.round(((totalBahan - kritisItems.length) / (totalBahan || 1)) * 100))}% siap saji</span>
               </div>
-              <span class="text-[11px] text-slate-400">Update ${new Date(stokData.lastUpdated || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] text-slate-400">Update ${new Date(stokData.lastUpdated || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+                <button id="btn-sync-cloud" type="button" class="w-6 h-6 rounded-lg bg-emerald-100/80 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition active:scale-95" title="Sinkronkan dengan Cloud Firestore">
+                  <span class="material-symbols-outlined text-[14px]">sync</span>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -495,6 +512,27 @@ export function renderBerandaPage() {
       selectedItemIds.clear();
       isBulkMode = false;
       renderBerandaPage();
+    });
+
+    // Cloud Manual Sync
+    document.getElementById('btn-sync-cloud')?.addEventListener('click', async () => {
+      const syncBtn = document.getElementById('btn-sync-cloud');
+      const icon = syncBtn?.querySelector('span');
+      if (icon) icon.classList.add('animate-spin');
+      showToast('Memeriksa database Cloud...', 'info', 1500);
+      try {
+        const synced = await StorageService.syncFromCloud(true);
+        if (icon) icon.classList.remove('animate-spin');
+        if (synced) {
+          showToast('Data inventaris berhasil diperbarui dari Cloud!', 'success');
+          renderBerandaPage();
+        } else {
+          showToast('Data stok lokal sudah yang paling mutakhir.', 'info', 2000);
+        }
+      } catch (err) {
+        if (icon) icon.classList.remove('animate-spin');
+        showToast('Sinkronisasi Cloud gagal.', 'error');
+      }
     });
 
     attachItemEvents();

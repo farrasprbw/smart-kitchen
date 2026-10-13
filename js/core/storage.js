@@ -30,6 +30,8 @@ const INITIAL_SETTINGS = {
   onboardingDone: false
 };
 
+let realtimeUnsubscribe = null;
+
 export class StorageService {
   static get(key, defaultValue = null) {
     try {
@@ -52,66 +54,168 @@ export class StorageService {
     }
   }
 
+  /**
+   * Mendapatkan User ID unik perangkat/pengguna saat ini.
+   * Jika belum ada, otomatis membuat User ID baru.
+   */
+  static getUserId() {
+    let uid = localStorage.getItem('dapur_pintar_active_user_id');
+    if (!uid) {
+      uid = 'usr_' + generateId().replace(/-/g, '').slice(0, 10);
+      localStorage.setItem('dapur_pintar_active_user_id', uid);
+    }
+    return uid;
+  }
+
+  /**
+   * Menetapkan atau mengganti User ID aktif (misal untuk multi-user / tautkan dapur keluarga)
+   */
+  static setUserId(uid) {
+    if (!uid || typeof uid !== 'string') return;
+    const clean = uid.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+    localStorage.setItem('dapur_pintar_active_user_id', clean);
+    return clean;
+  }
+
+  /**
+   * Menghasilkan key localStorage yang terisolasi per user
+   */
+  static getUserKey(baseKey) {
+    const uid = StorageService.getUserId();
+    return `${baseKey}_${uid}`;
+  }
+
   static initDefaults() {
-    // If not set or old mock version (< 2), migrate to clean empty state
-    const currentStok = StorageService.get(CONFIG.STORAGE_KEYS.STOK);
-    if (!currentStok || !currentStok.version || currentStok.version < 2) {
-      StorageService.set(CONFIG.STORAGE_KEYS.STOK, INITIAL_STOK);
-    }
+    const uid = StorageService.getUserId();
+    const stokKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK);
+    const masakKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_MASAK);
+    const belanjaKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_BELANJA);
+    const settingsKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.SETTINGS);
 
-    const currentLogMasak = StorageService.get(CONFIG.STORAGE_KEYS.LOG_MASAK);
-    if (!currentLogMasak || !currentLogMasak.version || currentLogMasak.version < 2) {
-      StorageService.set(CONFIG.STORAGE_KEYS.LOG_MASAK, INITIAL_LOG_MASAK);
-    }
-
-    const currentLogBelanja = StorageService.get(CONFIG.STORAGE_KEYS.LOG_BELANJA);
-    if (!currentLogBelanja || !currentLogBelanja.version || currentLogBelanja.version < 2) {
-      StorageService.set(CONFIG.STORAGE_KEYS.LOG_BELANJA, INITIAL_LOG_BELANJA);
-    }
-
-    const currentSettings = StorageService.get(CONFIG.STORAGE_KEYS.SETTINGS);
-    if (!currentSettings) {
-      StorageService.set(CONFIG.STORAGE_KEYS.SETTINGS, INITIAL_SETTINGS);
-    }
-
-    // Trigger cloud synchronization in background
-    setTimeout(async () => {
-      try {
-        await FirebaseService.init();
-        const cloudStok = await FirebaseService.fetchStokFromCloud();
-        if (cloudStok && cloudStok.kulkas) {
-          const local = StorageService.getStok();
-          // Jika cloud lebih baru atau lokal masih kosong
-          const cloudTime = new Date(cloudStok.lastUpdated || 0).getTime();
-          const localTime = new Date(local.lastUpdated || 0).getTime();
-          if (cloudTime > localTime || (local.kulkas.length === 0 && local.dapur.length === 0 && cloudStok.kulkas.length > 0)) {
-            StorageService.set(CONFIG.STORAGE_KEYS.STOK, cloudStok);
-            console.log('Stok disinkronkan dari Cloud Firestore');
-          }
-        }
-      } catch (e) {
-        console.warn('Latar belakang sync Firebase:', e);
+    // Cek apakah data user sudah ada, jika belum coba migrasi dari legacy key jika ada
+    let currentStok = StorageService.get(stokKey);
+    if (!currentStok) {
+      const legacyStok = StorageService.get(CONFIG.STORAGE_KEYS.STOK);
+      if (legacyStok && legacyStok.version && (legacyStok.kulkas?.length > 0 || legacyStok.dapur?.length > 0)) {
+        currentStok = { ...legacyStok, userId: uid };
+      } else {
+        currentStok = { ...INITIAL_STOK, userId: uid };
       }
-    }, 1000);
+      StorageService.set(stokKey, currentStok);
+    }
+
+    let currentLogMasak = StorageService.get(masakKey);
+    if (!currentLogMasak) {
+      const legacyMasak = StorageService.get(CONFIG.STORAGE_KEYS.LOG_MASAK);
+      currentLogMasak = legacyMasak || { ...INITIAL_LOG_MASAK };
+      StorageService.set(masakKey, currentLogMasak);
+    }
+
+    let currentLogBelanja = StorageService.get(belanjaKey);
+    if (!currentLogBelanja) {
+      const legacyBelanja = StorageService.get(CONFIG.STORAGE_KEYS.LOG_BELANJA);
+      currentLogBelanja = legacyBelanja || { ...INITIAL_LOG_BELANJA };
+      StorageService.set(belanjaKey, currentLogBelanja);
+    }
+
+    let currentSettings = StorageService.get(settingsKey);
+    if (!currentSettings) {
+      const legacySettings = StorageService.get(CONFIG.STORAGE_KEYS.SETTINGS);
+      currentSettings = legacySettings || { ...INITIAL_SETTINGS, userId: uid };
+      StorageService.set(settingsKey, currentSettings);
+    }
+
+    // Trigger cloud synchronization immediately and attach realtime listener
+    StorageService.syncFromCloud();
+    StorageService.listenToRealtimeSync();
+  }
+
+  static async syncFromCloud(force = false) {
+    try {
+      const uid = StorageService.getUserId();
+      await FirebaseService.init();
+      const cloudStok = await FirebaseService.fetchStokFromCloud(uid);
+      if (cloudStok && (Array.isArray(cloudStok.kulkas) || Array.isArray(cloudStok.dapur))) {
+        const local = StorageService.getStok();
+        const cloudTime = new Date(cloudStok.lastUpdated || 0).getTime();
+        const localTime = new Date(local.lastUpdated || 0).getTime();
+        const localEmpty = (!local.kulkas || local.kulkas.length === 0) && (!local.dapur || local.dapur.length === 0);
+        const cloudHasData = (cloudStok.kulkas && cloudStok.kulkas.length > 0) || (cloudStok.dapur && cloudStok.dapur.length > 0);
+
+        if (force || cloudTime > localTime || (localEmpty && cloudHasData)) {
+          cloudStok.kulkas = cloudStok.kulkas || [];
+          cloudStok.dapur = cloudStok.dapur || [];
+          cloudStok.userId = uid;
+          StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK), cloudStok);
+          console.log(`Stok user [${uid}] berhasil disinkronkan dari Cloud Firestore`);
+          window.dispatchEvent(new CustomEvent('dapur-stok-synced', { detail: cloudStok }));
+          return cloudStok;
+        }
+      }
+      return null;
+    } catch (e) {
+      console.warn('Sync from cloud error:', e);
+      return null;
+    }
+  }
+
+  static async listenToRealtimeSync() {
+    try {
+      if (typeof realtimeUnsubscribe === 'function') {
+        realtimeUnsubscribe();
+        realtimeUnsubscribe = null;
+      }
+      const uid = StorageService.getUserId();
+      realtimeUnsubscribe = await FirebaseService.listenToStokChanges((cloudStok) => {
+        if (cloudStok && (Array.isArray(cloudStok.kulkas) || Array.isArray(cloudStok.dapur))) {
+          cloudStok.kulkas = cloudStok.kulkas || [];
+          cloudStok.dapur = cloudStok.dapur || [];
+          cloudStok.userId = uid;
+          StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK), cloudStok);
+          window.dispatchEvent(new CustomEvent('dapur-stok-synced', { detail: cloudStok }));
+        }
+      }, uid);
+    } catch (e) {
+      console.warn('Realtime sync setup error:', e);
+    }
+  }
+
+  /**
+   * Beralih ke User ID lain (misal menautkan ID akun keluarga atau membuat profil baru)
+   */
+  static async switchUser(newUserId) {
+    if (!newUserId || !newUserId.trim()) return false;
+    const cleanUid = StorageService.setUserId(newUserId);
+    StorageService.initDefaults();
+    await StorageService.syncFromCloud(true);
+    await StorageService.listenToRealtimeSync();
+    window.dispatchEvent(new CustomEvent('dapur-stok-synced', { detail: StorageService.getStok() }));
+    return cleanUid;
   }
 
   static clearAllData() {
-    StorageService.set(CONFIG.STORAGE_KEYS.STOK, INITIAL_STOK);
-    StorageService.set(CONFIG.STORAGE_KEYS.LOG_MASAK, INITIAL_LOG_MASAK);
-    StorageService.set(CONFIG.STORAGE_KEYS.LOG_BELANJA, INITIAL_LOG_BELANJA);
-    FirebaseService.syncStokToCloud(INITIAL_STOK);
+    const uid = StorageService.getUserId();
+    const emptyStok = { ...INITIAL_STOK, userId: uid };
+    StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK), emptyStok);
+    StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_MASAK), INITIAL_LOG_MASAK);
+    StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_BELANJA), INITIAL_LOG_BELANJA);
+    FirebaseService.syncStokToCloud(emptyStok, uid);
+    window.dispatchEvent(new CustomEvent('dapur-stok-synced', { detail: emptyStok }));
   }
 
   // Stok CRUD
   static getStok() {
-    return StorageService.get(CONFIG.STORAGE_KEYS.STOK, INITIAL_STOK);
+    return StorageService.get(StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK), { ...INITIAL_STOK, userId: StorageService.getUserId() });
   }
 
   static saveStok(stokData) {
+    const uid = StorageService.getUserId();
     stokData.lastUpdated = new Date().toISOString();
-    const result = StorageService.set(CONFIG.STORAGE_KEYS.STOK, stokData);
-    // Background sync to Cloud Firestore
-    FirebaseService.syncStokToCloud(stokData);
+    stokData.userId = uid;
+    const result = StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK), stokData);
+    // Background sync to Cloud Firestore per user
+    FirebaseService.syncStokToCloud(stokData, uid);
+    window.dispatchEvent(new CustomEvent('dapur-stok-synced', { detail: stokData }));
     return result;
   }
 
@@ -204,44 +308,47 @@ export class StorageService {
 
   // Log Masak
   static getLogMasak() {
-    return StorageService.get(CONFIG.STORAGE_KEYS.LOG_MASAK, INITIAL_LOG_MASAK);
+    return StorageService.get(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_MASAK), INITIAL_LOG_MASAK);
   }
 
   static addLogMasak(entry) {
+    const uid = StorageService.getUserId();
     const log = StorageService.getLogMasak();
     log.entries.unshift({
       id: generateId(),
       tanggal: new Date().toISOString(),
       ...entry
     });
-    StorageService.set(CONFIG.STORAGE_KEYS.LOG_MASAK, log);
-    FirebaseService.syncLogMasakToCloud(log);
+    StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_MASAK), log);
+    FirebaseService.syncLogMasakToCloud(log, uid);
     return log;
   }
 
   // Log Belanja
   static getLogBelanja() {
-    return StorageService.get(CONFIG.STORAGE_KEYS.LOG_BELANJA, INITIAL_LOG_BELANJA);
+    return StorageService.get(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_BELANJA), INITIAL_LOG_BELANJA);
   }
 
   static addLogBelanja(entry) {
+    const uid = StorageService.getUserId();
     const log = StorageService.getLogBelanja();
     log.entries.unshift({
       id: generateId(),
       tanggal: new Date().toISOString(),
       ...entry
     });
-    StorageService.set(CONFIG.STORAGE_KEYS.LOG_BELANJA, log);
-    FirebaseService.syncLogBelanjaToCloud(log);
+    StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_BELANJA), log);
+    FirebaseService.syncLogBelanjaToCloud(log, uid);
     return log;
   }
 
   // Settings
   static getSettings() {
-    return StorageService.get(CONFIG.STORAGE_KEYS.SETTINGS, INITIAL_SETTINGS);
+    return StorageService.get(StorageService.getUserKey(CONFIG.STORAGE_KEYS.SETTINGS), { ...INITIAL_SETTINGS, userId: StorageService.getUserId() });
   }
 
   static saveSettings(settings) {
-    return StorageService.set(CONFIG.STORAGE_KEYS.SETTINGS, settings);
+    settings.userId = StorageService.getUserId();
+    return StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.SETTINGS), settings);
   }
 }

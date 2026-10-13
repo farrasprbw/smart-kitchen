@@ -63,4 +63,37 @@ export class ImageService {
       img.src = srcUrl;
     });
   }
+
+  /**
+   * Rotates an image (dataUrl) by 90 degrees clockwise
+   * @param {string} dataUrl
+   * @param {number} quality
+   */
+  static rotate90(dataUrl, quality = 0.88) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        // When rotated 90 degrees, width and height swap
+        canvas.width = img.height;
+        canvas.height = img.width;
+        const ctx = canvas.getContext('2d');
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((90 * Math.PI) / 180);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+        const rotatedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        const base64 = rotatedDataUrl.split(',')[1];
+        resolve({
+          dataUrl: rotatedDataUrl,
+          base64,
+          mimeType: 'image/jpeg',
+          width: canvas.width,
+          height: canvas.height
+        });
+      };
+      img.onerror = reject;
+      img.src = dataUrl;
+    });
+  }
 }

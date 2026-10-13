@@ -59,8 +59,23 @@ export function renderKonfirmasiPage() {
     `
   });
 
+  function syncConfirmedToStore() {
+    const curDetection = store.getState().detectionResults || {};
+    store.setState({
+      detectionResults: {
+        ...curDetection,
+        items: confirmedItems
+      }
+    });
+  }
+
   function renderContent() {
     if (confirmedItems.length === 0) {
+      const draftPhotos = scanState.scanType === 'belanja'
+        ? (scanState.belanjaPhotos || [])
+        : (scanState.kulkasPhotos || []);
+      const hasDrafts = draftPhotos.some(p => Boolean(p.dataUrl));
+
       mainEl.innerHTML = `
         <div class="page-enter flex flex-col items-center justify-center min-h-[55vh] max-w-md mx-auto px-6 text-center gap-3">
           <div class="w-16 h-16 rounded-3xl bg-slate-100 flex items-center justify-center text-slate-400">
@@ -68,11 +83,15 @@ export function renderKonfirmasiPage() {
           </div>
           <h2 class="text-base font-bold text-slate-800">Belum Ada Hasil Pemindaian</h2>
           <p class="text-xs text-slate-500 max-w-xs leading-relaxed">
-            Silakan ambil foto kulkas atau barang belanjaan terlebih dahulu untuk mendeteksi bahan makanan.
+            ${
+              hasDrafts
+                ? 'Foto draft Anda masih tersimpan di memori. Silakan kembali ke pemindai untuk menganalisis ulang.'
+                : 'Silakan ambil foto kulkas atau barang belanjaan terlebih dahulu untuk mendeteksi bahan makanan.'
+            }
           </p>
-          <a href="#pindai" class="mt-2 px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm active:scale-95 transition">
-            <span class="material-symbols-outlined text-[18px]">photo_camera</span>
-            <span>Buka Kamera Pemindai</span>
+          <a href="#pindai?type=${scanState.scanType || 'kulkas'}" class="mt-2 px-4 py-2.5 rounded-xl bg-primary text-white font-bold text-xs inline-flex items-center gap-2 shadow-sm active:scale-95 transition">
+            <span class="material-symbols-outlined text-[18px]">${hasDrafts ? 'auto_awesome' : 'photo_camera'}</span>
+            <span>${hasDrafts ? 'Buka Pemindai & Analisis Draft' : 'Buka Kamera Pemindai'}</span>
           </a>
         </div>
       `;
@@ -247,6 +266,7 @@ export function renderKonfirmasiPage() {
           statusClass: 'bg-emerald-100 text-emerald-800',
           lokasi: targetLocation
         });
+        syncConfirmedToStore();
         showToast(`Ditambahkan: ${newItem.nama}`, 'success');
         renderContent();
       });
@@ -271,7 +291,10 @@ export function renderKonfirmasiPage() {
       inp.addEventListener('change', (e) => {
         const id = e.target.getAttribute('data-id');
         const item = confirmedItems.find(x => x.id === id);
-        if (item) item.nama = e.target.value.trim();
+        if (item) {
+          item.nama = e.target.value.trim();
+          syncConfirmedToStore();
+        }
       });
     });
 
@@ -280,7 +303,10 @@ export function renderKonfirmasiPage() {
       sel.addEventListener('change', (e) => {
         const id = e.target.getAttribute('data-id');
         const item = confirmedItems.find(x => x.id === id);
-        if (item) item.satuan = e.target.value;
+        if (item) {
+          item.satuan = e.target.value;
+          syncConfirmedToStore();
+        }
       });
     });
 
@@ -289,7 +315,10 @@ export function renderKonfirmasiPage() {
       sel.addEventListener('change', (e) => {
         const id = e.target.getAttribute('data-id');
         const item = confirmedItems.find(x => x.id === id);
-        if (item) item.lokasi = e.target.value;
+        if (item) {
+          item.lokasi = e.target.value;
+          syncConfirmedToStore();
+        }
       });
     });
 
@@ -300,6 +329,7 @@ export function renderKonfirmasiPage() {
         const item = confirmedItems.find(x => x.id === id);
         if (item && item.jumlah > 1) {
           item.jumlah -= 1;
+          syncConfirmedToStore();
           renderContent();
         }
       });
@@ -312,6 +342,7 @@ export function renderKonfirmasiPage() {
         const item = confirmedItems.find(x => x.id === id);
         if (item) {
           item.jumlah += 1;
+          syncConfirmedToStore();
           renderContent();
         }
       });
@@ -322,6 +353,7 @@ export function renderKonfirmasiPage() {
       btn.addEventListener('click', (e) => {
         const id = e.currentTarget.getAttribute('data-id');
         confirmedItems = confirmedItems.filter(x => x.id !== id);
+        syncConfirmedToStore();
         renderContent();
       });
     });

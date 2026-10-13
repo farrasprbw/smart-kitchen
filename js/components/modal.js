@@ -53,6 +53,18 @@ export class ModalService {
         </div>
 
         <form id="form-settings" class="mt-4 space-y-4">
+          <!-- Identitas Akun Pengguna Terisolasi -->
+          <div class="p-3 rounded-2xl bg-surface-container border border-outline-variant/40 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-[18px] text-primary">person</span>
+              <div>
+                <span class="text-xs font-bold text-on-surface block">Profil Akun Mandiri</span>
+                <span class="text-[10px] font-mono text-on-surface-variant">${StorageService.getUserId()}</span>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Tersimpan Otomatis</span>
+          </div>
+
           <div>
             <label class="block text-xs font-bold text-on-surface mb-1">Nama Panggilan</label>
             <input type="text" id="setting-user-name" value="${settings.userName || 'Sari'}"
