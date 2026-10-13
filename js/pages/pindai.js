@@ -588,7 +588,7 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
     } catch (err) {
       if (isCancelled) return;
       ModalService.close();
-      console.error('AI Analysis failed:', err);
+      console.error('Analysis failed:', err);
 
       ModalService.open(`
         <div class="py-6 flex flex-col items-center text-center">
@@ -652,7 +652,7 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
           <span class="text-xl">🧾</span>
           <div>
             <strong class="text-on-surface block text-xs">3. Foto Struk Datar & Jelas</strong>
-            Ratakan struk kasir dan ambil tegak lurus agar teks harga & item terbaca tajam oleh AI.
+            Ratakan struk kasir dan ambil tegak lurus agar teks harga & item terbaca tajam.
           </div>
         </div>
       </div>

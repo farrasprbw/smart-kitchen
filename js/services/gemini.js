@@ -15,7 +15,7 @@ export class GeminiService {
    * Cleans model output and parses JSON safely
    */
   static parseJsonResponse(text) {
-    if (!text) throw new Error('Respon dari AI kosong. Silakan coba lagi.');
+    if (!text) throw new Error('Respon kosong. Silakan coba lagi.');
     let clean = text.trim();
     if (clean.startsWith('```')) {
       clean = clean.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
@@ -27,7 +27,7 @@ export class GeminiService {
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-      throw new Error('Format respon AI tidak terbaca. Klik coba lagi ya.');
+      throw new Error('Format respon tidak terbaca. Klik coba lagi ya.');
     }
   }
 
@@ -60,7 +60,7 @@ export class GeminiService {
           const result = await response.json();
           const candidate = result.candidates?.[0];
           if (!candidate?.content?.parts?.[0]?.text) {
-            throw new Error('Respon AI kosong.');
+            throw new Error('Respon kosong.');
           }
           return GeminiService.parseJsonResponse(candidate.content.parts[0].text);
         }
@@ -89,7 +89,7 @@ export class GeminiService {
       }
     }
 
-    throw lastError || new Error('Gagal menghubungi server AI. Coba beberapa saat lagi.');
+    throw lastError || new Error('Gagal menghubungi server. Coba beberapa saat lagi.');
   }
 
   /**
@@ -134,10 +134,17 @@ export class GeminiService {
   }
 
   /**
-   * Text-only prompt for recipe generation
+   * Text-only prompt for recipe generation with caching & speed optimization
    * @param {string} prompt
+   * @param {boolean} [forceFresh]
    */
-  static async generateRecipes(prompt) {
+  static async generateRecipes(prompt, forceFresh = false) {
+    const cacheKey = 'recipes_' + prompt.trim();
+    if (!forceFresh && GeminiService.cache.has(cacheKey)) {
+      console.log('Menggunakan rekomendasi resep dari cache');
+      return GeminiService.cache.get(cacheKey);
+    }
+
     const payload = {
       contents: [{
         parts: [{ text: prompt }]
@@ -145,11 +152,13 @@ export class GeminiService {
       generationConfig: {
         temperature: 0.4,
         topP: 0.9,
-        maxOutputTokens: 4096,
+        maxOutputTokens: 1500,
         responseMimeType: 'application/json'
       }
     };
 
-    return GeminiService.executeApiCall(payload);
+    const result = await GeminiService.executeApiCall(payload);
+    GeminiService.cache.set(cacheKey, result);
+    return result;
   }
 }

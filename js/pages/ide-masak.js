@@ -8,6 +8,8 @@ import { showToast } from '../components/toast.js';
 import { ModalService } from '../components/modal.js';
 import { store } from '../core/state.js';
 
+let isGeneratingRecipes = false;
+
 export function renderIdeMasakPage() {
   const mainEl = document.getElementById('app-main');
   if (!mainEl) return;
@@ -91,9 +93,11 @@ export function renderIdeMasakPage() {
             <p class="text-[11px] text-slate-500">Disesuaikan dengan stok nyata saat ini</p>
           </div>
           ${totalBahan > 0 ? `
-            <button id="btn-request-ai-recipe" class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-800 active:scale-95 transition">
-              <span class="material-symbols-outlined text-[16px]">auto_awesome</span>
-              <span>Racik Menu Baru</span>
+            <button id="btn-request-ai-recipe" ${isGeneratingRecipes ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-800 active:scale-95 transition ${isGeneratingRecipes ? 'opacity-70 cursor-not-allowed' : ''}">
+              ${isGeneratingRecipes
+                ? `<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span><span>Meracik Resep...</span>`
+                : `<span class="material-symbols-outlined text-[16px]">auto_awesome</span><span>Racik Menu Baru</span>`
+              }
             </button>
           ` : ''}
         </div>
@@ -116,9 +120,11 @@ export function renderIdeMasakPage() {
               </p>
             </div>
             ${totalBahan > 0 ? `
-              <button id="btn-trigger-generate-recipes" class="w-full h-12 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
-                <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
-                <span>Buat Rekomendasi Menu Sekarang</span>
+              <button id="btn-trigger-generate-recipes" ${isGeneratingRecipes ? 'disabled' : ''} class="w-full h-12 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition ${isGeneratingRecipes ? 'opacity-70 cursor-not-allowed' : ''}">
+                ${isGeneratingRecipes
+                  ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>Sedang Meracik Resep...</span>`
+                  : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Buat Rekomendasi Menu Sekarang</span>`
+                }
               </button>
             ` : `
               <div class="flex items-center gap-2 pt-1">
@@ -309,24 +315,58 @@ export function renderIdeMasakPage() {
         return;
       }
 
+      if (isGeneratingRecipes) {
+        showToast('Chef AI sedang meracik menu di latar belakang...', 'info', 2000);
+        return;
+      }
+
+      isGeneratingRecipes = true;
+      renderContent();
+
       ModalService.open(`
-        <div class="py-8 flex flex-col items-center text-center">
-          <div class="w-16 h-16 rounded-3xl bg-primary text-on-primary flex items-center justify-center animate-bounce shadow-lg">
+        <div class="py-3 flex flex-col items-center text-center relative">
+          <!-- Tombol Tutup X di Kanan Atas -->
+          <div class="w-full flex justify-end">
+            <button data-close-modal class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition">
+              <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+          </div>
+
+          <div class="w-16 h-16 rounded-3xl bg-primary text-on-primary flex items-center justify-center animate-bounce shadow-lg mt-1">
             <span class="material-symbols-outlined text-[36px]">restaurant_menu</span>
           </div>
-          <h3 class="font-headline-sm text-headline-sm text-on-surface mt-4">Meracik Rekomendasi Menu...</h3>
+
+          <h3 class="font-headline-sm text-base font-bold text-on-surface mt-4">Meracik Rekomendasi Menu...</h3>
           <p class="text-xs text-on-surface-variant max-w-xs mt-1.5 leading-relaxed">
-            Menyesuaikan stok ${totalBahan} bahan makanan dan bumbu dasarmu untuk menciptakan 3 rekomendasi menu praktis lezat.
+            Menyesuaikan stok ${totalBahan} bahan makanan dan bumbu dasarmu untuk menciptakan 3 menu praktis lezat.
           </p>
+
+          <!-- Tombol Tutup & Lanjut Jelajah -->
+          <div class="w-full mt-6 flex flex-col gap-2">
+            <button data-close-modal type="button" class="w-full h-11 rounded-xl bg-surface-container text-on-surface font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high active:scale-95 transition">
+              <span class="material-symbols-outlined text-[16px]">visibility_off</span>
+              <span>Lanjut Menjelajah (Tutup Modal)</span>
+            </button>
+            <p class="text-[10px] text-slate-400">
+              Kamu bisa klik di luar kotak atau tombol di atas. Chef AI akan tetap meracik di latar belakang.
+            </p>
+          </div>
         </div>
-      `);
+      `, {
+        onClose: () => {
+          if (isGeneratingRecipes) {
+            showToast('Chef AI tetap meracik di latar belakang...', 'info', 2500);
+          }
+        }
+      });
 
       try {
         const bumbuDasar = settings.bumbuDasar || [];
         const prompt = buildPromptRekomendasiMasak(allStok, bumbuDasar);
-        const result = await GeminiService.generateRecipes(prompt);
+        const result = await GeminiService.generateRecipes(prompt, true);
 
         ModalService.close();
+        isGeneratingRecipes = false;
 
         if (result.rekomendasi && result.rekomendasi.length > 0) {
           currentRecipes = result.rekomendasi.map((r, idx) => ({
@@ -349,15 +389,24 @@ export function renderIdeMasakPage() {
           }));
           activeSelectedRecipe = currentRecipes[0];
           store.setState({ generatedRecipes: currentRecipes });
-          showToast('Rekomendasi menu baru berhasil diracik!', 'success');
-          renderContent();
+          showToast('🎉 Rekomendasi menu baru berhasil diracik!', 'success');
+          if (store.getState().activeTab === 'ide-masak') {
+            renderContent();
+          }
         } else {
           showToast('Tidak ada menu yang cocok. Coba tambahkan lebih banyak bahan.', 'info');
+          if (store.getState().activeTab === 'ide-masak') {
+            renderContent();
+          }
         }
       } catch (err) {
         ModalService.close();
+        isGeneratingRecipes = false;
         console.error('Recipe generation error:', err);
         showToast(`Gagal meracik menu: ${err.message}`, 'error', 4000);
+        if (store.getState().activeTab === 'ide-masak') {
+          renderContent();
+        }
       }
     };
 

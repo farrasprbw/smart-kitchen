@@ -6,11 +6,11 @@ export const CONFIG = {
   GEMINI_API_KEY: '',
   DEFAULT_API_KEY: '',
   GEMINI_MODELS: [
-    'gemini-flash-lite-latest',
-    'gemini-3-flash-preview',
-    'gemini-3.8-flash'
+    'gemini-2.0-flash',
+    'gemini-1.5-flash',
+    'gemini-flash-lite-latest'
   ],
-  GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent',
+  GEMINI_API_URL: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
 
   FIREBASE: {
     projectId: 'dapur-pintar-ai',

@@ -74,6 +74,9 @@ TUGAS:
 Berikan 3 rekomendasi menu masakan Indonesia lezat yang BISA DIBUAT secara realistis dari stok yang ada dan bumbu dasar.
 Prioritaskan bahan yang mudah layu atau mendekati batas konsumsi. Semua resep praktis (< 30 menit).
 
+INSTRUKSI KECEPATAN:
+Buat penjelasan padat, ringkas, dan to-the-point. Langkah memasak maksimal 3 langkah singkat per menu, dan alasan cukup 1 kalimat singkat. Hindari kata-kata bertele-tele agar pemrosesan super cepat.
+
 Format JSON yang wajib diikuti:
 {
   "rekomendasi": [
@@ -81,7 +84,7 @@ Format JSON yang wajib diikuti:
       "id": "resep-1",
       "nama": "Nama Masakan Indonesia (misal: Tumis Sawi Tahu Gurih)",
       "badge": "100% Bahan Cocok / Cepat & Praktis / Rekomendasi Hemat",
-      "alasan": "Alasan rekomendasi (misal: Menggunakan sawi yang mulai layu dan tahu agar tidak terbuang)",
+      "alasan": "Alasan singkat (misal: Menggunakan sawi layu & tahu)",
       "waktu_masak": "15 menit",
       "tingkat_kesulitan": "Mudah",
       "porsi": "2-3 porsi",
@@ -91,12 +94,11 @@ Format JSON yang wajib diikuti:
       ],
       "bahan_bumbu": ["Bawang putih", "Kecap manis", "Garam", "Minyak goreng"],
       "langkah": [
-        "Potong tahu dadu kecil dan sawi sesuai selera.",
-        "Tumis bawang putih cincang hingga harum keemasan.",
-        "Masukkan tahu, masak sebentar lalu masukkan sawi.",
-        "Bumbui dengan kecap manis dan garam, masak cepat hingga sawi layu pas. Angkat dan sajikan."
+        "Potong tahu dadu kecil dan bersihkan sawi.",
+        "Tumis bawang putih hingga harum, masukkan tahu dan sawi.",
+        "Bumbui kecap manis dan garam, masak cepat hingga matang."
       ],
-      "tips": "Jangan terlalu lama memasak sawi agar nutrisi dan kerenyahannya tetap terjaga."
+      "tips": "Masak cepat agar sayur tetap renyah."
     }
   ]
 }
