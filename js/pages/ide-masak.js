@@ -338,7 +338,7 @@ export function renderIdeMasakPage() {
 
           <h3 class="font-headline-sm text-base font-bold text-on-surface mt-4">Meracik Rekomendasi Menu...</h3>
           <p class="text-xs text-on-surface-variant max-w-xs mt-1.5 leading-relaxed">
-            Menyesuaikan stok ${totalBahan} bahan makanan dan bumbu dasarmu untuk menciptakan 3 menu praktis lezat.
+            Menyesuaikan stok ${totalBahan} bahan makanan utama dan bumbu dapur untuk menciptakan 3 menu praktis lezat.
           </p>
 
           <!-- Tombol Tutup & Lanjut Jelajah -->
@@ -361,8 +361,7 @@ export function renderIdeMasakPage() {
       });
 
       try {
-        const bumbuDasar = settings.bumbuDasar || [];
-        const prompt = buildPromptRekomendasiMasak(allStok, bumbuDasar);
+        const prompt = buildPromptRekomendasiMasak(allStok);
         const result = await GeminiService.generateRecipes(prompt, true);
 
         ModalService.close();

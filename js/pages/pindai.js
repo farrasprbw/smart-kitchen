@@ -104,7 +104,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
               ${
                 scanType === 'belanja'
                   ? 'Foto bahan belanjaan dan struk kasir untuk inventarisasi & hitung total pengeluaran otomatis.'
-                  : 'Ambil foto bertahap tiap kompartemen agar bahan di dalam terlihat jelas tanpa terhalang kemasan lain.'
+                  : 'Cukup foto bahan makanan utama (sayur, lauk, buah). Bumbu dapur dasar diasumsikan sudah tersedia di rumah.'
               }
             </p>
           </div>

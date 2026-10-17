@@ -6,10 +6,10 @@
 
 ## ✨ Fitur Utama
 
-- **📸 Deteksi Kulkas Multi-Sudut**: Foto isi kulkas dari berbagai rak dan biarkan sistem mengenali bahan makanan beserta estimasi jumlah dan kondisinya.
+- **📸 Deteksi Kulkas Multi-Sudut**: Foto isi kulkas dari berbagai rak dan biarkan sistem mengenali bahan makanan utama beserta estimasi jumlah dan kondisinya. Pengguna tidak perlu repot memindai bumbu dasar (garam, gula, kecap, merica, dll) karena otomatis diasumsikan sudah tersedia di dapur.
 - **🛒 Pindai Belanjaan**: Foto barang belanjaan Anda untuk langsung memperbarui inventaris kulkas dan dapur secara otomatis.
-- **🍳 Ide Masak Pintar**: Dapatkan rekomendasi 3 resep masakan Indonesia lezat yang dibuat hanya menggunakan bahan-bahan yang saat ini tersedia di kulkas Anda.
-- **📦 Manajemen Stok Nyata**: Mulai dari inventaris bersih (tanpa data mock), pisahkan stok kulkas dan bahan kering dapur, serta lengkapi status kesegaran bahan.
+- **🍳 Ide Masak Pintar**: Dapatkan rekomendasi 3 resep masakan Indonesia praktis & lezat yang memadukan bahan makanan utama hasil pindai dengan bumbu dasar dapur rumahan tanpa perlu input bumbu manual.
+- **📦 Manajemen Stok Nyata**: Mulai dari inventaris bersih (tanpa data mock), pisahkan stok kulkas dan bahan dapur, serta lengkapi status kesegaran bahan.
 - **📋 Log & Riwayat**: Catatan aktivitas memasak dan belanja harian.
 - **📱 Progressive Web App (PWA)**: Ringan, dapat diinstal di smartphone (Android/iOS) atau desktop, dan mendukung akses offline dasar.
 - **🧹 Reset Data Fleksibel**: Kemudahan mengosongkan dan mengatur ulang seluruh inventaris kapan saja lewat menu Pengaturan.

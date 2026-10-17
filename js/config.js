@@ -29,12 +29,6 @@ export const CONFIG = {
     SETTINGS: 'dapur_pintar_settings',
   },
 
-  DEFAULT_BUMBU_DASAR: [
-    'garam', 'gula', 'kecap manis', 'kecap asin',
-    'bawang merah', 'bawang putih', 'cabai',
-    'minyak goreng', 'merica',
-  ],
-
   // Brightness thresholds
   BRIGHTNESS: {
     OPTIMAL: 120,

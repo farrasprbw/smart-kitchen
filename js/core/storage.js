@@ -25,7 +25,6 @@ const INITIAL_SETTINGS = {
   version: 2,
   apiKey: '',
   userName: 'Sari',
-  bumbuDasar: [...CONFIG.DEFAULT_BUMBU_DASAR],
   theme: 'light',
   onboardingDone: false
 };

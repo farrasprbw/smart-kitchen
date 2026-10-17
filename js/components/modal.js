@@ -72,13 +72,6 @@ export class ModalService {
 
 
 
-          <div>
-            <label class="block text-xs font-bold text-on-surface mb-1">Bumbu Dasar Selalu Ada (pisahkan dengan koma)</label>
-            <textarea id="setting-bumbu" rows="2"
-              class="w-full p-3 rounded-xl bg-surface-container border border-outline-variant text-on-surface text-xs focus:outline-none focus:ring-2 focus:ring-primary">${(settings.bumbuDasar || []).join(', ')}</textarea>
-            <p class="text-[11px] text-on-surface-variant mt-1">Bumbu yang diasumsikan selalu tersedia di dapur saat merekomendasikan resep.</p>
-          </div>
-
           <div class="pt-1">
             <button type="submit" class="w-full h-11 rounded-xl bg-primary text-on-primary font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition shadow-sm">
               <span class="material-symbols-outlined text-[18px]">check</span>
@@ -120,16 +113,13 @@ export class ModalService {
       document.getElementById('form-settings')?.addEventListener('submit', (e) => {
         e.preventDefault();
         const userName = document.getElementById('setting-user-name').value.trim() || 'Sari';
-        const bumbuStr = document.getElementById('setting-bumbu').value;
-        const bumbuDasar = bumbuStr.split(',').map(s => s.trim()).filter(Boolean);
         StorageService.saveSettings({
           ...settings,
-          userName,
-          bumbuDasar
+          userName
         });
 
         ModalService.close();
-        if (onSave) onSave({ ...settings, userName, bumbuDasar });
+        if (onSave) onSave({ ...settings, userName });
       });
 
       // Export JSON

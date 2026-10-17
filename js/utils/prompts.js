@@ -5,11 +5,12 @@ export function buildPromptDeteksiKulkas(jumlahFoto = 1) {
 Saya mengirim ${jumlahFoto} foto isi kulkas dari sudut/bagian berbeda.
 
 TUGAS:
-1. Analisis SEMUA foto dan gabungkan menjadi SATU daftar bahan makanan unik.
+1. Analisis SEMUA foto dan gabungkan menjadi SATU daftar bahan makanan utama unik.
 2. Identifikasi nama bahan, perkiraan jumlah, satuan, kategori, lokasi penyimpanan, dan tingkat keyakinan (confidence).
-3. Jika bahan tertutup atau kurang jelas, set "yakin": false dan beri catatan singkat.
-4. Jangan mengarang bahan yang tidak terlihat.
-5. Jawab HANYA dengan JSON valid tanpa formatting markdown lainnya jika memungkinkan, atau bungkus dalam block json.
+3. Fokus utamakan mendeteksi BAHAN MAKANAN UTAMA (sayur, protein/daging/ayam/ikan/telur, buah, olahan, minuman). Bumbu dasar dapur standar (seperti garam, gula, kecap, merica, minyak) diasumsikan sudah ada di rumah.
+4. Jika bahan tertutup atau kurang jelas, set "yakin": false dan beri catatan singkat.
+5. Jangan mengarang bahan yang tidak terlihat.
+6. Jawab HANYA dengan JSON valid tanpa formatting markdown lainnya jika memungkinkan, atau bungkus dalam block json.
 
 Format JSON yang wajib diikuti:
 {
@@ -53,26 +54,22 @@ Output dalam format JSON:
 Jawab HANYA dengan JSON valid.`;
 }
 
-export function buildPromptRekomendasiMasak(daftarStok, bumbuDasar) {
+export function buildPromptRekomendasiMasak(daftarStok) {
   const stokStr = daftarStok && daftarStok.length > 0
     ? daftarStok.map(b => `- ${b.nama}: ${b.jumlah ?? '?'} ${b.satuan || ''}${b.catatan ? ` (${b.catatan})` : ''}`).join('\n')
-    : '(Stok kosong, gunakan bumbu dasar dan bahan umum)';
-
-  const bumbuStr = (bumbuDasar && bumbuDasar.length > 0)
-    ? bumbuDasar.join(', ')
-    : 'garam, gula, minyak goreng, bawang merah, bawang putih';
+    : '(Stok bahan utama kosong, berikan rekomendasi menu kreatif dari bahan umum rumahan)';
 
   return `Kamu adalah chef rumahan Indonesia yang kreatif, praktis, dan ahli zero-waste cooking.
 
-STOK BAHAN TERSEDIA SAAT INI:
+STOK BAHAN UTAMA TERSEDIA SAAT INI (HASIL SCAN):
 ${stokStr}
 
-BUMBU DASAR YANG SELALU TERSEDIA:
-${bumbuStr}
+ASUMSI BUMBU DASAR DAPUR:
+User SUDAH MEMILIKI bumbu-bumbu dasar dapur umum di rumah (seperti garam, gula, minyak goreng, bawang merah, bawang putih, cabai, merica/lada, kecap manis, kecap asin, saus tiram, kaldu bubuk, dll). User HANYA memindai bahan makanan utama. Manfaatkan stok bahan utama hasil scan di atas dan kombinasikan secara wajar dengan bumbu dasar dapur standar untuk menghasilkan hidangan yang enak.
 
 TUGAS:
-Berikan 3 rekomendasi menu masakan Indonesia lezat yang BISA DIBUAT secara realistis dari stok yang ada dan bumbu dasar.
-Prioritaskan bahan yang mudah layu atau mendekati batas konsumsi. Semua resep praktis (< 30 menit).
+Berikan 3 rekomendasi menu masakan Indonesia lezat yang BISA DIBUAT secara realistis dari bahan utama yang di-scan dan bumbu dapur standar.
+Prioritaskan bahan makanan utama yang mudah layu atau mendekati batas konsumsi. Semua resep praktis (< 30 menit).
 
 INSTRUKSI KECEPATAN:
 Buat penjelasan padat, ringkas, dan to-the-point. Langkah memasak maksimal 3 langkah singkat per menu, dan alasan cukup 1 kalimat singkat. Hindari kata-kata bertele-tele agar pemrosesan super cepat.
