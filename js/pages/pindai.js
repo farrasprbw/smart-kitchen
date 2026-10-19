@@ -40,15 +40,13 @@ export function renderPindaiPage(params = new URLSearchParams()) {
   const mainEl = document.getElementById('app-main');
   if (!mainEl) return;
 
-  // Mode: 'kulkas' (AI Ambil Foto) | 'barcode' (Pemindai Otomatis) | 'belanja' (Struk & Belanja)
+  // Mode: 'kulkas' (AI Ambil Foto) | 'barcode' (Pemindai Otomatis)
   const queryType = params.get('type') || store.getState().scanType || 'kulkas';
-  const scanType = ['kulkas', 'barcode', 'belanja'].includes(queryType) ? queryType : 'kulkas';
+  const scanType = queryType === 'barcode' ? 'barcode' : 'kulkas';
   store.setState({ scanType });
 
   const pageSubtitle = scanType === 'barcode'
     ? 'Deteksi Barcode Otomatis'
-    : scanType === 'belanja'
-    ? 'Bahan & Struk Belanja'
     : 'Inventaris Kulkas (AI Vision)';
 
   renderHeader({
@@ -57,11 +55,11 @@ export function renderPindaiPage(params = new URLSearchParams()) {
     subtitle: pageSubtitle
   });
 
-  const slots = scanType === 'belanja' ? CONFIG.BELANJA_SLOTS : CONFIG.PHOTO_SLOTS;
+  const slots = CONFIG.PHOTO_SLOTS;
 
-  // Ambil draft foto untuk mode kulkas / belanja
+  // Ambil draft foto untuk mode kulkas
   const currentState = store.getState();
-  let photos = scanType === 'belanja' ? (currentState.belanjaPhotos || []) : (currentState.kulkasPhotos || []);
+  let photos = currentState.kulkasPhotos || [];
 
   if (scanType !== 'barcode') {
     if (!photos || photos.length !== slots.length) {
@@ -73,7 +71,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
         base64: null,
         mimeType: 'image/jpeg'
       }));
-      store.saveDraftPhotos(scanType, photos);
+      store.saveDraftPhotos('kulkas', photos);
     }
   }
 
@@ -86,9 +84,9 @@ export function renderPindaiPage(params = new URLSearchParams()) {
   mainEl.innerHTML = `
     <div class="page-enter flex flex-col w-full max-w-md mx-auto px-4 pt-2 pb-24 gap-4">
 
-      <!-- Mode Switcher: Pindai Kulkas vs Scan Barcode -->
+      <!-- Mode Switcher: 2 Tab Bersih (Pindai Kulkas vs Scan Barcode) -->
       <div class="p-1 rounded-2xl bg-surface-container-high border border-outline-variant/30 flex items-center shadow-xs">
-        <button id="tab-scan-kulkas" type="button" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+        <button id="tab-scan-kulkas" type="button" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
           scanType === 'kulkas'
             ? 'bg-primary text-on-primary shadow-sm'
             : 'text-on-surface-variant hover:text-on-surface'
@@ -97,22 +95,13 @@ export function renderPindaiPage(params = new URLSearchParams()) {
           <span>Pindai Kulkas</span>
         </button>
 
-        <button id="tab-scan-barcode" type="button" class="flex-1 py-2 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+        <button id="tab-scan-barcode" type="button" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
           scanType === 'barcode'
             ? 'bg-primary text-on-primary shadow-sm'
             : 'text-on-surface-variant hover:text-on-surface'
         }">
           <span class="material-symbols-outlined text-[18px]">barcode_scanner</span>
           <span>Scan Barcode</span>
-        </button>
-
-        <button id="tab-scan-belanja" type="button" class="py-2 px-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 ${
-          scanType === 'belanja'
-            ? 'bg-primary text-on-primary shadow-sm'
-            : 'text-on-surface-variant hover:text-on-surface'
-        }" title="Mode Belanjaan & Struk">
-          <span class="material-symbols-outlined text-[18px]">receipt_long</span>
-          <span class="hidden sm:inline">Struk</span>
         </button>
       </div>
 
@@ -127,7 +116,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
           <div class="flex-1 min-w-0">
             <div class="flex items-center justify-between">
               <span class="font-bold text-xs text-on-surface">
-                ${scanType === 'barcode' ? 'Mode Scan Barcode' : (scanType === 'belanja' ? 'Pindai Belanjaan' : 'Mode Pindai Kulkas')}
+                ${scanType === 'barcode' ? 'Mode Scan Barcode' : 'Mode Pindai Kulkas'}
               </span>
               <button id="btn-open-tips" type="button" class="flex items-center gap-1 text-[11px] font-bold text-primary hover:underline">
                 <span class="material-symbols-outlined text-[14px]">lightbulb</span>
@@ -138,9 +127,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
               ${
                 scanType === 'barcode'
                   ? 'Arahkan kotak kamera ke barcode produk kemasan. Pemindaian berlangsung otomatis tanpa perlu menekan tombol jepret.'
-                  : (scanType === 'belanja'
-                    ? 'Foto bahan belanjaan dan struk kasir untuk inventarisasi & hitung total pengeluaran otomatis.'
-                    : 'Ambil 3-4 foto kulkas dari sudut berbeda (Rak, Laci, Freezer, Pintu), lalu klik Analisis agar AI mendeteksi semua bahan.')
+                  : 'Ambil 3-4 foto kulkas dari sudut berbeda (Rak, Laci, Freezer, Pintu), lalu klik Analisis agar AI mendeteksi semua bahan.'
               }
             </p>
           </div>
@@ -385,13 +372,6 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
     if (scanType !== 'barcode') {
       stopPindaiCamera();
       renderPindaiPage(new URLSearchParams('type=barcode'));
-    }
-  });
-
-  document.getElementById('tab-scan-belanja')?.addEventListener('click', () => {
-    if (scanType !== 'belanja') {
-      stopPindaiCamera();
-      renderPindaiPage(new URLSearchParams('type=belanja'));
     }
   });
 

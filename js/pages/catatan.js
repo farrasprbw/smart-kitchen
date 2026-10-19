@@ -134,8 +134,8 @@ export function renderCatatanPage() {
         <div class="p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">
           <span class="material-symbols-outlined text-[32px] text-slate-300">shopping_bag</span>
           <p class="text-xs mt-2 font-medium">Belum ada riwayat belanja.</p>
-          <a href="#pindai?type=belanja" class="mt-3 px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold inline-flex items-center gap-1">
-            Pindai Belanjaan →
+          <a href="#pindai?type=barcode" class="mt-3 px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold inline-flex items-center gap-1">
+            Scan Barcode →
           </a>
         </div>
       `;

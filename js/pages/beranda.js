@@ -381,9 +381,9 @@ export function renderBerandaPage() {
               <span class="material-symbols-outlined text-[18px]">kitchen</span>
               <span>Pindai Kulkas</span>
             </a>
-            <a href="#pindai?type=belanja" class="px-3 py-2.5 rounded-xl bg-amber-600 text-white text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition hover:bg-amber-700">
-              <span class="material-symbols-outlined text-[18px]">receipt_long</span>
-              <span>Pindai Belanjaan</span>
+            <a href="#pindai?type=barcode" class="px-3 py-2.5 rounded-xl bg-amber-600 text-white text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition hover:bg-amber-700">
+              <span class="material-symbols-outlined text-[18px]">barcode_scanner</span>
+              <span>Scan Barcode</span>
             </a>
             <button id="btn-empty-add" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition">
               <span class="material-symbols-outlined text-[18px]">edit_note</span>
