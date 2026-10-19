@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Dapur Pintar</string>
+    <string name="title_activity_main">Dapur Pintar</string>
+    <string name="package_name">com.dapurpintar.app</string>
+    <string name="custom_url_scheme">com.dapurpintar.app</string>
+</resources>

@@ -1,0 +1,27 @@
+{
+  "name": "dapur-pintar",
+  "version": "1.0.0",
+  "description": "Smart Kitchen Assistant - Asisten Dapur Pintar AI",
+  "type": "module",
+  "scripts": {
+    "dev": "npx serve . -l 3000",
+    "prepare-web": "node scripts/prepare-web.js",
+    "cap:sync": "npm run prepare-web && npx cap sync",
+    "cap:open": "npx cap open android",
+    "build:apk": "npm run cap:sync && cd android && .\\gradlew.bat assembleDebug && copy app\\build\\outputs\\apk\\debug\\app-debug.apk ..\\dapur-pintar.apk"
+  },
+  "keywords": [
+    "smart-kitchen",
+    "dapur-pintar",
+    "capacitor",
+    "android"
+  ],
+  "author": "Dapur Pintar",
+  "license": "MIT",
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
+    "@capacitor/preferences": "^8.0.1"
+  }
+}

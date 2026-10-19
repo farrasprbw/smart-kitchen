@@ -6,21 +6,22 @@
 
 ## ✨ Fitur Utama
 
-- **📸 Deteksi Kulkas Multi-Sudut**: Foto isi kulkas dari berbagai rak dan biarkan sistem mengenali bahan makanan utama beserta estimasi jumlah dan kondisinya. Pengguna tidak perlu repot memindai bumbu dasar (garam, gula, kecap, merica, dll) karena otomatis diasumsikan sudah tersedia di dapur.
-- **🛒 Pindai Belanjaan**: Foto barang belanjaan Anda untuk langsung memperbarui inventaris kulkas dan dapur secara otomatis.
-- **🍳 Ide Masak Pintar**: Dapatkan rekomendasi 3 resep masakan Indonesia praktis & lezat yang memadukan bahan makanan utama hasil pindai dengan bumbu dasar dapur rumahan tanpa perlu input bumbu manual.
-- **📦 Manajemen Stok Nyata**: Mulai dari inventaris bersih (tanpa data mock), pisahkan stok kulkas dan bahan dapur, serta lengkapi status kesegaran bahan.
+- **📸 Deteksi Kulkas Multi-Sudut**: Foto isi kulkas dari berbagai sudut (Rak, Laci, Pintu, Freezer) dan biarkan AI Gemini mengenali bahan makanan utama beserta kuantitas dan kesegarannya tanpa perlu input bumbu dasar manual.
+- **🏷️ Scan Barcode Produk Otomatis**: Deteksi cepat barcode kemasan makanan/minuman dengan integrasi database global **Open Food Facts** untuk input instan ke kulkas atau dapur.
+- **🍳 Ide Masak Pintar & Infinite Scroll**: Rekomendasi resep masakan rumahan Indonesia yang disesuaikan dengan stok nyata. Dilengkapi sistem *infinite scroll* dan tombol *"Cari Rekomendasi Lainnya"* anti-duplikasi.
+- **📦 Manajemen Stok Nyata**: Mulai dari inventaris bersih, pembagian jelas antara stok kulkas & dapur, serta indikator prioritas bahan yang harus segera dimasak (*zero food waste*).
 - **📋 Log & Riwayat**: Catatan aktivitas memasak dan belanja harian.
-- **📱 Progressive Web App (PWA)**: Ringan, dapat diinstal di smartphone (Android/iOS) atau desktop, dan mendukung akses offline dasar.
-- **🧹 Reset Data Fleksibel**: Kemudahan mengosongkan dan mengatur ulang seluruh inventaris kapan saja lewat menu Pengaturan.
+- **📱 Hybrid Mobile & PWA**: Tersedia sebagai Web App (PWA) dan aplikasi **Android Native (.apk)** menggunakan **Capacitor** (~4.2 MB).
 
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend**: HTML5, Vanilla JavaScript (ES Modules), Tailwind CSS (CDN), Material Symbols Outlined, Plus Jakarta Sans.
-- **AI Engine**: Google Gemini Flash (`gemini-flash-lite-latest`, `gemini-3-flash-preview`) dengan failover fallback otomatis.
-- **Storage**: Browser `localStorage` (Privasi terjaga, data tersimpan di perangkat pengguna).
+- **Mobile Wrapper**: **Capacitor 8** (`@capacitor/core`, `@capacitor/android`, `@capacitor/preferences`).
+- **Barcode Engine**: BarcodeDetector API / Html5Qrcode + Open Food Facts API.
+- **AI Engine**: Google Gemini Flash (`gemini-flash-lite-latest`, `gemini-3-flash-preview`) dengan multi-model failover fallback otomatis.
+- **Storage**: Browser `localStorage` & native persistent storage via `@capacitor/preferences`.
 - **Backend / Deployment**: Vercel Serverless Function (`/api/config`).
 
 ---
@@ -61,6 +62,38 @@ python -m http.server 8080
 ```
 
 Buka browser Anda di `http://localhost:8080`.
+
+---
+
+## 📱 Build Aplikasi Android Native (Capacitor)
+
+Proyek ini telah dilengkapi dengan wrapper **Capacitor 8** untuk menghasilkan file `.apk` mandiri yang siap diinstall ke smartphone Android:
+
+### Prasyarat
+- Node.js (v18+)
+- JDK 17 atau JDK 21
+- Android SDK (Platform 35/36, Build Tools)
+
+### Perintah Build APK
+
+```bash
+# 1. Install dependensi
+npm install
+
+# 2. Siapkan aset web ke direktori www/ dan sinkronkan ke Android
+npm run cap:sync
+
+# 3. Kompilasi langsung menjadi file APK debug
+npm run build:apk
+```
+
+File `.apk` yang dihasilkan akan otomatis tersedia di:
+- `android/app/build/outputs/apk/debug/app-debug.apk` (atau salinan root `dapur-pintar.apk`).
+
+### Buka di Android Studio (Opsional)
+```bash
+npm run cap:open
+```
 
 ---
 

@@ -7,6 +7,8 @@ implementation_plan.md
 # Vercel & build artifacts
 .vercel/
 node_modules/
+www/
+*.apk
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
