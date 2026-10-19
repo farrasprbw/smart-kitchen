@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
   <meta name="description" content="Dapur Pintar — Asisten dapur cerdas. Kelola stok kulkas, rekomendasi masakan, dan cegah food waste.">
-  <meta name="theme-color" content="#00652c">
+  <meta name="theme-color" content="#ffffff">
   <title>Dapur Pintar</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="manifest" href="manifest.json">
@@ -137,6 +137,7 @@
       }
       .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
       .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+      .pt-safe-content { padding-top: calc(4.25rem + env(safe-area-inset-top, 0px)); }
       main > :first-child { margin-top: 0 !important; }
       main > :last-child { margin-bottom: 0 !important; }
     }
@@ -193,16 +194,19 @@
 
   <!-- App Header -->
   <header id="app-header" class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe">
-    <div class="max-w-md mx-auto px-4 h-14 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-xs shadow-xs">DP</div>
-        <span class="font-bold text-sm text-slate-800">Dapur Pintar</span>
+    <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none">DP</div>
+        <div>
+          <span class="text-xs font-semibold text-on-surface-variant">Memuat...</span>
+          <h1 class="text-base font-bold text-on-surface leading-tight">Dapur Pintar</h1>
+        </div>
       </div>
     </div>
   </header>
 
   <!-- App Main Content (Memiliki Initial Structure Skeleton agar tidak kosong saat load) -->
-  <main id="app-main" class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface overflow-y-auto">
+  <main id="app-main" class="flex-1 flex flex-col relative w-full pt-safe-content pb-24 bg-surface overflow-y-auto">
     <div id="initial-loading-skeleton" class="flex flex-col w-full max-w-md mx-auto px-4 pt-2 gap-4">
       <!-- Welcome card skeleton -->
       <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">

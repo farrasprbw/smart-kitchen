@@ -59,7 +59,7 @@ export function renderHeader({
     container.innerHTML = `
       <div class="flex items-center justify-between px-4 h-16 max-w-md mx-auto">
         <div class="flex items-center gap-3">
-          <a href="#${backHash}" id="header-btn-back" class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition active:scale-95">
+          <a href="#${backHash}" id="header-btn-back" class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition active:scale-95" title="Kembali">
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </a>
           <div>
@@ -86,12 +86,12 @@ export function renderHeader({
     return;
   }
 
-  // Default Tab Header
+  // Default Tab Header (Logo DP Resmi Dapur Pintar)
   container.innerHTML = `
     <div class="flex items-center justify-between px-4 h-16 max-w-md mx-auto">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold text-base shadow-sm ring-2 ring-primary/20">
-          ${subtitle.replace('Halo, ', '').charAt(0) || 'S'}
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none">
+          DP
         </div>
         <div>
           <div class="flex items-center gap-2">
