@@ -209,35 +209,35 @@ export function renderBerandaPage() {
               </span>
             </div>
             <div class="grid grid-cols-3 gap-2.5">
-              <!-- Action 1: Foto Kulkas -->
+              <!-- Action 1: Pindai Kulkas -->
               <a href="#pindai?type=kulkas" class="flex flex-col justify-between p-3.5 h-32 rounded-2xl bg-emerald-700 text-white shadow-sm hover:bg-emerald-800 active:scale-95 transition text-left group">
                 <div class="flex justify-between items-start w-full">
                   <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition">
                     <span class="material-symbols-outlined text-[20px]">kitchen</span>
                   </div>
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100">Auto</span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100">AI</span>
                 </div>
                 <div>
-                  <h3 class="text-xs font-bold leading-tight">Foto Kulkas</h3>
-                  <p class="text-[10px] text-emerald-100/90 mt-0.5">Pindai 4 kompartemen</p>
+                  <h3 class="text-xs font-bold leading-tight">Pindai Kulkas</h3>
+                  <p class="text-[10px] text-emerald-100/90 mt-0.5">Multi-sudut kamera</p>
                 </div>
               </a>
 
-              <!-- Action 2: Foto Belanja -->
-              <a href="#pindai?type=belanja" class="flex flex-col justify-between p-3.5 h-32 rounded-2xl bg-amber-600 text-white shadow-sm hover:bg-amber-700 active:scale-95 transition text-left group">
+              <!-- Action 2: Scan Barcode -->
+              <a href="#pindai?type=barcode" class="flex flex-col justify-between p-3.5 h-32 rounded-2xl bg-amber-600 text-white shadow-sm hover:bg-amber-700 active:scale-95 transition text-left group">
                 <div class="flex justify-between items-start w-full">
                   <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition">
-                    <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                    <span class="material-symbols-outlined text-[20px]">barcode_scanner</span>
                   </div>
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-100">Auto</span>
+                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-100">Instan</span>
                 </div>
                 <div>
-                  <h3 class="text-xs font-bold leading-tight">Foto Belanja</h3>
-                  <p class="text-[10px] text-amber-100/90 mt-0.5">Bahan & struk kasir</p>
+                  <h3 class="text-xs font-bold leading-tight">Scan Barcode</h3>
+                  <p class="text-[10px] text-amber-100/90 mt-0.5">Deteksi otomatis</p>
                 </div>
               </a>
 
-              <!-- Action 3: Masak Apa -->
+              <!-- Action 3: Ide Masak -->
               <a href="#ide-masak" class="flex flex-col justify-between p-3.5 h-32 rounded-2xl bg-orange-600 text-white shadow-sm hover:bg-orange-700 active:scale-95 transition text-left group">
                 <div class="flex justify-between items-start w-full">
                   <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition">
@@ -246,7 +246,7 @@ export function renderBerandaPage() {
                   <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-900/40 text-orange-100">Chef</span>
                 </div>
                 <div>
-                  <h3 class="text-xs font-bold leading-tight">Masak Apa?</h3>
+                  <h3 class="text-xs font-bold leading-tight">Ide Masak</h3>
                   <p class="text-[10px] text-orange-100/90 mt-0.5">Dari stok tersedia</p>
                 </div>
               </a>

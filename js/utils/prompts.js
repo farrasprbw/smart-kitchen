@@ -54,15 +54,20 @@ Output dalam format JSON:
 Jawab HANYA dengan JSON valid.`;
 }
 
-export function buildPromptRekomendasiMasak(daftarStok) {
+export function buildPromptRekomendasiMasak(daftarStok, excludeNames = []) {
   const stokStr = daftarStok && daftarStok.length > 0
     ? daftarStok.map(b => `- ${b.nama}: ${b.jumlah ?? '?'} ${b.satuan || ''}${b.catatan ? ` (${b.catatan})` : ''}`).join('\n')
     : '(Stok bahan utama kosong, berikan rekomendasi menu kreatif dari bahan umum rumahan)';
+
+  const excludePrompt = excludeNames && excludeNames.length > 0
+    ? `\nMENU YANG SUDAH PERNAH DIREKOMENDASIKAN (JANGAN DIREKOMENDASIKAN ULANG / JANGAN DUPLIKAT):\n${excludeNames.map(n => `- ${n}`).join('\n')}\nPASTIKAN SEMUA MENU BARU BERIKUT TIDAK ADA YANG SAMA/MIRIP DENGAN DAFTAR DI ATAS!`
+    : '';
 
   return `Kamu adalah chef rumahan Indonesia yang kreatif, praktis, dan ahli zero-waste cooking.
 
 STOK BAHAN UTAMA TERSEDIA SAAT INI (HASIL SCAN):
 ${stokStr}
+${excludePrompt}
 
 ASUMSI BUMBU DASAR DAPUR:
 User SUDAH MEMILIKI bumbu-bumbu dasar dapur umum di rumah (seperti garam, gula, minyak goreng, bawang merah, bawang putih, cabai, merica/lada, kecap manis, kecap asin, saus tiram, kaldu bubuk, dll). User HANYA memindai bahan makanan utama. Manfaatkan stok bahan utama hasil scan di atas dan kombinasikan secara wajar dengan bumbu dasar dapur standar untuk menghasilkan hidangan yang enak.

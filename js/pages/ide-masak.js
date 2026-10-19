@@ -9,6 +9,9 @@ import { ModalService } from '../components/modal.js';
 import { store } from '../core/state.js';
 
 let isGeneratingRecipes = false;
+let isFetchingMore = false;
+const BATCH_SIZE = 3;
+let displayedCount = 3;
 
 export function renderIdeMasakPage() {
   const mainEl = document.getElementById('app-main');
@@ -38,7 +41,13 @@ export function renderIdeMasakPage() {
   let currentRecipes = store.getState().generatedRecipes || [];
   let activeSelectedRecipe = currentRecipes[0] || null;
 
+  // Pastikan displayedCount minimal BATCH_SIZE
+  if (displayedCount < BATCH_SIZE) displayedCount = BATCH_SIZE;
+
   function renderContent() {
+    const visibleRecipes = currentRecipes.slice(0, displayedCount);
+    const hasMoreInPool = displayedCount < currentRecipes.length;
+
     mainEl.innerHTML = `
       <div class="page-enter flex flex-col w-full max-w-md mx-auto px-4 pt-2 pb-32 gap-5">
 
@@ -86,19 +95,16 @@ export function renderIdeMasakPage() {
           </div>
         </section>
 
-        <!-- Recipes Section Header & Refresh Button -->
+        <!-- Recipes Section Header (Hapus tombol redundan, hanya header bersih) -->
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-base font-bold text-slate-900">Rekomendasi Menu</h2>
             <p class="text-[11px] text-slate-500">Disesuaikan dengan stok nyata saat ini</p>
           </div>
-          ${totalBahan > 0 ? `
-            <button id="btn-request-ai-recipe" ${isGeneratingRecipes ? 'disabled' : ''} class="px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold flex items-center gap-1.5 shadow-sm hover:bg-emerald-800 active:scale-95 transition ${isGeneratingRecipes ? 'opacity-70 cursor-not-allowed' : ''}">
-              ${isGeneratingRecipes
-                ? `<span class="material-symbols-outlined text-[16px] animate-spin">progress_activity</span><span>Meracik Resep...</span>`
-                : `<span class="material-symbols-outlined text-[16px]">auto_awesome</span><span>Racik Menu Baru</span>`
-              }
-            </button>
+          ${currentRecipes.length > 0 ? `
+            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+              Tampil ${visibleRecipes.length} dari ${currentRecipes.length}
+            </span>
           ` : ''}
         </div>
 
@@ -114,25 +120,26 @@ export function renderIdeMasakPage() {
               </h3>
               <p class="text-xs text-slate-500 mt-1 leading-relaxed max-w-xs mx-auto">
                 ${totalBahan > 0
-                  ? `Ada ${totalBahan} bahan di kulkasmu. Tekan tombol di bawah untuk membuat 3 rekomendasi menu praktis sesuai stok saat ini.`
+                  ? `Ada ${totalBahan} bahan di kulkasmu. Tekan tombol di bawah untuk membuat rekomendasi menu praktis sesuai stok saat ini.`
                   : 'Pindai kulkas dengan kamera atau tambahkan bahan secara manual untuk mendapatkan resep otomatis.'
                 }
               </p>
             </div>
             ${totalBahan > 0 ? `
-              <button id="btn-trigger-generate-recipes" ${isGeneratingRecipes ? 'disabled' : ''} class="w-full h-12 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition ${isGeneratingRecipes ? 'opacity-70 cursor-not-allowed' : ''}">
+              <!-- Satu Tombol Utama / Primary Button Tanpa Redundansi -->
+              <button id="btn-primary-generate" ${isGeneratingRecipes ? 'disabled' : ''} class="w-full h-12 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-emerald-800 active:scale-95 transition ${isGeneratingRecipes ? 'opacity-70 cursor-not-allowed' : ''}">
                 ${isGeneratingRecipes
-                  ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>Sedang Meracik Resep...</span>`
-                  : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Buat Rekomendasi Menu Sekarang</span>`
+                  ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>⏳ Meracik menu...</span>`
+                  : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Buat Rekomendasi Menu</span>`
                 }
               </button>
             ` : `
               <div class="flex items-center gap-2 pt-1">
-                <a href="#/pindai" class="flex-1 h-11 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
+                <a href="#pindai" class="flex-1 h-11 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition">
                   <span class="material-symbols-outlined text-[18px]">photo_camera</span>
                   <span>Pindai Kulkas</span>
                 </a>
-                <a href="#/stok" class="flex-1 h-11 rounded-xl bg-slate-100 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
+                <a href="#beranda" class="flex-1 h-11 rounded-xl bg-slate-100 text-slate-800 font-bold text-xs flex items-center justify-center gap-1.5 active:scale-95 transition">
                   <span class="material-symbols-outlined text-[18px]">inventory_2</span>
                   <span>Input Stok</span>
                 </a>
@@ -140,18 +147,40 @@ export function renderIdeMasakPage() {
             `}
           </div>
         ` : `
-          <!-- Recipe List -->
+          <!-- Recipe List (Infinite Scroll Cards Container) -->
           <div id="recipe-cards-container" class="space-y-4">
-            <!-- Hero Card -->
-            ${renderHeroCard(currentRecipes[0])}
+            <!-- Hero Card (Kartu Pertama) -->
+            ${renderHeroCard(visibleRecipes[0])}
 
-            <!-- Compact Cards -->
-            ${currentRecipes.length > 1 ? `
-              <div class="space-y-3 pt-1">
+            <!-- Compact Cards (Kartu Berikutnya) -->
+            ${visibleRecipes.length > 1 ? `
+              <div class="space-y-3 pt-1" id="compact-cards-wrapper">
                 <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Alternatif Menu Lain</h3>
-                ${currentRecipes.slice(1).map(r => renderCompactCard(r)).join('')}
+                ${visibleRecipes.slice(1).map(r => renderCompactCard(r)).join('')}
               </div>
             ` : ''}
+          </div>
+
+          <!-- Scroll Indicator / Action Section -->
+          <div id="infinite-scroll-dock" class="pt-2 flex flex-col items-center gap-2 text-center">
+            ${hasMoreInPool ? `
+              <div class="py-3 flex items-center justify-center gap-2 text-xs font-semibold text-slate-400 animate-pulse">
+                <span class="material-symbols-outlined text-[18px]">arrow_downward</span>
+                <span>Gulir ke bawah untuk melihat menu lainnya...</span>
+              </div>
+            ` : `
+              <!-- Semua rekomendasi habis -> Munculkan Tombol 'Cari Rekomendasi Lainnya' -->
+              <div class="w-full bg-surface-container-low rounded-2xl p-4 border border-outline-variant/30 flex flex-col items-center gap-2 shadow-xs">
+                <p class="text-xs text-slate-600 font-medium">Semua menu rekomendasi telah ditampilkan.</p>
+                <button id="btn-fetch-more-recipes" ${isFetchingMore ? 'disabled' : ''} class="w-full h-11 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-emerald-800 active:scale-95 transition ${isFetchingMore ? 'opacity-70 cursor-not-allowed' : ''}">
+                  ${isFetchingMore
+                    ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>⏳ Meracik menu baru lainnya...</span>`
+                    : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Cari Rekomendasi Lainnya</span>`
+                  }
+                </button>
+                <span class="text-[10px] text-slate-400">AI akan meracik menu baru tanpa duplikat dengan menu di atas.</span>
+              </div>
+            `}
           </div>
         `}
 
@@ -210,7 +239,7 @@ export function renderIdeMasakPage() {
           <div>
             <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1.5">Bahan dari Stok:</span>
             <div class="flex flex-wrap gap-1.5">
-              ${recipe.bahan_terpakai.map(b => `
+              ${(recipe.bahan_terpakai || []).map(b => `
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200/60 text-emerald-800 text-xs font-semibold">
                   <span class="material-symbols-outlined text-[14px]">check</span>
                   ${b.nama} (${b.jumlah} ${b.satuan})
@@ -271,7 +300,7 @@ export function renderIdeMasakPage() {
 
           <div class="mt-2 flex items-center justify-between">
             <span class="text-[10px] text-slate-500 truncate">
-              ${recipe.bahan_terpakai.map(b => b.nama).join(', ')}
+              ${(recipe.bahan_terpakai || []).map(b => b.nama).join(', ')}
             </span>
             <button class="btn-select-recipe text-xs font-bold text-emerald-700 hover:text-emerald-800 ml-2 flex-shrink-0" data-id="${recipe.id}">
               Detail →
@@ -309,23 +338,20 @@ export function renderIdeMasakPage() {
       });
     });
 
-    const handleGenerateRecipes = async () => {
+    // Primary Single Button: "Buat Rekomendasi Menu"
+    document.getElementById('btn-primary-generate')?.addEventListener('click', async () => {
       if (totalBahan === 0) {
         showToast('Stok bahan kosong. Tambahkan atau pindai bahan terlebih dahulu.', 'warning');
         return;
       }
 
-      if (isGeneratingRecipes) {
-        showToast('Chef sedang meracik menu di latar belakang...', 'info', 2000);
-        return;
-      }
+      if (isGeneratingRecipes) return;
 
       isGeneratingRecipes = true;
       renderContent();
 
       ModalService.open(`
         <div class="py-3 flex flex-col items-center text-center relative">
-          <!-- Tombol Tutup X di Kanan Atas -->
           <div class="w-full flex justify-end">
             <button data-close-modal class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition">
               <span class="material-symbols-outlined text-[18px]">close</span>
@@ -336,32 +362,28 @@ export function renderIdeMasakPage() {
             <span class="material-symbols-outlined text-[36px]">restaurant_menu</span>
           </div>
 
-          <h3 class="font-headline-sm text-base font-bold text-on-surface mt-4">Meracik Rekomendasi Menu...</h3>
+          <h3 class="font-headline-sm text-base font-bold text-on-surface mt-4">⏳ Meracik menu...</h3>
           <p class="text-xs text-on-surface-variant max-w-xs mt-1.5 leading-relaxed">
-            Menyesuaikan stok ${totalBahan} bahan makanan utama dan bumbu dapur untuk menciptakan 3 menu praktis lezat.
+            Menyesuaikan stok ${totalBahan} bahan makanan dan bumbu dapur untuk menyusun menu praktis lezat.
           </p>
 
-          <!-- Tombol Tutup & Lanjut Jelajah -->
           <div class="w-full mt-6 flex flex-col gap-2">
             <button data-close-modal type="button" class="w-full h-11 rounded-xl bg-surface-container text-on-surface font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high active:scale-95 transition">
               <span class="material-symbols-outlined text-[16px]">visibility_off</span>
               <span>Lanjut Menjelajah (Tutup Modal)</span>
             </button>
-            <p class="text-[10px] text-slate-400">
-              Kamu bisa klik di luar kotak atau tombol di atas. Chef akan tetap meracik di latar belakang.
-            </p>
           </div>
         </div>
       `, {
         onClose: () => {
           if (isGeneratingRecipes) {
-            showToast('Chef tetap meracik di latar belakang...', 'info', 2500);
+            showToast('Chef tetap meracik menu di latar belakang...', 'info', 2500);
           }
         }
       });
 
       try {
-        const prompt = buildPromptRekomendasiMasak(allStok);
+        const prompt = buildPromptRekomendasiMasak(allStok, []);
         const result = await GeminiService.generateRecipes(prompt, true);
 
         ModalService.close();
@@ -369,7 +391,7 @@ export function renderIdeMasakPage() {
 
         if (result.rekomendasi && result.rekomendasi.length > 0) {
           currentRecipes = result.rekomendasi.map((r, idx) => ({
-            id: `resep-${idx + 1}`,
+            id: `resep-${Date.now()}-${idx + 1}`,
             nama: r.nama,
             isHero: idx === 0,
             badge: r.badge || (idx === 0 ? '100% Cocok' : 'Rekomendasi Cepat'),
@@ -387,8 +409,9 @@ export function renderIdeMasakPage() {
             tips: r.tips || 'Sajikan selagi hangat.'
           }));
           activeSelectedRecipe = currentRecipes[0];
+          displayedCount = BATCH_SIZE;
           store.setState({ generatedRecipes: currentRecipes });
-          showToast('🎉 Rekomendasi menu baru berhasil diracik!', 'success');
+          showToast('🎉 Rekomendasi menu berhasil diracik!', 'success');
           if (store.getState().activeTab === 'ide-masak') {
             renderContent();
           }
@@ -407,11 +430,82 @@ export function renderIdeMasakPage() {
           renderContent();
         }
       }
-    };
+    });
 
-    // Request new recipes buttons
-    document.getElementById('btn-request-ai-recipe')?.addEventListener('click', handleGenerateRecipes);
-    document.getElementById('btn-trigger-generate-recipes')?.addEventListener('click', handleGenerateRecipes);
+    // "Cari Rekomendasi Lainnya" Button (Saat kartu habis dan ingin menu baru tanpa duplikat)
+    document.getElementById('btn-fetch-more-recipes')?.addEventListener('click', async () => {
+      if (isFetchingMore) return;
+      isFetchingMore = true;
+      renderContent();
+
+      try {
+        const existingNames = currentRecipes.map(r => r.nama);
+        const prompt = buildPromptRekomendasiMasak(allStok, existingNames);
+        const result = await GeminiService.generateRecipes(prompt, true);
+
+        isFetchingMore = false;
+
+        if (result.rekomendasi && result.rekomendasi.length > 0) {
+          const existingLower = new Set(existingNames.map(n => n.toLowerCase().trim()));
+          // Deduplikasi ketat
+          const freshList = result.rekomendasi.filter(r => !existingLower.has(r.nama.toLowerCase().trim()));
+
+          if (freshList.length > 0) {
+            const mappedNew = freshList.map((r, idx) => ({
+              id: `resep-more-${Date.now()}-${idx + 1}`,
+              nama: r.nama,
+              isHero: false,
+              badge: r.badge || 'Variasi Menu Baru',
+              badgeClass: 'bg-emerald-100 text-emerald-800',
+              waktu_masak: r.waktu_masak || '20 Menit',
+              tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
+              porsi: r.porsi || '2 Porsi',
+              image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=80',
+              alasan: r.alasan || 'Variasi kreasi baru dari stok bahan yang sama.',
+              bahan_terpakai: r.bahan_terpakai || [],
+              bahan_bumbu: r.bahan_bumbu || ['Garam', 'Minyak goreng'],
+              langkah: r.langkah || ['Siapkan bahan', 'Masak hingga matang', 'Sajikan hangat'],
+              tips: r.tips || 'Sajikan selagi hangat.'
+            }));
+
+            currentRecipes = [...currentRecipes, ...mappedNew];
+            displayedCount += mappedNew.length;
+            store.setState({ generatedRecipes: currentRecipes });
+            showToast(`✨ ${mappedNew.length} menu variasi baru berhasil ditambahkan!`, 'success');
+          } else {
+            showToast('Semua variasi utama sudah dicoba oleh Chef.', 'info');
+          }
+        } else {
+          showToast('Tidak ada menu baru tambahan dari bahan saat ini.', 'info');
+        }
+      } catch (err) {
+        isFetchingMore = false;
+        console.error('Fetch more recipes error:', err);
+        showToast('Gagal memuat rekomendasi lainnya. Coba sesaat lagi.', 'error');
+      }
+
+      if (store.getState().activeTab === 'ide-masak') {
+        renderContent();
+      }
+    });
+
+    // Infinite Scroll Handler on #app-main
+    const scrollContainer = document.getElementById('app-main');
+    if (scrollContainer) {
+      scrollContainer.onscroll = () => {
+        if (store.getState().activeTab !== 'ide-masak') return;
+        if (displayedCount >= currentRecipes.length) return;
+
+        const scrollBottom = scrollContainer.scrollTop + scrollContainer.clientHeight;
+        const totalHeight = scrollContainer.scrollHeight;
+
+        // Jika user mendekati bagian bawah (toleransi 100px)
+        if (scrollBottom >= totalHeight - 100) {
+          displayedCount += BATCH_SIZE;
+          renderContent();
+        }
+      };
+    }
 
     // Cooking Dock Button
     document.getElementById('btn-dock-cook')?.addEventListener('click', () => {
@@ -421,7 +515,7 @@ export function renderIdeMasakPage() {
 
   function updateDockUI() {
     const titleEl = document.getElementById('dock-recipe-title');
-    if (titleEl) titleEl.textContent = activeSelectedRecipe.nama;
+    if (titleEl && activeSelectedRecipe) titleEl.textContent = activeSelectedRecipe.nama;
   }
 
   function openRecipeDetailModal(recipe) {
@@ -459,7 +553,7 @@ export function renderIdeMasakPage() {
         <div>
           <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Bahan yang Digunakan:</h4>
           <div class="space-y-1.5">
-            ${recipe.bahan_terpakai.map(b => `
+            ${(recipe.bahan_terpakai || []).map(b => `
               <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container text-xs">
                 <span class="font-semibold text-on-surface">✓ ${b.nama}</span>
                 <span class="text-primary font-bold">${b.jumlah} ${b.satuan}</span>
@@ -539,7 +633,7 @@ export function renderIdeMasakPage() {
   }
 
   function confirmCooking(recipe) {
-    const deductList = recipe.bahan_terpakai.map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('<br>');
+    const deductList = (recipe.bahan_terpakai || []).map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('<br>');
 
     ModalService.open(`
       <div class="text-center py-4 space-y-3">
@@ -567,10 +661,8 @@ export function renderIdeMasakPage() {
     `);
 
     document.getElementById('confirm-deduct-btn')?.addEventListener('click', () => {
-      // 1. Deduct inventory
       StorageService.kurangiStokMasak(recipe.bahan_terpakai);
 
-      // 2. Add to cooking log
       StorageService.addLogMasak({
         resep: recipe.nama,
         waktu_masak: recipe.waktu_masak,
@@ -581,7 +673,6 @@ export function renderIdeMasakPage() {
       ModalService.close();
       showToast(`Selamat makan! Stok ${recipe.nama} telah dikurangi otomatis.`, 'success', 3500);
 
-      // Re-render page to update pantry numbers
       renderIdeMasakPage();
     });
   }

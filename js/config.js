@@ -56,10 +56,16 @@ export const CONFIG = {
 
 /**
  * Cek apakah ada konfigurasi API key dari serverless function Vercel (/api/config)
+ * Diberi timeout 1.2 detik agar tidak pernah memblokir rendering awal halaman.
  */
 export async function loadServerConfig() {
   try {
-    const res = await fetch('/api/config');
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1200);
+
+    const res = await fetch('/api/config', { signal: controller.signal });
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const data = await res.json();
       if (data?.geminiApiKey) {
@@ -67,7 +73,7 @@ export async function loadServerConfig() {
       }
     }
   } catch {
-    // Mode statis murni / offline, fallback ke localStorage
+    // Mode statis murni / offline / timeout, fallback ke localStorage tanpa blocking
   }
 }
 

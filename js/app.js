@@ -19,13 +19,24 @@ class App {
   }
 
   async init() {
-    // 1. Fetch server config if deployed (Vercel env vars)
-    await loadServerConfig();
+    // 1. Pengecekan Jaringan (Online / Offline)
+    window.addEventListener('offline', () => {
+      showToast('Koneksi internet terputus. Mode offline aktif — data tersimpan aman di HP kamu.', 'warning', 4000);
+    });
+    window.addEventListener('online', () => {
+      showToast('Koneksi internet kembali aktif!', 'success', 2500);
+    });
 
-    // 2. Initialize Default Seeds in localStorage
+    if (!navigator.onLine) {
+      setTimeout(() => {
+        showToast('Kamu sedang offline. Dapur Pintar tetap dapat digunakan.', 'info', 3000);
+      }, 500);
+    }
+
+    // 2. Initialize Default Seeds in localStorage langsung
     StorageService.initDefaults();
 
-    // 2. Setup Router
+    // 3. Setup Router & Render UI pertama kali secara instan (prioritas struktur & teks cepat)
     this.router = new Router({
       beranda: () => {
         store.setState({ activeTab: 'beranda' });
@@ -61,7 +72,7 @@ class App {
       return true;
     });
 
-    // 3. Global Settings Listener
+    // 4. Global Settings Listener
     document.addEventListener('click', (e) => {
       const settingsBtn = e.target.closest('#btn-open-settings');
       if (settingsBtn) {
@@ -73,16 +84,19 @@ class App {
       }
     });
 
-    // 4. Start Router
+    // 5. Start Router (UI langsung muncul seketika!)
     this.router.init();
 
-    // 5. Check Onboarding
+    // 6. Fetch server config di latar belakang tanpa memblokir tampilan awal
+    loadServerConfig().catch(() => {});
+
+    // 7. Check Onboarding
     const settings = StorageService.getSettings();
     if (!settings?.onboardingDone) {
       this.showOnboardingModal();
     }
 
-    // 6. Initialize Service Worker & PWA Updater
+    // 8. Initialize Service Worker & PWA Updater
     initAppUpdater();
   }
 
