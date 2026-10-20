@@ -178,7 +178,7 @@ export function renderIdeMasakPage() {
                     : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Cari Rekomendasi Lainnya</span>`
                   }
                 </button>
-                <span class="text-[10px] text-slate-400">AI akan meracik menu baru tanpa duplikat dengan menu di atas.</span>
+                <span class="text-[10px] text-slate-400">Sistem akan meracik menu baru tanpa duplikat dengan menu di atas.</span>
               </div>
             `}
           </div>

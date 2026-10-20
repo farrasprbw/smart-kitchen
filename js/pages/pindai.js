@@ -47,7 +47,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
 
   const pageSubtitle = scanType === 'barcode'
     ? 'Deteksi Barcode Otomatis'
-    : 'Inventaris Kulkas (AI Vision)';
+    : 'Inventaris Kulkas (Deteksi Foto)';
 
   renderHeader({
     type: 'tab',
@@ -127,7 +127,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
               ${
                 scanType === 'barcode'
                   ? 'Arahkan kotak kamera ke barcode produk kemasan. Pemindaian berlangsung otomatis tanpa perlu menekan tombol jepret.'
-                  : 'Ambil 3-4 foto kulkas dari sudut berbeda (Rak, Laci, Freezer, Pintu), lalu klik Analisis agar AI mendeteksi semua bahan.'
+                  : 'Ambil 3-4 foto kulkas dari sudut berbeda (Rak, Laci, Freezer, Pintu), lalu klik Analisis agar sistem mendeteksi semua bahan.'
               }
             </p>
           </div>
@@ -844,7 +844,7 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
         <div class="w-16 h-16 rounded-3xl bg-primary text-on-primary flex items-center justify-center animate-bounce shadow-lg">
           <span class="material-symbols-outlined text-[36px]">document_scanner</span>
         </div>
-        <h3 class="font-headline-sm text-headline-sm text-on-surface mt-4">AI sedang menganalisis...</h3>
+        <h3 class="font-headline-sm text-headline-sm text-on-surface mt-4">Sistem sedang menganalisis...</h3>
         <p class="text-xs text-on-surface-variant max-w-xs mt-1.5 leading-relaxed">
           Sedang menganalisis ${validPhotos.length} foto ${scanType === 'belanja' ? 'belanjaan & struk' : 'kulkas'} untuk mengenali jenis bahan makanan, kuantitas, dan kesegaran.
         </p>
@@ -938,7 +938,7 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
         <div class="flex items-start gap-3 p-3 rounded-xl bg-surface-container">
           <span class="text-xl">📸</span>
           <div>
-            <strong class="text-on-surface block text-xs">Pindai Kulkas (AI Vision)</strong>
+            <strong class="text-on-surface block text-xs">Pindai Kulkas (Multi-Sudut)</strong>
             Ambil foto kulkas dari 3-4 sudut berbeda (Rak, Laci, Freezer, Pintu). Tekan tombol jepret besar lalu klik "Analisis Bahan Makanan".
           </div>
         </div>

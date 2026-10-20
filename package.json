@@ -1,7 +1,7 @@
 {
   "name": "dapur-pintar",
   "version": "1.0.0",
-  "description": "Smart Kitchen Assistant - Asisten Dapur Pintar AI",
+  "description": "Smart Kitchen Assistant - Asisten Dapur Pintar",
   "type": "module",
   "scripts": {
     "dev": "npx serve . -l 3000",

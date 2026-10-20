@@ -1,7 +1,7 @@
 {
   "name": "Dapur Pintar — Smart Kitchen Assistant",
   "short_name": "Dapur Pintar",
-  "description": "Asisten dapur cerdas berbasis AI untuk mengelola stok kulkas dan rekomendasi masakan",
+  "description": "Asisten dapur cerdas untuk mengelola stok kulkas dan rekomendasi masakan",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f9f9ff",
