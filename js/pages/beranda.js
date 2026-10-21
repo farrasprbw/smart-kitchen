@@ -141,222 +141,237 @@ export function renderBerandaPage() {
     const displayedList = getFilteredAndSortedList();
 
     mainEl.innerHTML = `
-      <div class="page-enter flex flex-col w-full max-w-md mx-auto px-4 pt-3 pb-20 gap-5">
+      <div class="page-enter w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-20 md:pb-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
-        <!-- Status Ringkasan Dapur -->
-        <section>
-          <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 to-teal-50/60 border border-emerald-100/80 p-4 shadow-sm">
-            <div class="flex items-start justify-between gap-2">
-              <div class="flex flex-col">
-                <div class="flex items-center gap-1.5 text-emerald-800">
-                  <span class="material-symbols-outlined text-[18px]">eco</span>
-                  <span class="text-[11px] font-bold uppercase tracking-wider">Kondisi Dapur Terpantau</span>
-                </div>
-                <div class="mt-1 flex items-baseline gap-2">
-                  <span class="text-2xl font-extrabold text-slate-800 tracking-tight">${totalBahan} Bahan</span>
-                  <span class="text-xs font-medium text-slate-500">Tersimpan</span>
-                </div>
-              </div>
-              <div class="inline-flex items-center gap-1.5 rounded-full ${
-                totalBahan === 0
-                  ? 'bg-slate-200 text-slate-700'
-                  : kritisItems.length > 0
-                  ? 'bg-amber-500 text-white animate-pulse'
-                  : 'bg-emerald-600 text-white'
-              } px-3 py-1 shadow-sm text-xs font-bold">
-                <span class="material-symbols-outlined text-[15px]">${
-                  totalBahan === 0
-                    ? 'inventory_2'
-                    : kritisItems.length > 0
-                    ? 'warning'
-                    : 'check_circle'
-                }</span>
-                <span>${
-                  totalBahan === 0
-                    ? 'Kulkas Kosong'
-                    : kritisItems.length > 0
-                    ? `${kritisItems.length} Segera Olah`
-                    : 'Semua Segar'
-                }</span>
-              </div>
-            </div>
-            <div class="mt-3.5 pt-3 border-t border-emerald-100/80 flex items-center justify-between text-xs text-slate-600">
-              <div class="flex items-center gap-2">
-                <span class="h-2 w-2 rounded-full ${totalBahan === 0 ? 'bg-slate-400' : 'bg-emerald-500 ring-4 ring-emerald-100'}"></span>
-                <span class="font-medium">${
-                  totalBahan === 0
-                    ? 'Penyimpanan optimal • Belum ada data'
-                    : `Penyimpanan optimal • ${Math.round(((totalBahan - kritisItems.length) / totalBahan) * 100)}% siap saji`
-                }</span>
-              </div>
-              <div class="flex items-center gap-1.5">
-                <span class="text-[11px] text-slate-400">Update ${new Date(stokData.lastUpdated || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
-                <button id="btn-sync-cloud" type="button" class="w-6 h-6 rounded-lg bg-emerald-100/80 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition active:scale-95" title="Sinkronkan dengan Cloud Firestore">
-                  <span class="material-symbols-outlined text-[14px]">sync</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Aksi Cepat Dapur -->
-        <section>
-          <div>
-            <div class="flex items-center justify-between mb-2.5">
-              <h2 class="text-base font-bold text-slate-800">Aksi Cepat Dapur</h2>
-              <span class="text-xs font-semibold text-emerald-700 flex items-center gap-1">
-                <span class="material-symbols-outlined text-[14px]">bolt</span>Pindai Cepat
-              </span>
-            </div>
-            <div class="grid grid-cols-3 gap-2.5">
-              <!-- Action 1: Pindai Kulkas -->
-              <a href="#pindai?type=kulkas" class="flex flex-col justify-between p-3.5 h-32 rounded-2xl bg-emerald-700 text-white shadow-sm hover:bg-emerald-800 active:scale-95 transition text-left group">
-                <div class="flex justify-between items-start w-full">
-                  <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition">
-                    <span class="material-symbols-outlined text-[20px]">kitchen</span>
-                  </div>
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100">Foto</span>
-                </div>
-                <div>
-                  <h3 class="text-xs font-bold leading-tight">Pindai Kulkas</h3>
-                  <p class="text-[10px] text-emerald-100/90 mt-0.5">Multi-sudut kamera</p>
-                </div>
-              </a>
-
-              <!-- Action 2: Scan Barcode -->
-              <a href="#pindai?type=barcode" class="flex flex-col justify-between p-3.5 h-32 rounded-2xl bg-amber-600 text-white shadow-sm hover:bg-amber-700 active:scale-95 transition text-left group">
-                <div class="flex justify-between items-start w-full">
-                  <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition">
-                    <span class="material-symbols-outlined text-[20px]">barcode_scanner</span>
-                  </div>
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-100">Instan</span>
-                </div>
-                <div>
-                  <h3 class="text-xs font-bold leading-tight">Scan Barcode</h3>
-                  <p class="text-[10px] text-amber-100/90 mt-0.5">Deteksi otomatis</p>
-                </div>
-              </a>
-
-              <!-- Action 3: Ide Masak -->
-              <a href="#ide-masak" class="flex flex-col justify-between p-3.5 h-32 rounded-2xl bg-orange-600 text-white shadow-sm hover:bg-orange-700 active:scale-95 transition text-left group">
-                <div class="flex justify-between items-start w-full">
-                  <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 transition">
-                    <span class="material-symbols-outlined text-[20px]">restaurant_menu</span>
-                  </div>
-                  <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-900/40 text-orange-100">Chef</span>
-                </div>
-                <div>
-                  <h3 class="text-xs font-bold leading-tight">Ide Masak</h3>
-                  <p class="text-[10px] text-orange-100/90 mt-0.5">Dari stok tersedia</p>
-                </div>
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <!-- Inventaris Bahan -->
-        <section>
-          <div class="flex items-center justify-between mb-2">
-            <h2 class="text-base font-bold text-slate-800">Inventaris Bahan</h2>
-            <div class="flex items-center gap-1.5">
-              <button id="btn-toggle-bulk" class="px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 ${
-                isBulkMode ? 'bg-primary text-white' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
-              }">
-                <span class="material-symbols-outlined text-[15px]">checklist</span>
-                <span>${isBulkMode ? 'Selesai Pilih' : 'Pilih Banyak'}</span>
-              </button>
-              <button id="btn-tambah-manual" class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-xs font-bold flex items-center gap-1 hover:bg-emerald-100 transition active:scale-95">
-                <span class="material-symbols-outlined text-[16px]">add</span>
-                <span>Tambah</span>
-              </button>
-            </div>
-          </div>
-
-          <!-- Section Switcher Tabs -->
-          <div class="flex p-1 bg-surface-container rounded-xl gap-1 mb-2.5">
-            <button id="tab-btn-kulkas" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeTabSection === 'kulkas' ? 'bg-surface-container-lowest text-emerald-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'}">
-              <span class="material-symbols-outlined text-[16px]">kitchen</span>
-              <span>Kulkas (${kulkasItems.length})</span>
-            </button>
-            <button id="tab-btn-dapur" class="flex-1 py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeTabSection === 'dapur' ? 'bg-surface-container-lowest text-emerald-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'}">
-              <span class="material-symbols-outlined text-[16px]">shelves</span>
-              <span>Dapur Kering (${dapurItems.length})</span>
-            </button>
-          </div>
-
-          <!-- Search & Sorting Toolbar -->
-          <div class="flex items-center gap-2 mb-2">
-            <div class="relative flex-1">
-              <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]">search</span>
-              <input type="text" id="inventory-search" value="${searchQuery}" placeholder="Cari nama bahan atau catatan..."
-                class="w-full h-9 pl-9 pr-4 rounded-xl bg-white border border-slate-200/80 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition">
-            </div>
-            <select id="inventory-sort" class="h-9 px-2.5 bg-white border border-slate-200/80 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition">
-              <option value="nama" ${currentSort === 'nama' ? 'selected' : ''}>A-Z</option>
-              <option value="jumlah" ${currentSort === 'jumlah' ? 'selected' : ''}>Jumlah</option>
-              <option value="terbaru" ${currentSort === 'terbaru' ? 'selected' : ''}>Terkini</option>
-            </select>
-          </div>
-
-          <!-- Filter Chips -->
-          <div class="flex items-center gap-1.5 overflow-x-auto pb-1 mb-3 scrollbar-none text-[11px] font-semibold text-slate-600">
-            <button class="filter-chip px-3 py-1 rounded-full whitespace-nowrap transition ${activeFilter === 'all' ? 'bg-primary text-white font-bold' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}" data-filter="all">Semua</button>
-            <button class="filter-chip px-3 py-1 rounded-full whitespace-nowrap transition ${activeFilter === 'kritis' ? 'bg-amber-500 text-white font-bold' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}" data-filter="kritis">⚠️ Segera Olah</button>
-            <button class="filter-chip px-3 py-1 rounded-full whitespace-nowrap transition ${activeFilter === 'sayur' ? 'bg-primary text-white font-bold' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}" data-filter="sayur">Sayur</button>
-            <button class="filter-chip px-3 py-1 rounded-full whitespace-nowrap transition ${activeFilter === 'protein' ? 'bg-primary text-white font-bold' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}" data-filter="protein">Protein</button>
-            <button class="filter-chip px-3 py-1 rounded-full whitespace-nowrap transition ${activeFilter === 'buah' ? 'bg-primary text-white font-bold' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}" data-filter="buah">Buah</button>
-            <button class="filter-chip px-3 py-1 rounded-full whitespace-nowrap transition ${activeFilter === 'bumbu' ? 'bg-primary text-white font-bold' : 'bg-slate-100 hover:bg-slate-200 text-slate-700'}" data-filter="bumbu">Bumbu</button>
-          </div>
-
-          <!-- Inventory List Container -->
-          <div id="inventory-list-container" class="flex flex-col gap-2">
-            ${renderItemsList(displayedList)}
-          </div>
-
-          <!-- Bulk Action Floating Bar (Muncul jika dalam bulk mode dan ada item terpilih) -->
-          ${
-            isBulkMode && selectedItemIds.size > 0
-              ? `
-                <div class="fixed bottom-20 inset-x-4 max-w-md mx-auto z-40 bg-slate-900 text-white rounded-2xl p-3 shadow-2xl flex items-center justify-between gap-2 border border-slate-700">
-                  <span class="text-xs font-bold pl-2">${selectedItemIds.size} Dipilih</span>
-                  <div class="flex items-center gap-1.5">
-                    <button id="btn-bulk-move" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold flex items-center gap-1 active:scale-95 transition">
-                      <span class="material-symbols-outlined text-[15px]">swap_horiz</span>
-                      <span>Pindah</span>
-                    </button>
-                    <button id="btn-bulk-delete" class="px-3 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold flex items-center gap-1 active:scale-95 transition shadow-sm">
-                      <span class="material-symbols-outlined text-[15px]">delete</span>
-                      <span>Hapus</span>
-                    </button>
-                  </div>
-                </div>
-              `
-              : ''
-          }
-        </section>
-
-        <!-- Tips Dapur Pintar Dinamis -->
-        <section>
-          <div class="rounded-2xl bg-amber-50/80 border border-amber-200/60 p-4 flex items-start justify-between gap-3 shadow-xs">
-            <div class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-amber-600 text-[22px] flex-shrink-0 mt-0.5">tips_and_updates</span>
+          <!-- SISI KIRI (Kolom Utama): Inventaris Bahan -->
+          <section class="order-2 lg:order-1 lg:col-span-7 xl:col-span-8 flex flex-col gap-4">
+            <div class="flex items-center justify-between">
               <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-xs font-bold text-amber-900">Tips Cerdas Dapur</h3>
-                  <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-amber-200/60 text-amber-800">Tips Harian</span>
-                </div>
-                <p id="tip-text-content" class="text-xs text-amber-800/90 mt-1 leading-relaxed">
-                  ${TIPS_DAPUR[Math.floor(Math.random() * TIPS_DAPUR.length)]}
-                </p>
-                <button id="btn-next-tip" type="button" class="inline-flex items-center gap-1 text-[11px] font-bold text-amber-900 hover:text-amber-950 mt-2 active:scale-95 transition">
-                  <span class="material-symbols-outlined text-[13px]">refresh</span>
-                  <span>Tips Lainnya</span>
+                <h2 class="text-base sm:text-lg lg:text-xl font-extrabold text-slate-900 tracking-tight">Inventaris Bahan</h2>
+                <p class="text-xs sm:text-sm text-slate-500 hidden sm:block">Kelola stok kulkas & dapur kering secara real-time</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="btn-toggle-bulk" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 cursor-pointer ${
+                  isBulkMode ? 'bg-primary text-white shadow-xs' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+                }">
+                  <span class="material-symbols-outlined text-[18px]">checklist</span>
+                  <span>${isBulkMode ? 'Selesai Pilih' : 'Pilih Banyak'}</span>
+                </button>
+                <button id="btn-tambah-manual" class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-sm hover:shadow">
+                  <span class="material-symbols-outlined text-[18px]">add</span>
+                  <span>Tambah Bahan</span>
                 </button>
               </div>
             </div>
-          </div>
-        </section>
 
+            <!-- Section Switcher Tabs (Proporsional di Mobile & Desktop) -->
+            <div class="flex p-1.5 bg-slate-100/90 rounded-2xl gap-1.5 w-full sm:max-w-md lg:max-w-lg shadow-2xs">
+              <button id="tab-btn-kulkas" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTabSection === 'kulkas' ? 'bg-white text-emerald-800 shadow-sm ring-1 ring-black/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'}">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' ${activeTabSection === 'kulkas' ? 1 : 0};">kitchen</span>
+                <span>Kulkas</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold ${activeTabSection === 'kulkas' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">${kulkasItems.length}</span>
+              </button>
+              <button id="tab-btn-dapur" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${activeTabSection === 'dapur' ? 'bg-white text-emerald-800 shadow-sm ring-1 ring-black/5' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'}">
+                <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' ${activeTabSection === 'dapur' ? 1 : 0};">shelves</span>
+                <span>Dapur Kering</span>
+                <span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold ${activeTabSection === 'dapur' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'}">${dapurItems.length}</span>
+              </button>
+            </div>
+
+            <!-- Search & Sorting Toolbar -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+              <div class="relative flex-1">
+                <span class="material-symbols-outlined absolute left-3.5 top-3 text-slate-400 text-[19px]">search</span>
+                <input type="text" id="inventory-search" value="${searchQuery}" placeholder="Cari nama bahan atau catatan..."
+                  class="w-full h-11 pl-10 pr-4 rounded-xl bg-white border border-slate-200/90 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 transition shadow-2xs hover:border-slate-300">
+              </div>
+              <select id="inventory-sort" class="h-11 px-3.5 bg-white border border-slate-200/90 rounded-xl text-xs sm:text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition cursor-pointer shadow-2xs hover:border-slate-300">
+                <option value="nama" ${currentSort === 'nama' ? 'selected' : ''}>Urut: A-Z</option>
+                <option value="jumlah" ${currentSort === 'jumlah' ? 'selected' : ''}>Urut: Jumlah</option>
+                <option value="terbaru" ${currentSort === 'terbaru' ? 'selected' : ''}>Urut: Terkini</option>
+              </select>
+            </div>
+
+            <!-- Filter Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none text-[11px] sm:text-xs font-semibold text-slate-600">
+              <button class="filter-chip px-3.5 py-1.5 rounded-full whitespace-nowrap transition cursor-pointer ${activeFilter === 'all' ? 'bg-primary text-white font-bold ring-2 ring-primary/20 shadow-xs' : 'bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-700'}" data-filter="all">Semua</button>
+              <button class="filter-chip px-3.5 py-1.5 rounded-full whitespace-nowrap transition cursor-pointer ${activeFilter === 'kritis' ? 'bg-amber-500 text-white font-bold ring-2 ring-amber-500/20 shadow-xs' : 'bg-white border border-slate-200/80 hover:bg-amber-50 hover:text-amber-800 text-slate-700'}" data-filter="kritis">⚠️ Segera Olah</button>
+              <button class="filter-chip px-3.5 py-1.5 rounded-full whitespace-nowrap transition cursor-pointer ${activeFilter === 'sayur' ? 'bg-primary text-white font-bold ring-2 ring-primary/20 shadow-xs' : 'bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-700'}" data-filter="sayur">Sayur</button>
+              <button class="filter-chip px-3.5 py-1.5 rounded-full whitespace-nowrap transition cursor-pointer ${activeFilter === 'protein' ? 'bg-primary text-white font-bold ring-2 ring-primary/20 shadow-xs' : 'bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-700'}" data-filter="protein">Protein</button>
+              <button class="filter-chip px-3.5 py-1.5 rounded-full whitespace-nowrap transition cursor-pointer ${activeFilter === 'buah' ? 'bg-primary text-white font-bold ring-2 ring-primary/20 shadow-xs' : 'bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-700'}" data-filter="buah">Buah</button>
+              <button class="filter-chip px-3.5 py-1.5 rounded-full whitespace-nowrap transition cursor-pointer ${activeFilter === 'bumbu' ? 'bg-primary text-white font-bold ring-2 ring-primary/20 shadow-xs' : 'bg-white border border-slate-200/80 hover:bg-slate-50 text-slate-700'}" data-filter="bumbu">Bumbu</button>
+            </div>
+
+            <!-- Inventory List Container (Grid 2-3 kolom di Desktop) -->
+            <div id="inventory-list-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3.5">
+              ${renderItemsList(displayedList)}
+            </div>
+
+            <!-- Bulk Action Floating Bar -->
+            ${
+              isBulkMode && selectedItemIds.size > 0
+                ? `
+                  <div class="fixed bottom-20 md:bottom-6 inset-x-4 max-w-lg mx-auto z-40 bg-slate-900 text-white rounded-2xl p-3.5 shadow-2xl flex items-center justify-between gap-3 border border-slate-700">
+                    <span class="text-xs sm:text-sm font-bold pl-2">${selectedItemIds.size} Bahan Dipilih</span>
+                    <div class="flex items-center gap-2">
+                      <button id="btn-bulk-move" class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs sm:text-sm font-bold flex items-center gap-1 active:scale-95 transition cursor-pointer">
+                        <span class="material-symbols-outlined text-[18px]">swap_horiz</span>
+                        <span>Pindah</span>
+                      </button>
+                      <button id="btn-bulk-delete" class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm font-bold flex items-center gap-1 active:scale-95 transition shadow-sm cursor-pointer">
+                        <span class="material-symbols-outlined text-[18px]">delete</span>
+                        <span>Hapus</span>
+                      </button>
+                    </div>
+                  </div>
+                `
+                : ''
+            }
+          </section>
+
+          <!-- SISI KANAN (Sidebar Desktop Sticky): Status Ringkasan, Aksi Cepat, Tips Cerdas -->
+          <aside class="order-1 lg:order-2 lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-5 lg:sticky lg:top-20 self-start">
+
+            <!-- Card 1: Kondisi Dapur Terpantau (Ringkasan Status) -->
+            <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-white border border-emerald-100 p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex flex-col">
+                  <div class="flex items-center gap-1.5 text-emerald-800">
+                    <span class="material-symbols-outlined text-[18px]">eco</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider">Kondisi Dapur Terpantau</span>
+                  </div>
+                  <div class="mt-1 flex items-baseline gap-2">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-slate-800 tracking-tight">${totalBahan} Bahan</span>
+                    <span class="text-xs sm:text-sm font-medium text-slate-500">Tersimpan</span>
+                  </div>
+                </div>
+                <div class="inline-flex items-center gap-1.5 rounded-full ${
+                  totalBahan === 0
+                    ? 'bg-slate-200 text-slate-700'
+                    : kritisItems.length > 0
+                    ? 'bg-amber-500 text-white animate-pulse'
+                    : 'bg-emerald-600 text-white'
+                } px-3 py-1 shadow-sm text-xs font-bold">
+                  <span class="material-symbols-outlined text-[15px]">${
+                    totalBahan === 0
+                      ? 'inventory_2'
+                      : kritisItems.length > 0
+                      ? 'warning'
+                      : 'check_circle'
+                  }</span>
+                  <span>${
+                    totalBahan === 0
+                      ? 'Kulkas Kosong'
+                      : kritisItems.length > 0
+                      ? `${kritisItems.length} Segera Olah`
+                      : 'Semua Segar'
+                  }</span>
+                </div>
+              </div>
+              <div class="mt-3.5 pt-3 border-t border-emerald-100/80 flex items-center justify-between text-xs sm:text-sm text-slate-600">
+                <div class="flex items-center gap-2">
+                  <span class="h-2.5 w-2.5 rounded-full ${totalBahan === 0 ? 'bg-slate-400' : 'bg-emerald-500 ring-4 ring-emerald-100'}"></span>
+                  <span class="font-medium text-xs sm:text-sm">${
+                    totalBahan === 0
+                      ? 'Penyimpanan optimal • Belum ada data'
+                      : `Penyimpanan optimal • ${Math.round(((totalBahan - kritisItems.length) / totalBahan) * 100)}% siap saji`
+                  }</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[11px] text-slate-400">Update ${new Date(stokData.lastUpdated || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+                  <button id="btn-sync-cloud" type="button" class="w-7 h-7 rounded-lg bg-emerald-100/80 hover:bg-emerald-200 text-emerald-800 flex items-center justify-center transition active:scale-95 cursor-pointer" title="Sinkronkan dengan Cloud Firestore">
+                    <span class="material-symbols-outlined text-[16px]">sync</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2: Aksi Cepat Dapur (Responsif: 3 Kolom di Mobile, List Horizontal Elegan di Desktop Sidebar) -->
+            <div>
+              <div class="flex items-center justify-between mb-2.5">
+                <h2 class="text-sm sm:text-base font-bold text-slate-800">Aksi Cepat Dapur</h2>
+                <span class="text-xs font-semibold text-emerald-700 flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[15px]">bolt</span>Pindai Cepat
+                </span>
+              </div>
+              <div class="grid grid-cols-3 lg:grid-cols-1 gap-2.5 sm:gap-3">
+                <!-- Action 1: Pindai Kulkas -->
+                <a href="#pindai?type=kulkas" class="flex flex-col justify-between lg:flex-row lg:items-center p-3.5 sm:p-4 min-h-[7.5rem] lg:min-h-0 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer">
+                  <div class="flex items-start lg:items-center gap-3">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition flex-shrink-0">
+                      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">kitchen</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <h3 class="text-xs sm:text-sm font-bold leading-tight">Pindai Kulkas</h3>
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100 hidden sm:inline-block">Foto</span>
+                      </div>
+                      <p class="text-[10px] sm:text-xs text-emerald-100/90 mt-0.5">Multi-sudut kamera AI</p>
+                    </div>
+                  </div>
+                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block">arrow_forward</span>
+                </a>
+
+                <!-- Action 2: Scan Barcode -->
+                <a href="#pindai?type=barcode" class="flex flex-col justify-between lg:flex-row lg:items-center p-3.5 sm:p-4 min-h-[7.5rem] lg:min-h-0 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer">
+                  <div class="flex items-start lg:items-center gap-3">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition flex-shrink-0">
+                      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">barcode_scanner</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <h3 class="text-xs sm:text-sm font-bold leading-tight">Scan Barcode</h3>
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-100 hidden sm:inline-block">Instan</span>
+                      </div>
+                      <p class="text-[10px] sm:text-xs text-amber-100/90 mt-0.5">Deteksi instan kemasan</p>
+                    </div>
+                  </div>
+                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block">arrow_forward</span>
+                </a>
+
+                <!-- Action 3: Ide Masak -->
+                <a href="#ide-masak" class="flex flex-col justify-between lg:flex-row lg:items-center p-3.5 sm:p-4 min-h-[7.5rem] lg:min-h-0 rounded-2xl bg-gradient-to-br from-orange-500 to-rose-600 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer">
+                  <div class="flex items-start lg:items-center gap-3">
+                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition flex-shrink-0">
+                      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">restaurant_menu</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-1.5">
+                        <h3 class="text-xs sm:text-sm font-bold leading-tight">Ide Masak</h3>
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-900/40 text-orange-100 hidden sm:inline-block">Chef</span>
+                      </div>
+                      <p class="text-[10px] sm:text-xs text-orange-100/90 mt-0.5">Rekomendasi dari stok</p>
+                    </div>
+                  </div>
+                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block">arrow_forward</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Card 3: Tips Cerdas Dapur Dinamis -->
+            <div class="rounded-2xl bg-gradient-to-br from-amber-50 to-orange-50/50 border border-amber-200/80 p-4 sm:p-5 shadow-xs hover:shadow-sm transition-shadow">
+              <div class="flex items-start gap-3">
+                <span class="material-symbols-outlined text-amber-600 text-[24px] flex-shrink-0 mt-0.5">tips_and_updates</span>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-xs sm:text-sm font-bold text-amber-900">Tips Cerdas Dapur</h3>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200/70 text-amber-900">Tips Harian</span>
+                  </div>
+                  <p id="tip-text-content" class="text-xs sm:text-sm text-amber-900/90 mt-1.5 leading-relaxed">
+                    ${TIPS_DAPUR[Math.floor(Math.random() * TIPS_DAPUR.length)]}
+                  </p>
+                  <button id="btn-next-tip" type="button" class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-900 hover:text-amber-950 hover:underline mt-2.5 active:scale-95 transition cursor-pointer">
+                    <span class="material-symbols-outlined text-[15px]">refresh</span>
+                    <span>Tips Lainnya</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </aside>
+
+        </div>
       </div>
     `;
 
@@ -366,16 +381,15 @@ export function renderBerandaPage() {
   function renderItemsList(items) {
     if (!items || items.length === 0) {
       return `
-        <div class="p-6 sm:p-8 text-center bg-white rounded-3xl border border-dashed border-slate-200 text-slate-500 shadow-xs">
+        <div class="col-span-full p-6 sm:p-8 text-center bg-white rounded-3xl border border-dashed border-slate-200 text-slate-500 shadow-xs">
           <div class="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-700 flex items-center justify-center mx-auto mb-3">
             <span class="material-symbols-outlined text-[36px]">inventory_2</span>
           </div>
-          <h3 class="text-sm font-bold text-slate-800">Tidak ada bahan ditemukan</h3>
-          <p class="text-xs text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">
+          <h3 class="text-sm sm:text-base font-bold text-slate-800">Tidak ada bahan ditemukan</h3>
+          <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto leading-relaxed">
             ${searchQuery ? `Tidak ada bahan yang cocok dengan kata kunci "${searchQuery}".` : 'Mulai tambahkan bahan kulkas atau belanjaan Anda dengan 3 cara mudah:'}
           </p>
 
-          <!-- 3 Tombol Aksi Lengkap -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4 max-w-md mx-auto">
             <a href="#pindai?type=kulkas" class="px-3 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-xs flex items-center justify-center gap-1.5 active:scale-95 transition hover:bg-primary/90">
               <span class="material-symbols-outlined text-[18px]">kitchen</span>
@@ -385,7 +399,7 @@ export function renderBerandaPage() {
               <span class="material-symbols-outlined text-[18px]">barcode_scanner</span>
               <span>Scan Barcode</span>
             </a>
-            <button id="btn-empty-add" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition">
+            <button id="btn-empty-add" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer">
               <span class="material-symbols-outlined text-[18px]">edit_note</span>
               <span>Input Manual</span>
             </button>
@@ -397,48 +411,55 @@ export function renderBerandaPage() {
     return items.map(item => {
       const isSelected = selectedItemIds.has(item.id);
       return `
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-white border ${isSelected ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-slate-100'} shadow-sm hover:border-slate-200 transition group" data-item-id="${item.id}">
-          <div class="flex items-center gap-3 min-w-0 flex-1">
-            ${
-              isBulkMode
-                ? `
-                  <input type="checkbox" class="bulk-item-checkbox w-4 h-4 rounded text-primary focus:ring-primary cursor-pointer" data-id="${item.id}" ${isSelected ? 'checked' : ''}>
-                `
-                : `
-                  <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center flex-shrink-0 font-bold text-sm">
-                    <span class="material-symbols-outlined text-[20px]">${item.icon || 'kitchen'}</span>
-                  </div>
-                `
-            }
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center gap-1.5">
-                <h4 class="text-xs font-bold text-slate-900 truncate">${item.nama}</h4>
-                <span class="text-[10px] font-bold px-1.5 py-0.2 rounded ${item.statusClass || 'bg-slate-100 text-slate-700'}">${item.status || 'Segar'}</span>
-              </div>
-              <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
-                <span class="font-semibold text-emerald-800">${item.jumlah ?? '?'} ${item.satuan || ''}</span>
-                ${item.catatan ? `<span class="truncate text-slate-400">• ${item.catatan}</span>` : ''}
+        <div class="p-4 rounded-2xl bg-white border ${isSelected ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-slate-200/80 hover:border-emerald-400 hover:shadow-md'} shadow-2xs hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-3.5 group" data-item-id="${item.id}">
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              ${
+                isBulkMode
+                  ? `
+                    <input type="checkbox" class="bulk-item-checkbox w-5 h-5 rounded text-primary focus:ring-primary cursor-pointer mt-0.5" data-id="${item.id}" ${isSelected ? 'checked' : ''}>
+                  `
+                  : `
+                    <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center flex-shrink-0 font-bold text-sm shadow-2xs group-hover:bg-emerald-100 group-hover:scale-105 transition-all">
+                      <span class="material-symbols-outlined text-[22px]">${item.icon || 'kitchen'}</span>
+                    </div>
+                  `
+              }
+              <div class="min-w-0 flex-1">
+                <h4 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-950 transition-colors truncate" title="${item.nama}">${item.nama}</h4>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <span class="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md ${item.statusClass || 'bg-slate-100 text-slate-700'}">${item.status || 'Segar'}</span>
+                  ${item.catatan ? `<span class="truncate text-xs text-slate-400" title="${item.catatan}">• ${item.catatan}</span>` : ''}
+                </div>
               </div>
             </div>
           </div>
 
-          ${
-            !isBulkMode
-              ? `
-                <div class="flex items-center gap-1 flex-shrink-0 ml-2">
-                  <button class="btn-qty-minus w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center active:scale-90 transition" data-id="${item.id}" title="Kurangi">
-                    <span class="material-symbols-outlined text-[14px]">remove</span>
-                  </button>
-                  <button class="btn-qty-plus w-7 h-7 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 flex items-center justify-center active:scale-90 transition" data-id="${item.id}" title="Tambah">
-                    <span class="material-symbols-outlined text-[14px]">add</span>
-                  </button>
-                  <button class="btn-item-delete w-7 h-7 rounded-lg bg-slate-50 hover:bg-rose-50 text-slate-400 hover:text-rose-600 flex items-center justify-center active:scale-90 transition" data-id="${item.id}" title="Hapus">
-                    <span class="material-symbols-outlined text-[14px]">delete</span>
-                  </button>
-                </div>
-              `
-              : ''
-          }
+          <div class="flex items-center justify-between pt-2.5 border-t border-slate-100">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xs sm:text-sm font-extrabold text-emerald-800 bg-emerald-50/90 px-3 py-1 rounded-xl border border-emerald-100/80">
+                ${item.jumlah ?? '?'} ${item.satuan || ''}
+              </span>
+            </div>
+
+            ${
+              !isBulkMode
+                ? `
+                  <div class="flex items-center gap-1.5 flex-shrink-0">
+                    <button class="btn-qty-minus w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center active:scale-90 transition cursor-pointer hover:ring-2 hover:ring-slate-300/40" data-id="${item.id}" title="Kurangi (minus)">
+                      <span class="material-symbols-outlined text-[18px]">remove</span>
+                    </button>
+                    <button class="btn-qty-plus w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center active:scale-90 transition cursor-pointer hover:ring-2 hover:ring-slate-300/40" data-id="${item.id}" title="Tambah (plus)">
+                      <span class="material-symbols-outlined text-[18px]">add</span>
+                    </button>
+                    <button class="btn-item-delete w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-rose-100 text-slate-400 hover:text-rose-600 flex items-center justify-center active:scale-90 transition cursor-pointer hover:ring-2 hover:ring-rose-200" data-id="${item.id}" title="Hapus bahan">
+                      <span class="material-symbols-outlined text-[18px]">delete</span>
+                    </button>
+                  </div>
+                `
+                : ''
+            }
+          </div>
         </div>
       `;
     }).join('');

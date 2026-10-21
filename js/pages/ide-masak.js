@@ -49,7 +49,7 @@ export function renderIdeMasakPage() {
     const hasMoreInPool = displayedCount < currentRecipes.length;
 
     mainEl.innerHTML = `
-      <div class="page-enter flex flex-col w-full max-w-md mx-auto px-4 pt-2 pb-32 gap-5">
+      <div class="page-enter flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-32 gap-5">
 
         <!-- Kitchen Pantry Status & Zero Waste Indicator -->
         <section class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3 relative overflow-hidden">
@@ -154,9 +154,11 @@ export function renderIdeMasakPage() {
 
             <!-- Compact Cards (Kartu Berikutnya) -->
             ${visibleRecipes.length > 1 ? `
-              <div class="space-y-3 pt-1" id="compact-cards-wrapper">
-                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Alternatif Menu Lain</h3>
-                ${visibleRecipes.slice(1).map(r => renderCompactCard(r)).join('')}
+              <div class="space-y-3 pt-1">
+                <h3 class="text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider">Alternatif Menu Lain</h3>
+                <div id="compact-cards-wrapper" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                  ${visibleRecipes.slice(1).map(r => renderCompactCard(r)).join('')}
+                </div>
               </div>
             ` : ''}
           </div>
@@ -188,16 +190,16 @@ export function renderIdeMasakPage() {
 
       <!-- Floating Cooking Dock -->
       ${activeSelectedRecipe ? `
-        <div id="cooking-dock" class="fixed bottom-16 inset-x-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 p-3 shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-          <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+        <div id="cooking-dock" class="fixed bottom-16 md:bottom-5 inset-x-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-40 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl p-3 sm:p-3.5 shadow-2xl max-w-lg w-full">
+          <div class="flex items-center justify-between gap-3">
             <div class="min-w-0 flex-1">
               <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Menu Terpilih</span>
-              <h4 id="dock-recipe-title" class="text-xs font-extrabold text-slate-900 truncate">${activeSelectedRecipe.nama}</h4>
-              <p class="text-[10px] text-slate-500 truncate mt-0.5">
+              <h4 id="dock-recipe-title" class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">${activeSelectedRecipe.nama}</h4>
+              <p class="text-[10px] sm:text-xs text-slate-500 truncate mt-0.5">
                 Bahan: ${(activeSelectedRecipe.bahan_terpakai || []).map(b => `${b.nama} (${b.jumlah} ${b.satuan})`).join(', ')}
               </p>
             </div>
-            <button id="btn-dock-cook" type="button" class="h-11 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition flex-shrink-0">
+            <button id="btn-dock-cook" type="button" class="h-11 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md active:scale-95 transition flex-shrink-0 cursor-pointer">
               <span class="material-symbols-outlined text-[18px]">skillet</span>
               <span>Sudah Masak Ini 🍳</span>
             </button>

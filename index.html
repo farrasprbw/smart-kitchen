@@ -188,13 +188,20 @@
       50% { transform: translateY(140px); opacity: 1; }
       100% { transform: translateY(0); opacity: 0.8; }
     }
+
+    /* Strict Desktop Navigation - Hide Mobile Bottom Nav on screens 768px and wider */
+    @media (min-width: 768px) {
+      #app-nav {
+        display: none !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen">
 
   <!-- App Header -->
-  <header id="app-header" class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe">
-    <div class="max-w-md mx-auto px-4 h-16 flex items-center justify-between">
+  <header id="app-header" class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-slate-100/80 pt-safe">
+    <div class="max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none">DP</div>
         <div>
@@ -206,8 +213,8 @@
   </header>
 
   <!-- App Main Content (Memiliki Initial Structure Skeleton agar tidak kosong saat load) -->
-  <main id="app-main" class="flex-1 flex flex-col relative w-full pt-safe-content pb-24 bg-surface overflow-y-auto">
-    <div id="initial-loading-skeleton" class="flex flex-col w-full max-w-md mx-auto px-4 pt-2 gap-4">
+  <main id="app-main" class="flex-1 flex flex-col relative w-full pt-safe-content pb-24 md:pb-12 bg-surface overflow-y-auto">
+    <div id="initial-loading-skeleton" class="flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 gap-4">
       <!-- Welcome card skeleton -->
       <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
         <div class="h-4 w-32 rounded-md skeleton"></div>
@@ -216,7 +223,7 @@
       </div>
 
       <!-- Quick stats skeleton -->
-      <div class="grid grid-cols-2 gap-2.5">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
         <div class="bg-surface-container-lowest rounded-2xl p-3.5 border border-slate-100 space-y-2">
           <div class="h-3 w-20 rounded skeleton"></div>
           <div class="h-7 w-12 rounded skeleton"></div>
@@ -228,16 +235,16 @@
       </div>
 
       <!-- Item card placeholder -->
-      <div class="space-y-2 pt-2">
-        <div class="h-4 w-28 rounded skeleton"></div>
-        <div class="h-16 w-full rounded-2xl skeleton"></div>
-        <div class="h-16 w-full rounded-2xl skeleton"></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+        <div class="h-20 w-full rounded-2xl skeleton"></div>
+        <div class="h-20 w-full rounded-2xl skeleton"></div>
+        <div class="h-20 w-full rounded-2xl skeleton"></div>
       </div>
     </div>
   </main>
 
-  <!-- Bottom Tab Navigation -->
-  <nav id="app-nav" class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(30,41,59,0.05)]">
+  <!-- Bottom Tab Navigation (Khusus Mobile, tersembunyi di Desktop) -->
+  <nav id="app-nav" class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(30,41,59,0.05)] md:hidden">
     <div class="flex justify-around items-center h-16 px-gutter-sm max-w-md mx-auto">
       <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-primary font-bold transition-colors" data-path="beranda" href="#beranda">
         <span class="material-symbols-outlined text-[24px]">cottage</span>

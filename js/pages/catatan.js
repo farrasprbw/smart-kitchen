@@ -25,48 +25,48 @@ export function renderCatatanPage() {
 
   function renderContent() {
     mainEl.innerHTML = `
-      <div class="page-enter flex flex-col w-full max-w-md mx-auto px-4 pt-2 pb-24 gap-4">
+      <div class="page-enter flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-24 gap-5">
 
         <!-- Header Summary Banner -->
         <section>
-          <div class="bg-gradient-to-br from-emerald-50 via-teal-50 to-teal-100/50 rounded-2xl p-4 border border-emerald-100 shadow-sm relative overflow-hidden">
+          <div class="bg-gradient-to-br from-emerald-50 via-teal-50 to-teal-100/50 rounded-2xl p-5 border border-emerald-100 shadow-sm relative overflow-hidden">
             <div class="flex items-center justify-between">
               <div>
                 <span class="text-[11px] font-bold text-emerald-800 uppercase tracking-wider block">Catatan & Riwayat</span>
-                <h2 class="text-lg font-bold text-slate-900 mt-0.5">Aktivitas Dapur Pintar</h2>
+                <h2 class="text-lg sm:text-xl font-bold text-slate-900 mt-0.5">Aktivitas Dapur Pintar</h2>
               </div>
-              <div class="w-11 h-11 rounded-2xl bg-primary text-white flex items-center justify-center shadow-sm">
-                <span class="material-symbols-outlined text-[24px]">menu_book</span>
+              <div class="w-12 h-12 rounded-2xl bg-primary text-white flex items-center justify-center shadow-sm">
+                <span class="material-symbols-outlined text-[26px]">menu_book</span>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-emerald-200/60">
-              <div class="bg-white/80 rounded-xl p-2.5 backdrop-blur-sm">
-                <span class="text-[10px] text-slate-500 font-bold block uppercase">Menu Dimasak</span>
-                <span class="text-xl font-extrabold text-slate-900">${logMasak.length} Resep</span>
+            <div class="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-emerald-200/60 max-w-lg">
+              <div class="bg-white/80 rounded-xl p-3 backdrop-blur-sm">
+                <span class="text-[10px] sm:text-xs text-slate-500 font-bold block uppercase">Menu Dimasak</span>
+                <span class="text-xl sm:text-2xl font-extrabold text-slate-900">${logMasak.length} Resep</span>
               </div>
-              <div class="bg-white/80 rounded-xl p-2.5 backdrop-blur-sm">
-                <span class="text-[10px] text-slate-500 font-bold block uppercase">Sesi Belanja</span>
-                <span class="text-xl font-extrabold text-slate-900">${logBelanja.length} Kali</span>
+              <div class="bg-white/80 rounded-xl p-3 backdrop-blur-sm">
+                <span class="text-[10px] sm:text-xs text-slate-500 font-bold block uppercase">Sesi Belanja</span>
+                <span class="text-xl sm:text-2xl font-extrabold text-slate-900">${logBelanja.length} Kali</span>
               </div>
             </div>
           </div>
         </section>
 
         <!-- Tab Switcher -->
-        <div class="flex p-1 bg-surface-container rounded-xl gap-1">
-          <button id="catatan-tab-masak" class="flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeTab === 'masak' ? 'bg-surface-container-lowest text-emerald-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'}">
-            <span class="material-symbols-outlined text-[16px]">skillet</span>
+        <div class="flex p-1.5 bg-slate-100 rounded-2xl gap-1.5 w-full sm:max-w-md shadow-2xs">
+          <button id="catatan-tab-masak" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === 'masak' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+            <span class="material-symbols-outlined text-[18px]">skillet</span>
             <span>Riwayat Masak (${logMasak.length})</span>
           </button>
-          <button id="catatan-tab-belanja" class="flex-1 py-2 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 ${activeTab === 'belanja' ? 'bg-surface-container-lowest text-emerald-800 shadow-sm' : 'text-slate-500 hover:text-slate-800'}">
-            <span class="material-symbols-outlined text-[16px]">shopping_bag</span>
+          <button id="catatan-tab-belanja" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === 'belanja' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
+            <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
             <span>Riwayat Belanja (${logBelanja.length})</span>
           </button>
         </div>
 
-        <!-- Log List Container -->
-        <div class="flex flex-col gap-3">
+        <!-- Log List Container (Grid 2 Kolom di Tablet & Desktop) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
           ${activeTab === 'masak' ? renderLogMasakList(logMasak) : renderLogBelanjaList(logBelanja)}
         </div>
 

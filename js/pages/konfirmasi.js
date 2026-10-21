@@ -109,7 +109,7 @@ export function renderKonfirmasiPage() {
     const countYakin = confirmedItems.filter(i => i.status === 'Yakin').length;
 
     mainEl.innerHTML = `
-      <div class="page-enter flex flex-col w-full max-w-md mx-auto px-4 pt-2 pb-28 gap-4">
+      <div class="page-enter flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-28 gap-5">
 
         <!-- Status Banner & Summary -->
         <section>
@@ -238,7 +238,7 @@ export function renderKonfirmasiPage() {
 
       <!-- Sticky Save Dock -->
       <div class="fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-xl border-t border-slate-200/80 p-3 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]">
-        <div class="max-w-md mx-auto flex items-center justify-between gap-3">
+        <div class="max-w-md md:max-w-4xl lg:max-w-5xl mx-auto flex items-center justify-between gap-3">
           <div>
             <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">Total Terdeteksi</span>
             <span class="text-sm font-extrabold text-slate-900">${confirmedItems.length} Bahan Siap Disimpan</span>

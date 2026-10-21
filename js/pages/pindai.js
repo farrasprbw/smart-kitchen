@@ -82,7 +82,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
   }
 
   mainEl.innerHTML = `
-    <div class="page-enter flex flex-col w-full max-w-md mx-auto px-4 pt-2 pb-24 gap-4">
+    <div class="page-enter flex flex-col w-full max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 pb-24 gap-5">
 
       <!-- Mode Switcher: 2 Tab Bersih (Pindai Kulkas vs Scan Barcode) -->
       <div class="p-1 rounded-2xl bg-surface-container-high border border-outline-variant/30 flex items-center shadow-xs">

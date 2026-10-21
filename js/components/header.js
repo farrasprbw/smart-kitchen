@@ -1,4 +1,5 @@
-// Header component with Active Online/Offline verification
+import { store } from '../core/state.js';
+import { StorageService } from '../core/storage.js';
 
 let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
 
@@ -48,6 +49,10 @@ export function renderHeader({
   const container = document.getElementById('app-header');
   if (!container) return;
 
+  const activeRoute = store?.getState()?.activeTab || (typeof window !== 'undefined' ? window.location.hash.replace('#', '').split('?')[0] : 'beranda') || 'beranda';
+  const settings = StorageService.getSettings();
+  const userName = settings?.userName || 'Sari';
+
   const offlineBadgeHtml = `
     <span id="header-offline-badge" class="${isOnline ? 'hidden' : ''} px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-800 text-[10px] font-bold flex items-center gap-1 shadow-xs">
       <span class="material-symbols-outlined text-[13px]">cloud_off</span>
@@ -55,11 +60,32 @@ export function renderHeader({
     </span>
   `;
 
+  const desktopNavHtml = `
+    <nav class="hidden md:flex items-center gap-1.5 lg:gap-2">
+      <a href="#beranda" data-desktop-nav="beranda" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition-all ${activeRoute === 'beranda' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold'}">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' ${activeRoute === 'beranda' ? 1 : 0};">cottage</span>
+        <span>Beranda</span>
+      </a>
+      <a href="#pindai" data-desktop-nav="pindai" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition-all ${activeRoute === 'pindai' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold'}">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' ${activeRoute === 'pindai' ? 1 : 0};">document_scanner</span>
+        <span>Pindai</span>
+      </a>
+      <a href="#ide-masak" data-desktop-nav="ide-masak" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition-all ${activeRoute === 'ide-masak' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold'}">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' ${activeRoute === 'ide-masak' ? 1 : 0};">skillet</span>
+        <span>Ide Masak</span>
+      </a>
+      <a href="#catatan" data-desktop-nav="catatan" class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs lg:text-sm font-bold transition-all ${activeRoute === 'catatan' ? 'bg-primary text-white shadow-sm ring-2 ring-primary/20' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold'}">
+        <span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' ${activeRoute === 'catatan' ? 1 : 0};">menu_book</span>
+        <span>Catatan</span>
+      </a>
+    </nav>
+  `;
+
   if (type === 'stack') {
     container.innerHTML = `
-      <div class="flex items-center justify-between px-4 h-16 max-w-md mx-auto">
+      <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto">
         <div class="flex items-center gap-3">
-          <a href="#${backHash}" id="header-btn-back" class="w-9 h-9 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition active:scale-95" title="Kembali">
+          <a href="#${backHash}" id="header-btn-back" class="w-9 h-9 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface hover:bg-surface-container-highest transition active:scale-95" title="Kembali">
             <span class="material-symbols-outlined text-[20px]">arrow_back</span>
           </a>
           <div>
@@ -70,7 +96,10 @@ export function renderHeader({
             <p class="text-xs text-on-surface-variant">${subtitle}</p>
           </div>
         </div>
-        ${rightAction ? rightAction : ''}
+        ${desktopNavHtml}
+        <div class="flex items-center gap-2">
+          ${rightAction ? rightAction : ''}
+        </div>
       </div>
     `;
 
@@ -88,7 +117,7 @@ export function renderHeader({
 
   // Default Tab Header (Logo DP Resmi Dapur Pintar)
   container.innerHTML = `
-    <div class="flex items-center justify-between px-4 h-16 max-w-md mx-auto">
+    <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none">
           DP
@@ -101,10 +130,18 @@ export function renderHeader({
           <h1 class="text-base font-bold text-on-surface leading-tight">${title}</h1>
         </div>
       </div>
-      <div class="flex items-center gap-1">
-        <button id="btn-open-settings" aria-label="Pengaturan" class="w-9 h-9 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition active:scale-95" title="Pengaturan">
+
+      ${desktopNavHtml}
+
+      <div class="flex items-center gap-2">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span>${userName}</span>
+        </div>
+        <button id="btn-open-settings" aria-label="Pengaturan" class="w-9 h-9 rounded-xl flex items-center justify-center text-on-surface-variant hover:bg-surface-container-high transition active:scale-95" title="Pengaturan">
           <span class="material-symbols-outlined text-[22px]">settings</span>
         </button>
+        ${rightAction ? rightAction : ''}
       </div>
     </div>
   `;
