@@ -1,11 +1,13 @@
 // Dapur Pintar Service Worker
 
-const CACHE_NAME = 'dapur-pintar-v9';
+const CACHE_NAME = 'dapur-pintar-v10';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './favicon.ico',
   './manifest.json',
+  './assets/fonts/material-symbols.css',
+  './assets/fonts/material-symbols-outlined.woff2',
   './js/app.js',
   './js/config.js',
   './js/core/router.js',
