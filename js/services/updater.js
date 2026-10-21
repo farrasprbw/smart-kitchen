@@ -83,7 +83,15 @@ export function showUpdatePrompt(waitingWorker = null) {
  * Inisialisasi Service Worker dengan pendeteksi update otomatis
  */
 export function initAppUpdater() {
+  // 0. Jangan aktifkan Service Worker jika berjalan di aplikasi native Capacitor / Android APK
+  if (typeof window !== 'undefined' && window.Capacitor?.isNativePlatform?.()) {
+    return;
+  }
+
   if (!('serviceWorker' in navigator)) return;
+
+  // Catat apakah halaman sudah dikontrol oleh Service Worker sebelumnya
+  const hadController = Boolean(navigator.serviceWorker.controller);
 
   window.addEventListener('load', async () => {
     try {
@@ -127,6 +135,11 @@ export function initAppUpdater() {
   // 5. Listener reload saat controller baru mengambil alih
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
+    // Jangan reload pada instalasi pertama kali (karena aplikasi baru saja dimuat dari awal)
+    if (!hadController) {
+      return;
+    }
+
     if (!refreshing) {
       refreshing = true;
       window.location.reload();

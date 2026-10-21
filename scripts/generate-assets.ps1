@@ -46,24 +46,31 @@ function Create-SplashScreen($src, $w, $h) {
     return $bmp
 }
 
-# 1. Launcher icons
+# 1. Launcher icons & Adaptive Foreground
 $iconSizes = @{
-    "mipmap-mdpi" = 48
-    "mipmap-hdpi" = 72
-    "mipmap-xhdpi" = 96
-    "mipmap-xxhdpi" = 144
-    "mipmap-xxxhdpi" = 192
+    "mipmap-mdpi" = @{ legacy = 48; fg = 108 }
+    "mipmap-hdpi" = @{ legacy = 72; fg = 162 }
+    "mipmap-xhdpi" = @{ legacy = 96; fg = 216 }
+    "mipmap-xxhdpi" = @{ legacy = 144; fg = 324 }
+    "mipmap-xxxhdpi" = @{ legacy = 192; fg = 432 }
 }
 
 foreach ($entry in $iconSizes.GetEnumerator()) {
     $dir = Join-Path $resDir $entry.Key
     if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force }
     
-    $iconBmp = Resize-Image $srcImage $entry.Value $entry.Value
+    # Legacy & round icons
+    $iconBmp = Resize-Image $srcImage $entry.Value.legacy $entry.Value.legacy
     $iconBmp.Save((Join-Path $dir "ic_launcher.png"), [System.Drawing.Imaging.ImageFormat]::Png)
     $iconBmp.Save((Join-Path $dir "ic_launcher_round.png"), [System.Drawing.Imaging.ImageFormat]::Png)
     $iconBmp.Dispose()
-    Write-Host "Generated icon for $($entry.Key) ($($entry.Value)x$($entry.Value))"
+
+    # Adaptive icon foreground (Android 8.0+)
+    $fgBmp = Resize-Image $srcImage $entry.Value.fg $entry.Value.fg
+    $fgBmp.Save((Join-Path $dir "ic_launcher_foreground.png"), [System.Drawing.Imaging.ImageFormat]::Png)
+    $fgBmp.Dispose()
+
+    Write-Host "Generated legacy ($($entry.Value.legacy)px) & foreground ($($entry.Value.fg)px) for $($entry.Key)"
 }
 
 # 2. Splash Screens (Portrait & Landscape)
