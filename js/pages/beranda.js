@@ -141,11 +141,11 @@ export function renderBerandaPage() {
     const displayedList = getFilteredAndSortedList();
 
     mainEl.innerHTML = `
-      <div class="page-enter w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-20 md:pb-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+      <div class="page-enter w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-20 md:pb-12 overflow-x-hidden min-w-0 max-w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start w-full min-w-0">
 
           <!-- SISI KIRI (Kolom Utama): Inventaris Bahan -->
-          <section class="order-2 lg:order-1 lg:col-span-7 xl:col-span-8 flex flex-col gap-4">
+          <section class="order-2 lg:order-1 lg:col-span-7 xl:col-span-8 flex flex-col gap-4 w-full min-w-0">
             <div class="flex items-center justify-between">
               <div>
                 <h2 class="text-base sm:text-lg lg:text-xl font-extrabold text-slate-900 tracking-tight">Inventaris Bahan</h2>
@@ -229,7 +229,7 @@ export function renderBerandaPage() {
           </section>
 
           <!-- SISI KANAN (Sidebar Desktop Sticky): Status Ringkasan, Aksi Cepat, Tips Cerdas -->
-          <aside class="order-1 lg:order-2 lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-5 lg:sticky lg:top-20 self-start">
+          <aside class="order-1 lg:order-2 lg:col-span-5 xl:col-span-4 flex flex-col gap-4 lg:gap-5 lg:sticky lg:top-20 self-start w-full min-w-0">
 
             <!-- Card 1: Kondisi Dapur Terpantau (Ringkasan Status) -->
             <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-white border border-emerald-100 p-4 sm:p-5 shadow-xs hover:shadow-md transition-shadow">
@@ -281,64 +281,55 @@ export function renderBerandaPage() {
               </div>
             </div>
 
-            <!-- Card 2: Aksi Cepat Dapur (Responsif: 3 Kolom di Mobile, List Horizontal Elegan di Desktop Sidebar) -->
-            <div>
+            <!-- Card 2: Aksi Cepat Dapur (Responsif: Vertikal Rapi di Mobile, Horizontal Elegan di Desktop Sidebar) -->
+            <div class="w-full min-w-0">
               <div class="flex items-center justify-between mb-2.5">
                 <h2 class="text-sm sm:text-base font-bold text-slate-800">Aksi Cepat Dapur</h2>
                 <span class="text-xs font-semibold text-emerald-700 flex items-center gap-1">
                   <span class="material-symbols-outlined text-[15px]">bolt</span>Pindai Cepat
                 </span>
               </div>
-              <div class="grid grid-cols-3 lg:grid-cols-1 gap-2.5 sm:gap-3">
+              <div class="grid grid-cols-3 lg:grid-cols-1 gap-2 sm:gap-3 w-full min-w-0">
                 <!-- Action 1: Pindai Kulkas -->
-                <a href="#pindai?type=kulkas" class="flex flex-col justify-between lg:flex-row lg:items-center p-3.5 sm:p-4 min-h-[7.5rem] lg:min-h-0 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer">
-                  <div class="flex items-start lg:items-center gap-3">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition flex-shrink-0">
-                      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">kitchen</span>
+                <a href="#pindai?type=kulkas" class="flex flex-col lg:flex-row lg:items-center justify-between p-2.5 sm:p-4 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer min-w-0 overflow-hidden">
+                  <div class="flex flex-col lg:flex-row items-start lg:items-center gap-1.5 sm:gap-2 lg:gap-3 min-w-0 w-full">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition shrink-0">
+                      <span class="material-symbols-outlined text-[18px] sm:text-[22px]">kitchen</span>
                     </div>
-                    <div>
-                      <div class="flex items-center gap-1.5">
-                        <h3 class="text-xs sm:text-sm font-bold leading-tight">Pindai Kulkas</h3>
-                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100 hidden sm:inline-block">Foto</span>
-                      </div>
-                      <p class="text-[10px] sm:text-xs text-emerald-100/90 mt-0.5">Multi-sudut kamera</p>
+                    <div class="min-w-0 w-full">
+                      <h3 class="text-[11px] sm:text-sm font-bold leading-tight truncate">Pindai Kulkas</h3>
+                      <p class="text-[9px] sm:text-xs text-emerald-100/90 mt-0.5 truncate">Kamera AI</p>
                     </div>
                   </div>
-                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block">arrow_forward</span>
+                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block shrink-0">arrow_forward</span>
                 </a>
 
                 <!-- Action 2: Scan Barcode -->
-                <a href="#pindai?type=barcode" class="flex flex-col justify-between lg:flex-row lg:items-center p-3.5 sm:p-4 min-h-[7.5rem] lg:min-h-0 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer">
-                  <div class="flex items-start lg:items-center gap-3">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition flex-shrink-0">
-                      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">barcode_scanner</span>
+                <a href="#pindai?type=barcode" class="flex flex-col lg:flex-row lg:items-center justify-between p-2.5 sm:p-4 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer min-w-0 overflow-hidden">
+                  <div class="flex flex-col lg:flex-row items-start lg:items-center gap-1.5 sm:gap-2 lg:gap-3 min-w-0 w-full">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition shrink-0">
+                      <span class="material-symbols-outlined text-[18px] sm:text-[22px]">barcode_scanner</span>
                     </div>
-                    <div>
-                      <div class="flex items-center gap-1.5">
-                        <h3 class="text-xs sm:text-sm font-bold leading-tight">Scan Barcode</h3>
-                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-900/40 text-amber-100 hidden sm:inline-block">Instan</span>
-                      </div>
-                      <p class="text-[10px] sm:text-xs text-amber-100/90 mt-0.5">Deteksi instan kemasan</p>
+                    <div class="min-w-0 w-full">
+                      <h3 class="text-[11px] sm:text-sm font-bold leading-tight truncate">Scan Barcode</h3>
+                      <p class="text-[9px] sm:text-xs text-amber-100/90 mt-0.5 truncate">Kemasan instan</p>
                     </div>
                   </div>
-                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block">arrow_forward</span>
+                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block shrink-0">arrow_forward</span>
                 </a>
 
                 <!-- Action 3: Ide Masak -->
-                <a href="#ide-masak" class="flex flex-col justify-between lg:flex-row lg:items-center p-3.5 sm:p-4 min-h-[7.5rem] lg:min-h-0 rounded-2xl bg-gradient-to-br from-orange-500 to-rose-600 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer">
-                  <div class="flex items-start lg:items-center gap-3">
-                    <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition flex-shrink-0">
-                      <span class="material-symbols-outlined text-[20px] sm:text-[22px]">restaurant_menu</span>
+                <a href="#ide-masak" class="flex flex-col lg:flex-row lg:items-center justify-between p-2.5 sm:p-4 rounded-2xl bg-gradient-to-br from-orange-500 to-rose-600 text-white shadow-sm hover:shadow-md hover:scale-[1.01] active:scale-95 transition-all text-left group cursor-pointer min-w-0 overflow-hidden">
+                  <div class="flex flex-col lg:flex-row items-start lg:items-center gap-1.5 sm:gap-2 lg:gap-3 min-w-0 w-full">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-white/20 flex items-center justify-center text-white backdrop-blur-sm group-hover:scale-110 group-hover:bg-white/25 transition shrink-0">
+                      <span class="material-symbols-outlined text-[18px] sm:text-[22px]">restaurant_menu</span>
                     </div>
-                    <div>
-                      <div class="flex items-center gap-1.5">
-                        <h3 class="text-xs sm:text-sm font-bold leading-tight">Ide Masak</h3>
-                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-orange-900/40 text-orange-100 hidden sm:inline-block">Chef</span>
-                      </div>
-                      <p class="text-[10px] sm:text-xs text-orange-100/90 mt-0.5">Rekomendasi dari stok</p>
+                    <div class="min-w-0 w-full">
+                      <h3 class="text-[11px] sm:text-sm font-bold leading-tight truncate">Ide Masak</h3>
+                      <p class="text-[9px] sm:text-xs text-orange-100/90 mt-0.5 truncate">Dari stok dapur</p>
                     </div>
                   </div>
-                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block">arrow_forward</span>
+                  <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block shrink-0">arrow_forward</span>
                 </a>
               </div>
             </div>

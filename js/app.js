@@ -126,12 +126,20 @@ class App {
     // 6. Start Router (UI langsung muncul seketika!)
     this.router.init();
 
-    // 7. Sembunyikan Splash Screen Native segera setelah UI siap
-    if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
-      setTimeout(() => {
+    // 7. Splash Screen Handlers (Web & Native Capacitor)
+    const hideAppSplashScreen = () => {
+      const splashEl = document.getElementById('app-splash-screen');
+      if (splashEl) {
+        splashEl.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => splashEl.remove(), 750);
+      }
+      if (typeof window !== 'undefined' && window.Capacitor?.Plugins?.SplashScreen) {
         window.Capacitor.Plugins.SplashScreen.hide({ fadeOutDuration: 300 });
-      }, 350);
-    }
+      }
+    };
+
+    // Beri waktu 1.6 detik agar splash screen elegan tampil memukau sesuai desain
+    setTimeout(hideAppSplashScreen, 1600);
 
     // 8. Fetch server config di latar belakang tanpa memblokir tampilan awal
     loadServerConfig().catch(() => { });

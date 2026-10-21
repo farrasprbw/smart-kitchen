@@ -39,7 +39,7 @@ export function renderIdeMasakPage() {
   );
 
   let currentRecipes = store.getState().generatedRecipes || [];
-  let activeSelectedRecipe = currentRecipes[0] || null;
+  let activeSelectedRecipe = null;
 
   // Pastikan displayedCount minimal BATCH_SIZE
   if (displayedCount < BATCH_SIZE) displayedCount = BATCH_SIZE;
@@ -187,21 +187,26 @@ export function renderIdeMasakPage() {
 
       </div>
 
-      <!-- Floating Cooking Dock -->
+      <!-- Floating Cooking Dock (Compact, Safe-Area Aware, & Dismissible) -->
       ${activeSelectedRecipe ? `
-        <div id="cooking-dock" class="fixed bottom-16 md:bottom-5 inset-x-4 md:inset-x-auto md:left-1/2 md:-translate-x-1/2 z-40 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl p-3 sm:p-3.5 shadow-2xl max-w-lg w-full">
-          <div class="flex items-center justify-between gap-3">
+        <div id="cooking-dock" class="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:bottom-6 inset-x-3 sm:inset-x-auto sm:left-1/2 sm:-translate-x-1/2 z-40 bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-2xl p-2.5 sm:p-3 shadow-xl max-w-md w-auto">
+          <div class="flex items-center justify-between gap-2.5 min-w-0">
             <div class="min-w-0 flex-1">
-              <span class="text-[10px] font-bold text-emerald-800 uppercase tracking-wider block">Menu Terpilih</span>
+              <span class="text-[9px] font-bold text-emerald-800 uppercase tracking-wider block">Menu Terpilih</span>
               <h4 id="dock-recipe-title" class="text-xs sm:text-sm font-extrabold text-slate-900 truncate">${activeSelectedRecipe.nama}</h4>
-              <p class="text-[10px] sm:text-xs text-slate-500 truncate mt-0.5">
-                Bahan: ${(activeSelectedRecipe.bahan_terpakai || []).map(b => `${b.nama} (${b.jumlah} ${b.satuan})`).join(', ')}
+              <p class="text-[10px] text-slate-500 truncate mt-0.5">
+                Bahan: ${(activeSelectedRecipe.bahan_terpakai || []).map(b => `${b.nama}`).join(', ')}
               </p>
             </div>
-            <button id="btn-dock-cook" type="button" class="h-11 px-4 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md active:scale-95 transition flex-shrink-0 cursor-pointer">
-              <span class="material-symbols-outlined text-[18px]">skillet</span>
-              <span>Sudah Masak Ini 🍳</span>
-            </button>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button id="btn-dock-cook" type="button" class="h-9 px-3 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center gap-1 shadow-sm active:scale-95 transition shrink-0 cursor-pointer">
+                <span class="material-symbols-outlined text-[16px]">skillet</span>
+                <span>Sudah Masak 🍳</span>
+              </button>
+              <button id="btn-dock-close" type="button" class="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition shrink-0 cursor-pointer" title="Sembunyikan">
+                <span class="material-symbols-outlined text-[16px]">close</span>
+              </button>
+            </div>
           </div>
         </div>
       ` : ''}
@@ -531,15 +536,19 @@ export function renderIdeMasakPage() {
       };
     }
 
-    // Cooking Dock Button
+    // Cooking Dock Buttons
     document.getElementById('btn-dock-cook')?.addEventListener('click', () => {
       confirmCooking(activeSelectedRecipe);
+    });
+
+    document.getElementById('btn-dock-close')?.addEventListener('click', () => {
+      activeSelectedRecipe = null;
+      renderContent();
     });
   }
 
   function updateDockUI() {
-    const titleEl = document.getElementById('dock-recipe-title');
-    if (titleEl && activeSelectedRecipe) titleEl.textContent = activeSelectedRecipe.nama;
+    renderContent();
   }
 
   function openRecipeDetailModal(recipe) {

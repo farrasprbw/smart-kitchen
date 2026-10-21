@@ -56,14 +56,27 @@ export const CONFIG = {
 
 /**
  * Cek apakah ada konfigurasi API key dari serverless function Vercel (/api/config)
- * Diberi timeout 1.2 detik agar tidak pernah memblokir rendering awal halaman.
+ * Mendukung Capacitor Android (localhost -> remote Vercel API) dan Web.
  */
 export async function loadServerConfig() {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const isCapacitorOrLocal =
+      typeof window !== 'undefined' && (
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.protocol === 'capacitor:' ||
+        window.location.protocol === 'file:' ||
+        window.Capacitor?.isNativePlatform?.()
+      );
 
-    const res = await fetch('/api/config', { signal: controller.signal });
+    const configUrl = isCapacitorOrLocal
+      ? 'https://smart-kitchen-dun.vercel.app/api/config'
+      : '/api/config';
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2500);
+
+    const res = await fetch(configUrl, { signal: controller.signal });
     clearTimeout(timeoutId);
 
     if (res.ok) {
@@ -73,7 +86,7 @@ export async function loadServerConfig() {
       }
     }
   } catch {
-    // Mode statis murni / offline / timeout, fallback ke localStorage tanpa blocking
+    // Mode statis murni / offline / timeout, fallback ke default key tanpa blocking
   }
 }
 

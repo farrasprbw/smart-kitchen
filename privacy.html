@@ -43,12 +43,20 @@
       }
     };
   </script>
+  <style>
+    .pt-safe {
+      padding-top: max(env(safe-area-inset-top, 0px), 1.5rem);
+    }
+    .pb-safe {
+      padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+    }
+  </style>
 </head>
 
 <body class="bg-surface font-sans text-on-surface min-h-screen flex flex-col">
-  <!-- Top App Bar -->
-  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-xs">
-    <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+  <!-- Top App Bar with Safe Area Inset Support -->
+  <header class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-xs pt-safe">
+    <div class="max-w-3xl mx-auto px-4 h-14 sm:h-16 flex items-center justify-between">
       <a href="index.html#beranda"
         class="flex items-center gap-2 text-primary font-bold text-xs hover:opacity-80 transition active:scale-95">
         <span class="material-symbols-outlined text-[20px]">arrow_back</span>
@@ -62,7 +70,7 @@
   </header>
 
   <!-- Main Legal Content -->
-  <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
+  <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-6 sm:py-8 space-y-6 pb-safe">
     <div class="space-y-2">
       <div
         class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold">

@@ -119,8 +119,8 @@ export function renderHeader({
   container.innerHTML = `
     <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16 max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none">
-          DP
+        <div class="w-10 h-10 rounded-2xl overflow-hidden shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none bg-emerald-800">
+          <img src="assets/icons/logo.png" alt="Logo" class="w-full h-full object-cover">
         </div>
         <div>
           <div class="flex items-center gap-2">
