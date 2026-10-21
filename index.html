@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id" class="overflow-x-hidden">
+<html lang="id" class="h-full overflow-hidden">
 
 <head>
   <meta charset="utf-8">
@@ -133,14 +133,20 @@
       html,
       body {
         width: 100%;
+        height: 100%;
+        height: 100dvh;
         margin: 0;
         padding: 0;
-        min-height: 100%;
+        overflow: hidden;
       }
 
       body {
-        overscroll-behavior-y: none;
         -webkit-tap-highlight-color: transparent;
+      }
+
+      #app-main {
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
       }
 
       .pb-safe {
@@ -248,7 +254,7 @@
   </style>
 </head>
 
-<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen overflow-x-hidden max-w-full">
+<body class="bg-surface font-body-md text-on-surface flex flex-col h-full h-[100dvh] overflow-hidden max-w-full">
 
   <!-- Application Splash Screen (Gemini Design Reference: https://share.gemini.google/LbXdaiW1fTw5) -->
   <div id="app-splash-screen" class="fixed inset-0 z-[9999] flex flex-col items-center justify-between py-12 px-6 bg-[#1b4d3e] text-white transition-all duration-700 ease-in-out select-none">
@@ -306,7 +312,7 @@
 
   <!-- App Main Content (Memiliki Initial Structure Skeleton agar tidak kosong saat load) -->
   <main id="app-main"
-    class="flex-1 flex flex-col relative w-full max-w-full pt-safe-content pb-24 md:pb-12 bg-surface overflow-y-auto overflow-x-hidden">
+    class="flex-1 min-h-0 flex flex-col relative w-full max-w-full pt-safe-content pb-24 md:pb-12 bg-surface overflow-y-auto overflow-x-hidden overscroll-y-contain">
     <div id="initial-loading-skeleton"
       class="flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 gap-4">
       <!-- Welcome card skeleton -->
