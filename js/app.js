@@ -20,23 +20,62 @@ class App {
 
   async init() {
     // 1. Pengecekan Jaringan (Online / Offline)
+    const updateOfflineBanner = (isOffline) => {
+      const banner = document.getElementById('offline-banner');
+      if (banner) {
+        if (isOffline) {
+          banner.classList.remove('hidden');
+        } else {
+          banner.classList.add('hidden');
+        }
+      }
+    };
+
     window.addEventListener('offline', () => {
-      showToast('Koneksi internet terputus. Mode offline aktif — data tersimpan aman di HP kamu.', 'warning', 4000);
+      updateOfflineBanner(true);
+      showToast('Kamu sedang offline. Fitur scan & analisis dinonaktifkan sementara.', 'warning', 4000);
     });
+
     window.addEventListener('online', () => {
+      updateOfflineBanner(false);
       showToast('Koneksi internet kembali aktif!', 'success', 2500);
     });
 
     if (!navigator.onLine) {
+      updateOfflineBanner(true);
       setTimeout(() => {
-        showToast('Kamu sedang offline. Dapur Pintar tetap dapat digunakan.', 'info', 3000);
+        showToast('Kamu sedang offline. Data tersimpan aman di HP kamu.', 'info', 3000);
       }, 500);
+    } else {
+      updateOfflineBanner(false);
     }
 
-    // 2. Initialize Default Seeds in localStorage langsung
-    StorageService.initDefaults();
+    // 2. Initialize Default Seeds & Hydrate Native Storage (@capacitor/preferences)
+    await StorageService.initDefaults();
 
-    // 3. Setup Router & Render UI pertama kali secara instan (prioritas struktur & teks cepat)
+    // 3. Setup Android Hardware Back Button Listener (Native Feel)
+    if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+      window.Capacitor.Plugins.App.addListener('backButton', () => {
+        // A. Jika ada modal aktif, tutup modal terlebih dahulu
+        const modalEl = document.getElementById('app-modal');
+        if (modalEl && !modalEl.classList.contains('hidden')) {
+          ModalService.close();
+          return;
+        }
+
+        // B. Jika berada di halaman selain Beranda, kembali ke Beranda
+        const activeTab = store.getState().activeTab;
+        if (activeTab && activeTab !== 'beranda') {
+          window.location.hash = '#beranda';
+          return;
+        }
+
+        // C. Jika sudah di Beranda, biarkan aplikasi keluar
+        window.Capacitor.Plugins.App.exitApp();
+      });
+    }
+
+    // 4. Setup Router & Render UI pertama kali secara instan (prioritas struktur & teks cepat)
     this.router = new Router({
       beranda: () => {
         store.setState({ activeTab: 'beranda' });
@@ -72,7 +111,7 @@ class App {
       return true;
     });
 
-    // 4. Global Settings Listener
+    // 5. Global Settings Listener
     document.addEventListener('click', (e) => {
       const settingsBtn = e.target.closest('#btn-open-settings');
       if (settingsBtn) {
@@ -84,19 +123,26 @@ class App {
       }
     });
 
-    // 5. Start Router (UI langsung muncul seketika!)
+    // 6. Start Router (UI langsung muncul seketika!)
     this.router.init();
 
-    // 6. Fetch server config di latar belakang tanpa memblokir tampilan awal
-    loadServerConfig().catch(() => {});
+    // 7. Sembunyikan Splash Screen Native segera setelah UI siap
+    if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.SplashScreen) {
+      setTimeout(() => {
+        window.Capacitor.Plugins.SplashScreen.hide({ fadeOutDuration: 300 });
+      }, 350);
+    }
 
-    // 7. Check Onboarding
+    // 8. Fetch server config di latar belakang tanpa memblokir tampilan awal
+    loadServerConfig().catch(() => { });
+
+    // 9. Check Onboarding
     const settings = StorageService.getSettings();
     if (!settings?.onboardingDone) {
       this.showOnboardingModal();
     }
 
-    // 8. Initialize Service Worker & PWA Updater
+    // 10. Initialize Service Worker & PWA Updater
     initAppUpdater();
   }
 

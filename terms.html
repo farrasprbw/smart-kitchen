@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    name="viewport">
+  <meta name="description" content="Syarat & Ketentuan Layanan Dapur Pintar - Asisten dapur cerdas.">
+  <meta name="theme-color" content="#00652c">
+  <title>Syarat & Ketentuan — Dapur Pintar</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Google Fonts: Plus Jakarta Sans + Material Symbols -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00652c",
+            "primary-container": "#15803d",
+            "on-primary": "#ffffff",
+            background: "#f9f9ff",
+            surface: "#f9f9ff",
+            "on-surface": "#111c2d",
+            "on-surface-variant": "#3f493f",
+            "surface-container": "#e7eeff",
+            "surface-container-lowest": "#ffffff"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-surface font-sans text-on-surface min-h-screen flex flex-col">
+  <!-- Top App Bar -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-xs">
+    <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html#beranda"
+        class="flex items-center gap-2 text-primary font-bold text-xs hover:opacity-80 transition active:scale-95">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        <span>Kembali ke Aplikasi</span>
+      </a>
+      <span
+        class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
+        Dapur Pintar Legal
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Legal Content -->
+  <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
+    <div class="space-y-2">
+      <div
+        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold">
+        <span class="material-symbols-outlined text-[16px]">gavel</span>
+        <span>Perjanjian Pengguna</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Syarat & Ketentuan</h1>
+      <p class="text-xs text-slate-500">Terakhir diperbarui: 21 Oktober 2026</p>
+    </div>
+
+    <!-- Intro Card -->
+    <div
+      class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm leading-relaxed text-xs text-slate-600 space-y-3">
+      <p>
+        Selamat datang di <strong>Dapur Pintar</strong>. Dengan mengunduh, mengakses, atau menggunakan aplikasi ini,
+        Anda menyatakan setuju untuk terikat oleh Syarat dan Ketentuan berikut. Mohon membaca dokumen ini dengan saksama
+        sebelum memanfaatkan layanan kami.
+      </p>
+    </div>
+
+    <!-- Section 1 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">apps</span>
+        <h2>1. Layanan Aplikasi</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Dapur Pintar adalah aplikasi asisten pengelolaan dapur yang bertujuan membantu pengguna:
+      </p>
+      <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5 pl-2">
+        <li>Mencatat dan memantau stok bahan makanan di kulkas dan dapur.</li>
+        <li>Meminimalkan pemborosan makanan (<em>zero food waste</em>) melalui notifikasi kesegaran.</li>
+        <li>Menghasilkan ide kreasi resep masakan cerdas berbasis bahan yang tersedia dengan teknologi kecerdasan
+          buatan.</li>
+        <li>Membantu pencatatan riwayat memasak dan daftar rencana belanja dapur.</li>
+      </ul>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">psychology</span>
+        <h2>2. Batasan Tanggung Jawab atas Rekomendasi Kecerdasan Buatan</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Fitur pemindaian foto kulkas dan rekomendasi resep masakan dihasilkan menggunakan model kecerdasan buatan
+        (Google Gemini API). Walaupun kami berusaha memberikan hasil yang akurat:
+      </p>
+      <div class="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-950 space-y-2">
+        <p class="font-bold">⚠️ Perhatian Keamanan Pangan & Alergen:</p>
+        <p class="leading-relaxed">
+          Rekomendasi resep dan instruksi memasak hanya bersifat panduan dan inspirasi kuliner. Pengguna tetap
+          bertanggung jawab penuh untuk memeriksa secara fisik kelayakan konsumsi, kebersihan, tanggal kedaluwarsa riil,
+          tingkat kematangan, serta kandungan alergen dari setiap bahan makanan sebelum dikonsumsi.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">verified_user</span>
+        <h2>3. Penggunaan yang Diperbolehkan</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Pengguna dilarang menyalahgunakan aplikasi, termasuk namun tidak terbatas pada merekayasa balik (<em>reverse
+          engineer</em>) kode sumber tanpa izin, membanjiri antarmuka API dengan permintaan berlebihan, atau memindai
+        gambar yang melanggar hukum dan norma kesusilaan.
+      </p>
+    </section>
+
+    <!-- Section 4 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">copyright</span>
+        <h2>4. Hak Kekayaan Intelektual</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Seluruh hak cipta, merek dagang, desain antarmuka, tata letak grafis, serta kode aplikasi Dapur Pintar dimiliki
+        secara sah oleh pengembang. Pengguna diberikan lisensi terbatas, non-eksklusif, dan tidak dapat dialihkan untuk
+        penggunaan pribadi non-komersial.
+      </p>
+    </section>
+
+    <!-- Section 5 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">update</span>
+        <h2>5. Perubahan Ketentuan</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Kami berhak memperbarui Syarat & Ketentuan ini sewaktu-waktu seiring pengembangan fitur aplikasi. Pembaruan akan
+        berlaku segera setelah dipublikasikan pada halaman ini. Penggunaan berkelanjutan Anda atas aplikasi merupakan
+        persetujuan terhadap ketentuan terbaru.
+      </p>
+    </section>
+
+    <!-- Section 6 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">support_agent</span>
+        <h2>6. Hubungi Kami</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Untuk pertanyaan mengenai Syarat & Ketentuan ini, silakan hubungi kami melalui surel: <strong
+          class="text-primary">farrasprbw@gmail.com</strong>.
+      </p>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+    <p>© 2026 Dapur Pintar. Hak Cipta Dilindungi Undang-Undang.</p>
+  </footer>
+</body>
+
+</html>

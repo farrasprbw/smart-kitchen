@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport">
-  <meta name="description" content="Dapur Pintar — Asisten dapur cerdas. Kelola stok kulkas, rekomendasi masakan, dan cegah food waste.">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    name="viewport">
+  <meta name="description"
+    content="Dapur Pintar — Asisten dapur cerdas. Kelola stok kulkas, rekomendasi masakan, dan cegah food waste.">
   <meta name="theme-color" content="#ffffff">
   <title>Dapur Pintar</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -12,8 +15,11 @@
   <!-- Google Fonts: Plus Jakarta Sans + Material Symbols -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+    rel="stylesheet">
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -125,31 +131,60 @@
 
   <style>
     @layer base {
-      html, body {
+
+      html,
+      body {
         width: 100%;
         margin: 0;
         padding: 0;
         min-height: 100%;
       }
+
       body {
         overscroll-behavior-y: none;
         -webkit-tap-highlight-color: transparent;
       }
-      .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); }
-      .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
-      .pt-safe-content { padding-top: calc(4.25rem + env(safe-area-inset-top, 0px)); }
-      main > :first-child { margin-top: 0 !important; }
-      main > :last-child { margin-bottom: 0 !important; }
+
+      .pb-safe {
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      .pt-safe {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+
+      .pt-safe-content {
+        padding-top: calc(4.25rem + env(safe-area-inset-top, 0px));
+      }
+
+      main> :first-child {
+        margin-top: 0 !important;
+      }
+
+      main> :last-child {
+        margin-bottom: 0 !important;
+      }
     }
-    ::-webkit-scrollbar { display: none; }
+
+    ::-webkit-scrollbar {
+      display: none;
+    }
 
     /* Page transition */
     .page-enter {
       animation: pageIn 0.25s ease-out;
     }
+
     @keyframes pageIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     /* Skeleton loading */
@@ -158,9 +193,15 @@
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
+
     @keyframes shimmer {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      0% {
+        background-position: 200% 0;
+      }
+
+      100% {
+        background-position: -200% 0;
+      }
     }
 
     /* Hide material symbols raw text and ensure proper rendering */
@@ -184,9 +225,20 @@
 
     /* Barcode Laser Scanning Animation */
     @keyframes scanLaser {
-      0% { transform: translateY(0); opacity: 0.8; }
-      50% { transform: translateY(140px); opacity: 1; }
-      100% { transform: translateY(0); opacity: 0.8; }
+      0% {
+        transform: translateY(0);
+        opacity: 0.8;
+      }
+
+      50% {
+        transform: translateY(140px);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(0);
+        opacity: 0.8;
+      }
     }
 
     /* Strict Desktop Navigation - Hide Mobile Bottom Nav on screens 768px and wider */
@@ -197,13 +249,18 @@
     }
   </style>
 </head>
+
 <body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen">
 
   <!-- App Header -->
-  <header id="app-header" class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-slate-100/80 pt-safe">
-    <div class="max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+  <header id="app-header"
+    class="fixed top-0 inset-x-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-slate-100/80 pt-safe">
+    <div
+      class="max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none">DP</div>
+        <div
+          class="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white flex items-center justify-center font-extrabold text-sm tracking-tight shadow-sm ring-2 ring-emerald-500/20 shrink-0 select-none">
+          DP</div>
         <div>
           <span class="text-xs font-semibold text-on-surface-variant">Memuat...</span>
           <h1 class="text-base font-bold text-on-surface leading-tight">Dapur Pintar</h1>
@@ -212,9 +269,18 @@
     </div>
   </header>
 
+  <!-- Offline Warning Banner -->
+  <div id="offline-banner"
+    class="hidden fixed top-16 inset-x-0 z-40 bg-amber-500 text-slate-950 font-bold text-xs px-4 py-2 flex items-center justify-center gap-2 shadow-sm transition-all duration-300">
+    <span class="material-symbols-outlined text-[18px]">wifi_off</span>
+    <span>Kamu sedang offline. Fitur scan & analisis dinonaktifkan sementara.</span>
+  </div>
+
   <!-- App Main Content (Memiliki Initial Structure Skeleton agar tidak kosong saat load) -->
-  <main id="app-main" class="flex-1 flex flex-col relative w-full pt-safe-content pb-24 md:pb-12 bg-surface overflow-y-auto">
-    <div id="initial-loading-skeleton" class="flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 gap-4">
+  <main id="app-main"
+    class="flex-1 flex flex-col relative w-full pt-safe-content pb-24 md:pb-12 bg-surface overflow-y-auto">
+    <div id="initial-loading-skeleton"
+      class="flex flex-col w-full max-w-md md:max-w-4xl lg:max-w-6xl xl:max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-2 gap-4">
       <!-- Welcome card skeleton -->
       <div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm border border-slate-100 space-y-3">
         <div class="h-4 w-32 rounded-md skeleton"></div>
@@ -244,21 +310,26 @@
   </main>
 
   <!-- Bottom Tab Navigation (Khusus Mobile, tersembunyi di Desktop) -->
-  <nav id="app-nav" class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(30,41,59,0.05)] md:hidden">
+  <nav id="app-nav"
+    class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(30,41,59,0.05)] md:hidden">
     <div class="flex justify-around items-center h-16 px-gutter-sm max-w-md mx-auto">
-      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-primary font-bold transition-colors" data-path="beranda" href="#beranda">
+      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-primary font-bold transition-colors"
+        data-path="beranda" href="#beranda">
         <span class="material-symbols-outlined text-[24px]">cottage</span>
         <span class="font-label-sm text-label-sm mt-0.5">Beranda</span>
       </a>
-      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-on-surface-variant hover:text-primary transition-colors" data-path="pindai" href="#pindai">
+      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-on-surface-variant hover:text-primary transition-colors"
+        data-path="pindai" href="#pindai">
         <span class="material-symbols-outlined text-[24px]">document_scanner</span>
         <span class="font-label-sm text-label-sm mt-0.5">Pindai</span>
       </a>
-      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-on-surface-variant hover:text-primary transition-colors" data-path="ide-masak" href="#ide-masak">
+      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-on-surface-variant hover:text-primary transition-colors"
+        data-path="ide-masak" href="#ide-masak">
         <span class="material-symbols-outlined text-[24px]">skillet</span>
         <span class="font-label-sm text-label-sm mt-0.5">Ide Masak</span>
       </a>
-      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-on-surface-variant hover:text-primary transition-colors" data-path="catatan" href="#catatan">
+      <a class="flex flex-col items-center justify-center flex-1 h-full py-1 text-on-surface-variant hover:text-primary transition-colors"
+        data-path="catatan" href="#catatan">
         <span class="material-symbols-outlined text-[24px]">menu_book</span>
         <span class="font-label-sm text-label-sm mt-0.5">Catatan</span>
       </a>
@@ -266,7 +337,8 @@
   </nav>
 
   <!-- Toast Notification Overlay -->
-  <div id="app-toast" class="fixed top-20 inset-x-4 z-[60] max-w-sm mx-auto transform -translate-y-10 opacity-0 pointer-events-none transition-all duration-300">
+  <div id="app-toast"
+    class="fixed top-20 inset-x-4 z-[60] max-w-sm mx-auto transform -translate-y-10 opacity-0 pointer-events-none transition-all duration-300">
   </div>
 
   <!-- Modal Overlay -->
@@ -274,7 +346,8 @@
   </div>
 
   <!-- API Key Onboarding Modal -->
-  <div id="onboarding-modal" class="fixed inset-0 z-[80] bg-inverse-surface/60 backdrop-blur-sm flex flex-col justify-end hidden">
+  <div id="onboarding-modal"
+    class="fixed inset-0 z-[80] bg-inverse-surface/60 backdrop-blur-sm flex flex-col justify-end hidden">
     <div class="bg-surface-container-lowest rounded-t-3xl p-6 flex flex-col gap-4 shadow-2xl max-w-lg mx-auto w-full">
       <div class="w-12 h-1.5 rounded-full bg-surface-container-highest mx-auto"></div>
       <div class="flex items-center gap-3">
@@ -305,4 +378,5 @@
 
   <script type="module" src="js/app.js"></script>
 </body>
+
 </html>

@@ -1,4 +1,4 @@
-// AI Prompt templates for Gemini 2.0 Flash
+// Prompt templates for Gemini 2.0 Flash
 
 export function buildPromptDeteksiKulkas(jumlahFoto = 1) {
   return `Kamu adalah asisten dapur yang sangat teliti dan ahli mengidentifikasi bahan makanan.

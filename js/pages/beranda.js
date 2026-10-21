@@ -152,9 +152,8 @@ export function renderBerandaPage() {
                 <p class="text-xs sm:text-sm text-slate-500 hidden sm:block">Kelola stok kulkas & dapur kering secara real-time</p>
               </div>
               <div class="flex items-center gap-2">
-                <button id="btn-toggle-bulk" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 cursor-pointer ${
-                  isBulkMode ? 'bg-primary text-white shadow-xs' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
-                }">
+                <button id="btn-toggle-bulk" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1.5 cursor-pointer ${isBulkMode ? 'bg-primary text-white shadow-xs' : 'bg-surface-container text-on-surface-variant hover:bg-surface-container-high'
+      }">
                   <span class="material-symbols-outlined text-[18px]">checklist</span>
                   <span>${isBulkMode ? 'Selesai Pilih' : 'Pilih Banyak'}</span>
                 </button>
@@ -209,9 +208,8 @@ export function renderBerandaPage() {
             </div>
 
             <!-- Bulk Action Floating Bar -->
-            ${
-              isBulkMode && selectedItemIds.size > 0
-                ? `
+            ${isBulkMode && selectedItemIds.size > 0
+        ? `
                   <div class="fixed bottom-20 md:bottom-6 inset-x-4 max-w-lg mx-auto z-40 bg-slate-900 text-white rounded-2xl p-3.5 shadow-2xl flex items-center justify-between gap-3 border border-slate-700">
                     <span class="text-xs sm:text-sm font-bold pl-2">${selectedItemIds.size} Bahan Dipilih</span>
                     <div class="flex items-center gap-2">
@@ -226,8 +224,8 @@ export function renderBerandaPage() {
                     </div>
                   </div>
                 `
-                : ''
-            }
+        : ''
+      }
           </section>
 
           <!-- SISI KANAN (Sidebar Desktop Sticky): Status Ringkasan, Aksi Cepat, Tips Cerdas -->
@@ -246,37 +244,33 @@ export function renderBerandaPage() {
                     <span class="text-xs sm:text-sm font-medium text-slate-500">Tersimpan</span>
                   </div>
                 </div>
-                <div class="inline-flex items-center gap-1.5 rounded-full ${
-                  totalBahan === 0
-                    ? 'bg-slate-200 text-slate-700'
-                    : kritisItems.length > 0
-                    ? 'bg-amber-500 text-white animate-pulse'
-                    : 'bg-emerald-600 text-white'
-                } px-3 py-1 shadow-sm text-xs font-bold">
-                  <span class="material-symbols-outlined text-[15px]">${
-                    totalBahan === 0
-                      ? 'inventory_2'
-                      : kritisItems.length > 0
-                      ? 'warning'
-                      : 'check_circle'
-                  }</span>
-                  <span>${
-                    totalBahan === 0
-                      ? 'Kulkas Kosong'
-                      : kritisItems.length > 0
-                      ? `${kritisItems.length} Segera Olah`
-                      : 'Semua Segar'
-                  }</span>
+                <div class="inline-flex items-center gap-1.5 rounded-full ${totalBahan === 0
+        ? 'bg-slate-200 text-slate-700'
+        : kritisItems.length > 0
+          ? 'bg-amber-500 text-white animate-pulse'
+          : 'bg-emerald-600 text-white'
+      } px-3 py-1 shadow-sm text-xs font-bold">
+                  <span class="material-symbols-outlined text-[15px]">${totalBahan === 0
+        ? 'inventory_2'
+        : kritisItems.length > 0
+          ? 'warning'
+          : 'check_circle'
+      }</span>
+                  <span>${totalBahan === 0
+        ? 'Kulkas Kosong'
+        : kritisItems.length > 0
+          ? `${kritisItems.length} Segera Olah`
+          : 'Semua Segar'
+      }</span>
                 </div>
               </div>
               <div class="mt-3.5 pt-3 border-t border-emerald-100/80 flex items-center justify-between text-xs sm:text-sm text-slate-600">
                 <div class="flex items-center gap-2">
                   <span class="h-2.5 w-2.5 rounded-full ${totalBahan === 0 ? 'bg-slate-400' : 'bg-emerald-500 ring-4 ring-emerald-100'}"></span>
-                  <span class="font-medium text-xs sm:text-sm">${
-                    totalBahan === 0
-                      ? 'Penyimpanan optimal • Belum ada data'
-                      : `Penyimpanan optimal • ${Math.round(((totalBahan - kritisItems.length) / totalBahan) * 100)}% siap saji`
-                  }</span>
+                  <span class="font-medium text-xs sm:text-sm">${totalBahan === 0
+        ? 'Penyimpanan optimal • Belum ada data'
+        : `Penyimpanan optimal • ${Math.round(((totalBahan - kritisItems.length) / totalBahan) * 100)}% siap saji`
+      }</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                   <span class="text-[11px] text-slate-400">Update ${new Date(stokData.lastUpdated || Date.now()).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
@@ -307,7 +301,7 @@ export function renderBerandaPage() {
                         <h3 class="text-xs sm:text-sm font-bold leading-tight">Pindai Kulkas</h3>
                         <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-900/40 text-emerald-100 hidden sm:inline-block">Foto</span>
                       </div>
-                      <p class="text-[10px] sm:text-xs text-emerald-100/90 mt-0.5">Multi-sudut kamera AI</p>
+                      <p class="text-[10px] sm:text-xs text-emerald-100/90 mt-0.5">Multi-sudut kamera</p>
                     </div>
                   </div>
                   <span class="material-symbols-outlined text-white/70 group-hover:text-white group-hover:translate-x-1 transition text-[20px] hidden lg:block">arrow_forward</span>
@@ -414,17 +408,16 @@ export function renderBerandaPage() {
         <div class="p-4 rounded-2xl bg-white border ${isSelected ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-slate-200/80 hover:border-emerald-400 hover:shadow-md'} shadow-2xs hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-3.5 group" data-item-id="${item.id}">
           <div class="flex items-start justify-between gap-3">
             <div class="flex items-center gap-3 min-w-0 flex-1">
-              ${
-                isBulkMode
-                  ? `
+              ${isBulkMode
+          ? `
                     <input type="checkbox" class="bulk-item-checkbox w-5 h-5 rounded text-primary focus:ring-primary cursor-pointer mt-0.5" data-id="${item.id}" ${isSelected ? 'checked' : ''}>
                   `
-                  : `
+          : `
                     <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center flex-shrink-0 font-bold text-sm shadow-2xs group-hover:bg-emerald-100 group-hover:scale-105 transition-all">
                       <span class="material-symbols-outlined text-[22px]">${item.icon || 'kitchen'}</span>
                     </div>
                   `
-              }
+        }
               <div class="min-w-0 flex-1">
                 <h4 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-950 transition-colors truncate" title="${item.nama}">${item.nama}</h4>
                 <div class="flex items-center gap-1.5 mt-0.5">
@@ -442,9 +435,8 @@ export function renderBerandaPage() {
               </span>
             </div>
 
-            ${
-              !isBulkMode
-                ? `
+            ${!isBulkMode
+          ? `
                   <div class="flex items-center gap-1.5 flex-shrink-0">
                     <button class="btn-qty-minus w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center active:scale-90 transition cursor-pointer hover:ring-2 hover:ring-slate-300/40" data-id="${item.id}" title="Kurangi (minus)">
                       <span class="material-symbols-outlined text-[18px]">remove</span>
@@ -457,8 +449,8 @@ export function renderBerandaPage() {
                     </button>
                   </div>
                 `
-                : ''
-            }
+          : ''
+        }
           </div>
         </div>
       `;

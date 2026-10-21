@@ -1,4 +1,4 @@
-// Pindai (Scan) Page — Mode Pindai Kulkas (AI Multi-Sudut) vs Scan Barcode (Deteksi Otomatis)
+// Pindai (Scan) Page — Mode Pindai Kulkas (Multi-Sudut) vs Scan Barcode (Deteksi Otomatis)
 
 import { CONFIG } from '../config.js';
 import { CameraService } from '../services/camera.js';
@@ -40,7 +40,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
   const mainEl = document.getElementById('app-main');
   if (!mainEl) return;
 
-  // Mode: 'kulkas' (AI Ambil Foto) | 'barcode' (Pemindai Otomatis)
+  // Mode: 'kulkas' (Ambil Foto) | 'barcode' (Pemindai Otomatis)
   const queryType = params.get('type') || store.getState().scanType || 'kulkas';
   const scanType = queryType === 'barcode' ? 'barcode' : 'kulkas';
   store.setState({ scanType });
@@ -86,20 +86,18 @@ export function renderPindaiPage(params = new URLSearchParams()) {
 
       <!-- Mode Switcher: 2 Tab Bersih (Pindai Kulkas vs Scan Barcode) -->
       <div class="p-1 rounded-2xl bg-surface-container-high border border-outline-variant/30 flex items-center shadow-xs">
-        <button id="tab-scan-kulkas" type="button" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-          scanType === 'kulkas'
-            ? 'bg-primary text-on-primary shadow-sm'
-            : 'text-on-surface-variant hover:text-on-surface'
-        }">
+        <button id="tab-scan-kulkas" type="button" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${scanType === 'kulkas'
+      ? 'bg-primary text-on-primary shadow-sm'
+      : 'text-on-surface-variant hover:text-on-surface'
+    }">
           <span class="material-symbols-outlined text-[18px]">kitchen</span>
           <span>Pindai Kulkas</span>
         </button>
 
-        <button id="tab-scan-barcode" type="button" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-          scanType === 'barcode'
-            ? 'bg-primary text-on-primary shadow-sm'
-            : 'text-on-surface-variant hover:text-on-surface'
-        }">
+        <button id="tab-scan-barcode" type="button" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${scanType === 'barcode'
+      ? 'bg-primary text-on-primary shadow-sm'
+      : 'text-on-surface-variant hover:text-on-surface'
+    }">
           <span class="material-symbols-outlined text-[18px]">barcode_scanner</span>
           <span>Scan Barcode</span>
         </button>
@@ -124,11 +122,10 @@ export function renderPindaiPage(params = new URLSearchParams()) {
               </button>
             </div>
             <p class="text-xs text-on-surface-variant mt-0.5 leading-relaxed">
-              ${
-                scanType === 'barcode'
-                  ? 'Arahkan kotak kamera ke barcode produk kemasan. Pemindaian berlangsung otomatis tanpa perlu menekan tombol jepret.'
-                  : 'Ambil 3-4 foto kulkas dari sudut berbeda (Rak, Laci, Freezer, Pintu), lalu klik Analisis agar sistem mendeteksi semua bahan.'
-              }
+              ${scanType === 'barcode'
+      ? 'Arahkan kotak kamera ke barcode produk kemasan. Pemindaian berlangsung otomatis tanpa perlu menekan tombol jepret.'
+      : 'Ambil 3-4 foto kulkas dari sudut berbeda (Rak, Laci, Freezer, Pintu), lalu klik Analisis agar sistem mendeteksi semua bahan.'
+    }
             </p>
           </div>
         </div>
@@ -137,40 +134,36 @@ export function renderPindaiPage(params = new URLSearchParams()) {
         ${scanType !== 'barcode' ? `
           <div class="grid ${scanType === 'belanja' ? 'grid-cols-3' : 'grid-cols-4'} gap-2 mt-3 pt-3 border-t border-outline-variant/30">
             ${slots.map((s, idx) => {
-              const hasPhoto = Boolean(photos[idx]?.dataUrl);
-              const isActive = idx === activeSlotIndex;
-              return `
+      const hasPhoto = Boolean(photos[idx]?.dataUrl);
+      const isActive = idx === activeSlotIndex;
+      return `
                 <div class="relative group">
-                  <button type="button" class="slot-item w-full flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all border ${
-                    isActive
-                      ? 'border-2 border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
-                      : hasPhoto
-                      ? 'border-emerald-300 bg-emerald-50/60'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
-                  }" data-index="${idx}">
-                    <div class="w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden transition-colors ${
-                      hasPhoto ? 'bg-emerald-100' : 'bg-slate-100 text-slate-600'
-                    }">
-                      ${
-                        hasPhoto
-                          ? `<img src="${photos[idx].dataUrl}" class="w-full h-full object-cover">`
-                          : `<span class="material-symbols-outlined text-[20px]">${s.icon}</span>`
-                      }
+                  <button type="button" class="slot-item w-full flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all border ${isActive
+          ? 'border-2 border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
+          : hasPhoto
+            ? 'border-emerald-300 bg-emerald-50/60'
+            : 'border-slate-200 bg-white hover:border-slate-300'
+        }" data-index="${idx}">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden transition-colors ${hasPhoto ? 'bg-emerald-100' : 'bg-slate-100 text-slate-600'
+        }">
+                      ${hasPhoto
+          ? `<img src="${photos[idx].dataUrl}" class="w-full h-full object-cover">`
+          : `<span class="material-symbols-outlined text-[20px]">${s.icon}</span>`
+        }
                     </div>
                     <span class="text-[10px] text-center line-clamp-1 ${isActive ? 'text-primary font-extrabold' : 'text-slate-600 font-semibold'}">${s.label}</span>
                   </button>
 
                   <!-- Tombol Hapus Foto per Slot -->
-                  ${
-                    hasPhoto
-                      ? `<button type="button" class="btn-delete-slot absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md hover:bg-red-700 active:scale-90 transition-transform z-10" data-delete-idx="${idx}" title="Hapus foto ${s.label}">
+                  ${hasPhoto
+          ? `<button type="button" class="btn-delete-slot absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white flex items-center justify-center shadow-md hover:bg-red-700 active:scale-90 transition-transform z-10" data-delete-idx="${idx}" title="Hapus foto ${s.label}">
                            <span class="material-symbols-outlined text-[13px]">close</span>
                          </button>`
-                      : ''
-                  }
+          : ''
+        }
                 </div>
               `;
-            }).join('')}
+    }).join('')}
           </div>
         ` : ''}
       </div>
@@ -247,11 +240,10 @@ export function renderPindaiPage(params = new URLSearchParams()) {
         <div class="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none z-10">
           <span class="text-[11px] font-bold px-3 py-1 rounded-full bg-black/60 text-white backdrop-blur-md flex items-center gap-1.5 shadow-sm">
             <span class="w-2 h-2 rounded-full ${scanType === 'barcode' ? 'bg-amber-400' : 'bg-emerald-400'} animate-ping"></span>
-            ${
-              scanType === 'barcode'
-                ? 'Scan Barcode Aktif'
-                : `Target: <span id="current-slot-title">${slots[activeSlotIndex]?.label || 'Kulkas'}</span>`
-            }
+            ${scanType === 'barcode'
+      ? 'Scan Barcode Aktif'
+      : `Target: <span id="current-slot-title">${slots[activeSlotIndex]?.label || 'Kulkas'}</span>`
+    }
           </span>
 
           <div id="brightness-pill" class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-500/90 text-white backdrop-blur-md flex items-center gap-1 shadow-sm transition-colors">
@@ -314,7 +306,7 @@ export function renderPindaiPage(params = new URLSearchParams()) {
           </button>
         </div>
 
-        <!-- AI Analysis Dock -->
+        <!-- Analysis Dock -->
         <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-col gap-3">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
@@ -405,9 +397,8 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
   // Torch Toggle
   torchBtn?.addEventListener('click', async () => {
     const isTorchOn = await cameraServiceInstance.toggleTorch();
-    torchBtn.className = `w-12 h-12 rounded-full shadow-sm border text-slate-700 flex items-center justify-center active:scale-95 transition ${
-      isTorchOn ? 'bg-amber-400 text-slate-900 border-amber-500' : 'bg-white border-slate-200'
-    }`;
+    torchBtn.className = `w-12 h-12 rounded-full shadow-sm border text-slate-700 flex items-center justify-center active:scale-95 transition ${isTorchOn ? 'bg-amber-400 text-slate-900 border-amber-500' : 'bg-white border-slate-200'
+      }`;
   });
 
   // ========================================================
@@ -441,7 +432,7 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
 
           // Haptic feedback jika didukung perangkat
           if (navigator.vibrate) {
-            try { navigator.vibrate(100); } catch (e) {}
+            try { navigator.vibrate(100); } catch (e) { }
           }
 
           handleBarcodeFound(detectedCode);
@@ -716,26 +707,23 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
     slotButtons.forEach((btn, idx) => {
       const hasPhoto = Boolean(photos[idx]?.dataUrl);
       const isActive = idx === activeSlotIndex;
-      btn.className = `slot-item w-full flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all border ${
-        isActive
-          ? 'border-2 border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
-          : hasPhoto
+      btn.className = `slot-item w-full flex flex-col items-center gap-1.5 p-2 rounded-xl transition-all border ${isActive
+        ? 'border-2 border-primary bg-primary/5 ring-2 ring-primary/20 shadow-xs'
+        : hasPhoto
           ? 'border-emerald-300 bg-emerald-50/60'
           : 'border-slate-200 bg-white hover:border-slate-300'
-      }`;
+        }`;
 
       const iconBox = btn.querySelector('div');
       if (iconBox) {
-        iconBox.className = `w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden transition-colors ${
-          hasPhoto ? 'bg-emerald-100' : 'bg-slate-100 text-slate-600'
-        }`;
+        iconBox.className = `w-10 h-10 rounded-xl flex items-center justify-center relative overflow-hidden transition-colors ${hasPhoto ? 'bg-emerald-100' : 'bg-slate-100 text-slate-600'
+          }`;
       }
 
       const labelSpan = btn.querySelector('span:not(.material-symbols-outlined)');
       if (labelSpan) {
-        labelSpan.className = `text-[10px] text-center line-clamp-1 ${
-          isActive ? 'text-primary font-extrabold' : 'text-slate-600 font-semibold'
-        }`;
+        labelSpan.className = `text-[10px] text-center line-clamp-1 ${isActive ? 'text-primary font-extrabold' : 'text-slate-600 font-semibold'
+          }`;
       }
     });
 
@@ -830,8 +818,13 @@ async function setupCameraAndEvents(slots, initialSlotIndex, photos, scanType) {
 
   updateActiveSlotUI();
 
-  // Tombol Analisis AI Bahan Makanan
+  // Tombol Analisis Bahan Makanan
   analyzeBtn?.addEventListener('click', async () => {
+    if (!navigator.onLine) {
+      showToast('Kamu sedang offline. Analisis foto memerlukan koneksi internet.', 'warning', 4000);
+      return;
+    }
+
     const validPhotos = photos.filter(p => Boolean(p.dataUrl && p.base64));
     if (validPhotos.length === 0) {
       showToast('Harap ambil minimal 1 foto terlebih dahulu.', 'warning');

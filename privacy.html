@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    name="viewport">
+  <meta name="description" content="Kebijakan Privasi Dapur Pintar - Asisten dapur cerdas ramah privasi.">
+  <meta name="theme-color" content="#00652c">
+  <title>Kebijakan Privasi — Dapur Pintar</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <!-- Google Fonts: Plus Jakarta Sans + Material Symbols -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: "#00652c",
+            "primary-container": "#15803d",
+            "on-primary": "#ffffff",
+            background: "#f9f9ff",
+            surface: "#f9f9ff",
+            "on-surface": "#111c2d",
+            "on-surface-variant": "#3f493f",
+            "surface-container": "#e7eeff",
+            "surface-container-lowest": "#ffffff"
+          },
+          fontFamily: {
+            sans: ["Plus Jakarta Sans", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+</head>
+
+<body class="bg-surface font-sans text-on-surface min-h-screen flex flex-col">
+  <!-- Top App Bar -->
+  <header class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-xs">
+    <div class="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
+      <a href="index.html#beranda"
+        class="flex items-center gap-2 text-primary font-bold text-xs hover:opacity-80 transition active:scale-95">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+        <span>Kembali ke Aplikasi</span>
+      </a>
+      <span
+        class="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200/60">
+        Dapur Pintar Legal
+      </span>
+    </div>
+  </header>
+
+  <!-- Main Legal Content -->
+  <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-8 space-y-6">
+    <div class="space-y-2">
+      <div
+        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-bold">
+        <span class="material-symbols-outlined text-[16px]">shield</span>
+        <span>Perlindungan Privasi Pengguna</span>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Kebijakan Privasi</h1>
+      <p class="text-xs text-slate-500">Terakhir diperbarui: 21 Oktober 2026</p>
+    </div>
+
+    <!-- Intro Card -->
+    <div
+      class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm leading-relaxed text-xs text-slate-600 space-y-3">
+      <p>
+        Selamat datang di <strong>Dapur Pintar</strong> ("kami", "aplikasi"). Kami berkomitmen penuh untuk melindungi
+        privasi serta keamanan data pribadi Anda. Kebijakan Privasi ini menjelaskan bagaimana informasi Anda
+        dikumpulkan, digunakan, disimpan, dan dilindungi saat menggunakan aplikasi Dapur Pintar di perangkat seluler
+        maupun web.
+      </p>
+    </div>
+
+    <!-- Section 1 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">database</span>
+        <h2>1. Informasi yang Kami Simpan Secara Lokal</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Dapur Pintar dirancang dengan prinsip <em>local-first</em>. Data berikut disimpan langsung di memori perangkat
+        Anda menggunakan <strong>Capacitor Native Preferences</strong> (atau LocalStorage pada peramban web):
+      </p>
+      <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5 pl-2">
+        <li><strong>Daftar Stok Bahan:</strong> Catatan inventaris kulkas dan bumbu dapur (nama bahan, jumlah, satuan,
+          tanggal simpan, dan status kesegaran).</li>
+        <li><strong>Riwayat Memasak & Belanja:</strong> Log masakan yang telah diolah dan daftar belanja bahan makanan.
+        </li>
+        <li><strong>Pengaturan Pengguna:</strong> Nama panggilan profil dan preferensi tampilan.</li>
+      </ul>
+      <p class="text-xs text-slate-500 italic">
+        Kami tidak mengumpulkan nama lengkap asli, nomor telepon, kata sandi, maupun data perbankan pengguna.
+      </p>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">photo_camera</span>
+        <h2>2. Izin Kamera & Pemrosesan Citra (Scan)</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Aplikasi memerlukan izin akses kamera fisik perangkat untuk fungsi berikut:
+      </p>
+      <ul class="list-disc list-inside text-xs text-slate-600 space-y-1.5 pl-2">
+        <li><strong>Pemindaian Kulkas / Struk:</strong> Foto yang Anda ambil hanya diubah menjadi format biner sementara
+          untuk dianalisis oleh antarmuka pemrograman aplikasi kecerdasan buatan (Google Gemini API) guna
+          mengidentifikasi nama bahan dan estimasi kedaluwarsa.</li>
+        <li><strong>Deteksi Barcode:</strong> Pemindaian kode garis kemasan bahan makanan secara lokal untuk mengisi
+          nama produk secara instan.</li>
+      </ul>
+      <p class="text-xs text-emerald-800 bg-emerald-50 p-3 rounded-xl border border-emerald-200 font-medium">
+        🔒 <strong>Jaminan Keamanan:</strong> Foto Anda tidak pernah disimpan di galeri publik server kami, tidak dijual
+        ke pihak ketiga, dan tidak digunakan untuk keperluan periklanan.
+      </p>
+    </section>
+
+    <!-- Section 3 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">cloud_sync</span>
+        <h2>3. Sinkronisasi Cloud Opsional</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Jika Anda mengaktifkan sinkronisasi awan (Cloud Sync via Firebase Firestore), data inventaris stok dikaitkan
+        dengan ID perangkat anonim acak (<code
+          class="font-mono text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded">usr_xxxx</code>) agar Anda dapat
+        mencadangkan atau berbagi daftar belanja dengan anggota keluarga. Anda dapat memutuskan tautan atau mengosongkan
+        data kapan pun.
+      </p>
+    </section>
+
+    <!-- Section 4 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-red-600 font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">delete_forever</span>
+        <h2>4. Hak Penghapusan Data (Data Deletion)</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Sesuai dengan ketentuan Google Play Store dan regulasi perlindungan data pribadi, pengguna memiliki hak penuh
+        untuk menghapus seluruh data yang tersimpan.
+      </p>
+      <div class="p-3 bg-red-50 rounded-xl border border-red-200 text-xs text-red-900 space-y-1.5">
+        <p class="font-bold">Cara Menghapus Seluruh Data:</p>
+        <ol class="list-decimal list-inside space-y-1">
+          <li>Buka menu <strong>Pengaturan</strong> (ikon gerigi) di pojok kanan atas aplikasi Dapur Pintar.</li>
+          <li>Gulir ke bawah hingga bagian <strong>"Hapus Semua Data"</strong>.</li>
+          <li>Tekan tombol tersebut dan lakukan konfirmasi ganda. Seluruh riwayat inventaris lokal maupun cloud akan
+            dibersihkan seketika.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Section 5 -->
+    <section class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm space-y-3">
+      <div class="flex items-center gap-2 text-primary font-bold text-sm">
+        <span class="material-symbols-outlined text-[20px]">mail</span>
+        <h2>5. Kontak & Bantuan</h2>
+      </div>
+      <p class="text-xs text-slate-600 leading-relaxed">
+        Jika Anda memiliki pertanyaan, kendala, atau saran terkait kebijakan privasi kami, silakan hubungi tim
+        pengembang Dapur Pintar melalui email:
+      </p>
+      <div class="flex items-center gap-2 text-xs font-bold text-primary">
+        <span class="material-symbols-outlined text-[18px]">contact_support</span>
+        <span>farrasprbw@gmail.com</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 py-6 text-center text-xs text-slate-400">
+    <p>© 2026 Dapur Pintar. Hak Cipta Dilindungi Undang-Undang.</p>
+  </footer>
+</body>
+
+</html>

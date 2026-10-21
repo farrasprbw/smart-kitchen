@@ -1,4 +1,4 @@
-package com.dapurpintar.app;
+package com.farrasprbw.dapurpintar;
 
 import com.getcapacitor.BridgeActivity;
 

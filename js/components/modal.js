@@ -96,13 +96,31 @@ export class ModalService {
           </div>
         </div>
 
-        <!-- Danger Zone: Kosongkan Data -->
+        <!-- Informasi Hukum & Privasi -->
         <div class="pt-4 border-t border-outline-variant/30 mt-4 space-y-2">
-          <label class="block text-xs font-bold text-red-600">Kosongkan Data Inventaris</label>
-          <p class="text-[11px] text-on-surface-variant">Hapus semua stok bahan makanan, riwayat masak, dan catatan belanja di perangkat ini untuk memulai dari awal.</p>
-          <button type="button" id="btn-reset-all-data" class="w-full h-10 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95">
-            <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
-            <span>Kosongkan Semua Data Sekarang</span>
+          <label class="block text-xs font-bold text-on-surface">Informasi Hukum & Privasi</label>
+          <div class="grid grid-cols-2 gap-2">
+            <a href="privacy.html" class="h-10 px-3 rounded-xl bg-surface-container text-on-surface font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition active:scale-95">
+              <span class="material-symbols-outlined text-[18px] text-primary">shield</span>
+              <span>Kebijakan Privasi</span>
+            </a>
+            <a href="terms.html" class="h-10 px-3 rounded-xl bg-surface-container text-on-surface font-bold text-xs flex items-center justify-center gap-1.5 hover:bg-surface-container-high transition active:scale-95">
+              <span class="material-symbols-outlined text-[18px] text-primary">gavel</span>
+              <span>Syarat & Ketentuan</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Danger Zone: Hapus Semua Data -->
+        <div class="pt-4 border-t border-outline-variant/30 mt-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-bold text-red-600">Hapus Semua Data</label>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800">Zona Berbahaya</span>
+          </div>
+          <p class="text-[11px] text-on-surface-variant">Hapus seluruh data stok bahan makanan, riwayat masak, catatan belanja, dan pengaturan dari penyimpanan native perangkat ini.</p>
+          <button type="button" id="btn-reset-all-data" class="w-full h-11 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 font-bold text-xs flex items-center justify-center gap-2 transition active:scale-95">
+            <span class="material-symbols-outlined text-[18px]">delete_forever</span>
+            <span>Hapus Semua Data</span>
           </button>
         </div>
       `;
@@ -160,30 +178,64 @@ export class ModalService {
         reader.readAsText(file);
       });
 
-      // Clear all data with custom confirmation modal
+      // Hapus Semua Data dengan Konfirmasi Ganda (Double Confirmation Flow)
       document.getElementById('btn-reset-all-data')?.addEventListener('click', () => {
         ModalService.close();
         setTimeout(() => {
+          // Konfirmasi 1 dari 2
           ModalService.open(`
             <div class="py-5 text-center flex flex-col items-center">
-              <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center">
+              <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center">
                 <span class="material-symbols-outlined text-[32px]">warning</span>
               </div>
-              <h3 class="font-headline-sm text-sm font-bold text-slate-800 mt-3.5">Hapus Semua Data?</h3>
+              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 mt-3">Langkah 1 dari 2</span>
+              <h3 class="font-headline-sm text-sm font-bold text-slate-800 mt-2">Hapus Semua Data Aplikasi?</h3>
               <p class="text-xs text-slate-500 mt-1.5 max-w-xs leading-relaxed">
-                Tindakan ini akan mengosongkan seluruh stok kulkas, dapur, dan riwayat harian Anda. Tindakan ini tidak dapat dibatalkan.
+                Tindakan ini akan mengosongkan seluruh stok kulkas, bumbu dapur, log masak, log belanja, serta mereset profil ke kondisi awal.
               </p>
               <div class="flex gap-2 w-full mt-6">
                 <button data-close-modal class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold active:scale-95 transition">Batal</button>
-                <button id="btn-confirm-wipe" class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-xs font-bold active:scale-95 transition shadow-sm">Ya, Hapus Semua</button>
+                <button id="btn-next-wipe-confirm" class="flex-1 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold active:scale-95 transition shadow-sm">
+                  Lanjut Hapus &rarr;
+                </button>
               </div>
             </div>
           `);
 
-          document.getElementById('btn-confirm-wipe')?.addEventListener('click', () => {
-            StorageService.clearAllData();
+          document.getElementById('btn-next-wipe-confirm')?.addEventListener('click', () => {
             ModalService.close();
-            window.location.reload();
+            setTimeout(() => {
+              // Konfirmasi 2 dari 2 (Final Warning)
+              ModalService.open(`
+                <div class="py-5 text-center flex flex-col items-center">
+                  <div class="w-16 h-16 rounded-3xl bg-red-100 text-red-600 flex items-center justify-center animate-pulse">
+                    <span class="material-symbols-outlined text-[36px]">delete_forever</span>
+                  </div>
+                  <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 mt-3">Konfirmasi Terakhir (2 dari 2)</span>
+                  <h3 class="font-headline-sm text-base font-bold text-red-700 mt-2">PERINGATAN PERMANEN</h3>
+                  <p class="text-xs text-slate-600 mt-1.5 max-w-xs leading-relaxed">
+                    Data yang dihapus dari penyimpanan native <strong>tidak dapat dipulihkan kembali</strong>. Apakah Anda benar-benar yakin ingin menghapus permanen sekarang?
+                  </p>
+                  <div class="flex flex-col gap-2 w-full mt-6">
+                    <button id="btn-final-wipe-action" class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold active:scale-95 transition shadow-md flex items-center justify-center gap-1.5">
+                      <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+                      <span>Ya, Hapus Semua Data Sekarang</span>
+                    </button>
+                    <button data-close-modal class="w-full py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold active:scale-95 transition">
+                      Batalkan Penghapusan
+                    </button>
+                  </div>
+                </div>
+              `);
+
+              document.getElementById('btn-final-wipe-action')?.addEventListener('click', async () => {
+                await StorageService.clearAllData();
+                ModalService.close();
+                alert('Semua data berhasil dibersihkan dari perangkat.');
+                window.location.hash = '#beranda';
+                window.location.reload();
+              });
+            }, 150);
           });
         }, 150);
       });

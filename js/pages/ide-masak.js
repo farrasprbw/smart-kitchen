@@ -71,9 +71,9 @@ export function renderIdeMasakPage() {
             </h2>
             <p class="text-xs text-slate-500 leading-relaxed">
               ${totalBahan > 0
-                ? `${userName}, mari olah bahan yang butuh perhatian hari ini agar tetap lezat & bebas sampah makanan.`
-                : 'Pindai kulkas atau tambah bahan terlebih dahulu untuk membuat ide menu otomatis.'
-              }
+        ? `${userName}, mari olah bahan yang butuh perhatian hari ini agar tetap lezat & bebas sampah makanan.`
+        : 'Pindai kulkas atau tambah bahan terlebih dahulu untuk membuat ide menu otomatis.'
+      }
             </p>
           </div>
 
@@ -83,13 +83,12 @@ export function renderIdeMasakPage() {
             <div class="flex-1 min-w-0">
               <span class="text-xs block font-bold text-amber-950">💡 Status Kesegaran Stok:</span>
               <span class="text-xs text-amber-900/90 leading-relaxed">
-                ${
-                  expiringItems.length > 0
-                    ? `Prioritas olah <strong>${expiringItems.map(i => i.nama).slice(0, 2).join(' & ')}</strong> sebelum kesegarannya hilang.`
-                    : (totalBahan > 0
-                        ? 'Semua bahan dalam kondisi prima. Rekomendasi disusun berdasarkan variasi nutrisi seimbang.'
-                        : 'Inventaris kosong. Tambahkan bahan untuk memantau masa simpan dan kesegaran.')
-                }
+                ${expiringItems.length > 0
+        ? `Prioritas olah <strong>${expiringItems.map(i => i.nama).slice(0, 2).join(' & ')}</strong> sebelum kesegarannya hilang.`
+        : (totalBahan > 0
+          ? 'Semua bahan dalam kondisi prima. Rekomendasi disusun berdasarkan variasi nutrisi seimbang.'
+          : 'Inventaris kosong. Tambahkan bahan untuk memantau masa simpan dan kesegaran.')
+      }
               </span>
             </div>
           </div>
@@ -120,18 +119,18 @@ export function renderIdeMasakPage() {
               </h3>
               <p class="text-xs text-slate-500 mt-1 leading-relaxed max-w-xs mx-auto">
                 ${totalBahan > 0
-                  ? `Ada ${totalBahan} bahan di kulkasmu. Tekan tombol di bawah untuk membuat rekomendasi menu praktis sesuai stok saat ini.`
-                  : 'Pindai kulkas dengan kamera atau tambahkan bahan secara manual untuk mendapatkan resep otomatis.'
-                }
+          ? `Ada ${totalBahan} bahan di kulkasmu. Tekan tombol di bawah untuk membuat rekomendasi menu praktis sesuai stok saat ini.`
+          : 'Pindai kulkas dengan kamera atau tambahkan bahan secara manual untuk mendapatkan resep otomatis.'
+        }
               </p>
             </div>
             ${totalBahan > 0 ? `
               <!-- Satu Tombol Utama / Primary Button Tanpa Redundansi -->
               <button id="btn-primary-generate" ${isGeneratingRecipes ? 'disabled' : ''} class="w-full h-12 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-emerald-800 active:scale-95 transition ${isGeneratingRecipes ? 'opacity-70 cursor-not-allowed' : ''}">
                 ${isGeneratingRecipes
-                  ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>⏳ Meracik menu...</span>`
-                  : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Buat Rekomendasi Menu</span>`
-                }
+            ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>⏳ Meracik menu...</span>`
+            : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Buat Rekomendasi Menu</span>`
+          }
               </button>
             ` : `
               <div class="flex items-center gap-2 pt-1">
@@ -176,9 +175,9 @@ export function renderIdeMasakPage() {
                 <p class="text-xs text-slate-600 font-medium">Semua menu rekomendasi telah ditampilkan.</p>
                 <button id="btn-fetch-more-recipes" ${isFetchingMore ? 'disabled' : ''} class="w-full h-11 rounded-xl bg-primary text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md hover:bg-emerald-800 active:scale-95 transition ${isFetchingMore ? 'opacity-70 cursor-not-allowed' : ''}">
                   ${isFetchingMore
-                    ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>⏳ Meracik menu baru lainnya...</span>`
-                    : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Cari Rekomendasi Lainnya</span>`
-                  }
+        ? `<span class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span><span>⏳ Meracik menu baru lainnya...</span>`
+        : `<span class="material-symbols-outlined text-[18px]">auto_awesome</span><span>Cari Rekomendasi Lainnya</span>`
+      }
                 </button>
                 <span class="text-[10px] text-slate-400">Sistem akan meracik menu baru tanpa duplikat dengan menu di atas.</span>
               </div>
@@ -349,6 +348,11 @@ export function renderIdeMasakPage() {
 
       if (isGeneratingRecipes) return;
 
+      if (!navigator.onLine) {
+        showToast('Kamu sedang offline. Meracik menu memerlukan koneksi internet.', 'warning', 4000);
+        return;
+      }
+
       isGeneratingRecipes = true;
       renderContent();
 
@@ -436,7 +440,13 @@ export function renderIdeMasakPage() {
 
     // "Cari Rekomendasi Lainnya" Button (Saat kartu habis dan ingin menu baru tanpa duplikat)
     document.getElementById('btn-fetch-more-recipes')?.addEventListener('click', async () => {
-      if (isFetchingMore) return;
+      if (isFetchingMore || isGeneratingRecipes) return;
+
+      if (!navigator.onLine) {
+        showToast('Kamu sedang offline. Rekomendasi menu baru memerlukan koneksi internet.', 'warning', 4000);
+        return;
+      }
+
       isFetchingMore = true;
       renderContent();
 
@@ -491,20 +501,32 @@ export function renderIdeMasakPage() {
       }
     });
 
-    // Infinite Scroll Handler on #app-main
+    // Infinite Scroll Handler on #app-main dengan throttle halus & proteksi panggilan ganda
+    let isScrollPaginating = false;
     const scrollContainer = document.getElementById('app-main');
     if (scrollContainer) {
       scrollContainer.onscroll = () => {
         if (store.getState().activeTab !== 'ide-masak') return;
         if (displayedCount >= currentRecipes.length) return;
+        if (isScrollPaginating || isFetchingMore || isGeneratingRecipes) return;
 
         const scrollBottom = scrollContainer.scrollTop + scrollContainer.clientHeight;
         const totalHeight = scrollContainer.scrollHeight;
 
-        // Jika user mendekati bagian bawah (toleransi 100px)
-        if (scrollBottom >= totalHeight - 100) {
+        // Jika user mendekati bagian bawah (toleransi 120px)
+        if (scrollBottom >= totalHeight - 120) {
+          isScrollPaginating = true;
+          const currentScrollPos = scrollContainer.scrollTop;
           displayedCount += BATCH_SIZE;
           renderContent();
+
+          requestAnimationFrame(() => {
+            const sc = document.getElementById('app-main');
+            if (sc) sc.scrollTop = currentScrollPos;
+            setTimeout(() => {
+              isScrollPaginating = false;
+            }, 300);
+          });
         }
       };
     }
@@ -621,7 +643,7 @@ export function renderIdeMasakPage() {
             title: `Resep ${recipe.nama}`,
             text: shareText
           });
-        } catch (e) {}
+        } catch (e) { }
       } else {
         await navigator.clipboard.writeText(shareText);
         showToast('Resep berhasil disalin ke clipboard!', 'success');

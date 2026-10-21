@@ -1,5 +1,5 @@
 {
-  "appId": "com.dapurpintar.app",
+  "appId": "com.farrasprbw.dapurpintar",
   "appName": "Dapur Pintar",
   "webDir": "www",
   "bundledWebRuntime": false,
@@ -8,5 +8,18 @@
   },
   "android": {
     "allowMixedContent": true
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2500,
+      "launchAutoHide": true,
+      "launchFadeOutDuration": 300,
+      "backgroundColor": "#00652c",
+      "androidSplashResourceName": "splash",
+      "androidScaleType": "CENTER_CROP",
+      "showSpinner": false,
+      "splashFullScreen": true,
+      "splashImmersive": true
+    }
   }
 }

@@ -24,7 +24,7 @@ function copyRecursive(src, dest) {
 }
 
 // Items to copy
-const itemsToCopy = ['index.html', 'js', 'manifest.json', 'favicon.ico', 'sw.js'];
+const itemsToCopy = ['index.html', 'privacy.html', 'terms.html', 'js', 'manifest.json', 'favicon.ico', 'sw.js'];
 
 for (const item of itemsToCopy) {
   const srcPath = path.join(rootDir, item);

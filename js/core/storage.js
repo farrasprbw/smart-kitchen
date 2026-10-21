@@ -30,38 +30,95 @@ const INITIAL_SETTINGS = {
 };
 
 let realtimeUnsubscribe = null;
+const _cache = new Map();
+
+function getNativePreferences() {
+  if (typeof window !== 'undefined' && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Preferences) {
+    return window.Capacitor.Plugins.Preferences;
+  }
+  return null;
+}
 
 export class StorageService {
+  /**
+   * Mengambil data dari cache / native Preferences / fallback localStorage.
+   * Nilai selalu di-parse (JSON.parse) sebelum dikembalikan.
+   */
   static get(key, defaultValue = null) {
+    if (_cache.has(key)) {
+      return _cache.get(key);
+    }
     try {
-      const val = localStorage.getItem(key);
-      if (val === null) return defaultValue;
-      return JSON.parse(val);
+      const val = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
+      if (val === null || val === undefined) return defaultValue;
+      const parsed = JSON.parse(val);
+      _cache.set(key, parsed);
+      return parsed;
     } catch (e) {
-      console.warn(`Error reading localStorage ${key}:`, e);
+      console.warn(`[StorageService] Error reading storage for key ${key}:`, e);
       return defaultValue;
     }
   }
 
+  /**
+   * Menyimpan data ke in-memory cache, @capacitor/preferences (Native API),
+   * dan localStorage (Web API fallback).
+   * Nilai selalu di-stringify (JSON.stringify) sebelum disimpan.
+   */
   static set(key, value) {
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      _cache.set(key, value);
+      const serialized = JSON.stringify(value);
+
+      // Web Fallback
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(key, serialized);
+      }
+
+      // Native Capacitor Preferences API
+      const nativePref = getNativePreferences();
+      if (nativePref) {
+        nativePref.set({ key, value: serialized }).catch(err => {
+          console.warn(`[StorageService] Native Preferences set failed for ${key}:`, err);
+        });
+      }
+
       return true;
     } catch (e) {
-      console.error(`Error saving localStorage ${key}:`, e);
+      console.error(`[StorageService] Error saving storage ${key}:`, e);
       return false;
     }
   }
 
   /**
+   * Menghapus kunci dari cache, native Preferences, dan localStorage.
+   */
+  static remove(key) {
+    _cache.delete(key);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(key);
+    }
+    const nativePref = getNativePreferences();
+    if (nativePref) {
+      nativePref.remove({ key }).catch(() => {});
+    }
+  }
+
+  /**
    * Mendapatkan User ID unik perangkat/pengguna saat ini.
-   * Jika belum ada, otomatis membuat User ID baru.
+   * Jika belum ada, otomatis membuat User ID baru dan menyimpannya.
    */
   static getUserId() {
-    let uid = localStorage.getItem('dapur_pintar_active_user_id');
+    let uid = StorageService.get('dapur_pintar_active_user_id');
     if (!uid) {
-      uid = 'usr_' + generateId().replace(/-/g, '').slice(0, 10);
-      localStorage.setItem('dapur_pintar_active_user_id', uid);
+      // Cek localStorage langsung jika belum di cache
+      if (typeof localStorage !== 'undefined') {
+        uid = localStorage.getItem('dapur_pintar_active_user_id');
+      }
+      if (!uid) {
+        uid = 'usr_' + generateId().replace(/-/g, '').slice(0, 10);
+      }
+      StorageService.set('dapur_pintar_active_user_id', uid);
     }
     return uid;
   }
@@ -72,26 +129,68 @@ export class StorageService {
   static setUserId(uid) {
     if (!uid || typeof uid !== 'string') return;
     const clean = uid.trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-    localStorage.setItem('dapur_pintar_active_user_id', clean);
+    StorageService.set('dapur_pintar_active_user_id', clean);
     return clean;
   }
 
   /**
-   * Menghasilkan key localStorage yang terisolasi per user
+   * Menghasilkan key penyimpanan yang terisolasi per user
    */
   static getUserKey(baseKey) {
     const uid = StorageService.getUserId();
     return `${baseKey}_${uid}`;
   }
 
-  static initDefaults() {
+  /**
+   * Inisialisasi awal & hidrasi data dari @capacitor/preferences ke memory / fallback
+   */
+  static async initDefaults() {
+    const nativePref = getNativePreferences();
+
+    // 1. Hidrasi User ID dari Native Preferences jika ada
+    if (nativePref) {
+      try {
+        const { value: storedUid } = await nativePref.get({ key: 'dapur_pintar_active_user_id' });
+        if (storedUid) {
+          try {
+            const parsedUid = JSON.parse(storedUid);
+            _cache.set('dapur_pintar_active_user_id', parsedUid);
+          } catch {
+            _cache.set('dapur_pintar_active_user_id', storedUid);
+          }
+        }
+      } catch (e) {
+        console.warn('[StorageService] Error hydrating native user id:', e);
+      }
+    }
+
     const uid = StorageService.getUserId();
     const stokKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK);
     const masakKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_MASAK);
     const belanjaKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_BELANJA);
     const settingsKey = StorageService.getUserKey(CONFIG.STORAGE_KEYS.SETTINGS);
 
-    // Cek apakah data user sudah ada, jika belum coba migrasi dari legacy key jika ada
+    const keysToHydrate = [stokKey, masakKey, belanjaKey, settingsKey, CONFIG.STORAGE_KEYS.STOK, CONFIG.STORAGE_KEYS.LOG_MASAK, CONFIG.STORAGE_KEYS.LOG_BELANJA, CONFIG.STORAGE_KEYS.SETTINGS];
+
+    // 2. Hidrasi semua kunci utama dari Native Preferences
+    if (nativePref) {
+      for (const k of keysToHydrate) {
+        try {
+          const { value } = await nativePref.get({ key: k });
+          if (value !== null && value !== undefined) {
+            const parsed = JSON.parse(value);
+            _cache.set(k, parsed);
+            if (typeof localStorage !== 'undefined') {
+              localStorage.setItem(k, value);
+            }
+          }
+        } catch (e) {
+          console.warn(`[StorageService] Hydration error for key ${k}:`, e);
+        }
+      }
+    }
+
+    // 3. Cek apakah data user sudah ada, jika belum coba migrasi dari legacy key jika ada
     let currentStok = StorageService.get(stokKey);
     if (!currentStok) {
       const legacyStok = StorageService.get(CONFIG.STORAGE_KEYS.STOK);
@@ -192,14 +291,44 @@ export class StorageService {
     return cleanUid;
   }
 
-  static clearAllData() {
+  static async clearAllData() {
     const uid = StorageService.getUserId();
+    _cache.clear();
+
+    const nativePref = getNativePreferences();
+    if (nativePref) {
+      try {
+        await nativePref.clear();
+      } catch (e) {
+        console.warn('[StorageService] Error clearing native preferences:', e);
+      }
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.clear();
+      } catch (e) {
+        console.warn('[StorageService] Error clearing localStorage:', e);
+      }
+    }
+
+    // Set fresh clean defaults
     const emptyStok = { ...INITIAL_STOK, userId: uid };
+    const resetSettings = { ...INITIAL_SETTINGS, userId: uid };
     StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.STOK), emptyStok);
     StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_MASAK), INITIAL_LOG_MASAK);
     StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.LOG_BELANJA), INITIAL_LOG_BELANJA);
-    FirebaseService.syncStokToCloud(emptyStok, uid);
+    StorageService.set(StorageService.getUserKey(CONFIG.STORAGE_KEYS.SETTINGS), resetSettings);
+    StorageService.set('dapur_pintar_active_user_id', uid);
+
+    try {
+      await FirebaseService.syncStokToCloud(emptyStok, uid);
+    } catch (e) {
+      console.warn('[StorageService] Cloud sync clear error:', e);
+    }
+
     window.dispatchEvent(new CustomEvent('dapur-stok-synced', { detail: emptyStok }));
+    return true;
   }
 
   // Stok CRUD
