@@ -42,29 +42,26 @@ describe('StorageService Inventory & Cooking Logic', () => {
     assert.equal(stok.dapur.length, 0);
   });
 
-  test('addStokItem successfully adds an item', () => {
-    const item = StorageService.addStokItem('kulkas', {
+  test('addStok successfully adds an item', () => {
+    StorageService.addStok({
       nama: 'Telur Ayam',
       jumlah: 10,
       satuan: 'butir'
-    });
-
-    assert.ok(item.id);
-    assert.equal(item.nama, 'Telur Ayam');
-    assert.equal(item.jumlah, 10);
+    }, 'kulkas');
 
     const stok = StorageService.getStok();
     assert.equal(stok.kulkas.length, 1);
     assert.equal(stok.kulkas[0].nama, 'Telur Ayam');
+    assert.equal(stok.kulkas[0].jumlah, 10);
   });
 
   test('kurangiStokMasak correctly deducts quantity from matching ingredient', () => {
-    StorageService.addStokItem('kulkas', {
+    StorageService.addStok({
       id: 'telur-1',
       nama: 'Telur Ayam',
       jumlah: 6,
       satuan: 'butir'
-    });
+    }, 'kulkas');
 
     const berkurang = StorageService.kurangiStokMasak([
       { nama: 'Telur Ayam', jumlah: 2, satuan: 'butir' }
@@ -79,12 +76,12 @@ describe('StorageService Inventory & Cooking Logic', () => {
   });
 
   test('kurangiStokMasak prevents quantity from dropping below zero', () => {
-    StorageService.addStokItem('dapur', {
+    StorageService.addStok({
       id: 'bawang-1',
       nama: 'Bawang Putih',
       jumlah: 3,
       satuan: 'siung'
-    });
+    }, 'dapur');
 
     const berkurang = StorageService.kurangiStokMasak([
       { nama: 'Bawang Putih', jumlah: 5, satuan: 'siung' }
@@ -98,12 +95,12 @@ describe('StorageService Inventory & Cooking Logic', () => {
   });
 
   test('kurangiStokMasak handles case-insensitive and partial name matching', () => {
-    StorageService.addStokItem('kulkas', {
+    StorageService.addStok({
       id: 'wortel-1',
       nama: 'Wortel Segar',
       jumlah: 4,
       satuan: 'buah'
-    });
+    }, 'kulkas');
 
     const berkurang = StorageService.kurangiStokMasak([
       { nama: 'wortel', jumlah: 1, satuan: 'buah' }
@@ -114,15 +111,16 @@ describe('StorageService Inventory & Cooking Logic', () => {
   });
 
   test('deleteStokItem removes item by id from any storage section', () => {
-    const item = StorageService.addStokItem('dapur', {
+    StorageService.addStok({
+      id: 'kecap-1',
       nama: 'Kecap Manis',
       jumlah: 1,
       satuan: 'botol'
-    });
+    }, 'dapur');
 
     assert.equal(StorageService.getStok().dapur.length, 1);
 
-    StorageService.deleteStokItem(item.id);
+    StorageService.deleteStokItem('kecap-1');
     assert.equal(StorageService.getStok().dapur.length, 0);
   });
 });
