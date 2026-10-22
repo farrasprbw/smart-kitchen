@@ -4,6 +4,7 @@
   "description": "Smart Kitchen Assistant - Asisten Dapur Pintar",
   "type": "module",
   "scripts": {
+    "test": "node --test tests/**/*.test.js",
     "dev": "npx serve . -l 3000",
     "prepare-web": "node scripts/prepare-web.js",
     "cap:sync": "npm run prepare-web && npx cap sync",
