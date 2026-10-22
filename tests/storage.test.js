@@ -42,12 +42,12 @@ describe('StorageService Inventory & Cooking Logic', () => {
     assert.equal(stok.dapur.length, 0);
   });
 
-  test('addStok successfully adds an item', () => {
-    StorageService.addStok({
+  test('addItemsToStok successfully adds an item', () => {
+    StorageService.addItemsToStok([{
       nama: 'Telur Ayam',
       jumlah: 10,
       satuan: 'butir'
-    }, 'kulkas');
+    }], 'kulkas');
 
     const stok = StorageService.getStok();
     assert.equal(stok.kulkas.length, 1);
@@ -56,12 +56,12 @@ describe('StorageService Inventory & Cooking Logic', () => {
   });
 
   test('kurangiStokMasak correctly deducts quantity from matching ingredient', () => {
-    StorageService.addStok({
+    StorageService.addItemsToStok([{
       id: 'telur-1',
       nama: 'Telur Ayam',
       jumlah: 6,
       satuan: 'butir'
-    }, 'kulkas');
+    }], 'kulkas');
 
     const berkurang = StorageService.kurangiStokMasak([
       { nama: 'Telur Ayam', jumlah: 2, satuan: 'butir' }
@@ -76,12 +76,12 @@ describe('StorageService Inventory & Cooking Logic', () => {
   });
 
   test('kurangiStokMasak prevents quantity from dropping below zero', () => {
-    StorageService.addStok({
+    StorageService.addItemsToStok([{
       id: 'bawang-1',
       nama: 'Bawang Putih',
       jumlah: 3,
       satuan: 'siung'
-    }, 'dapur');
+    }], 'dapur');
 
     const berkurang = StorageService.kurangiStokMasak([
       { nama: 'Bawang Putih', jumlah: 5, satuan: 'siung' }
@@ -95,12 +95,12 @@ describe('StorageService Inventory & Cooking Logic', () => {
   });
 
   test('kurangiStokMasak handles case-insensitive and partial name matching', () => {
-    StorageService.addStok({
+    StorageService.addItemsToStok([{
       id: 'wortel-1',
       nama: 'Wortel Segar',
       jumlah: 4,
       satuan: 'buah'
-    }, 'kulkas');
+    }], 'kulkas');
 
     const berkurang = StorageService.kurangiStokMasak([
       { nama: 'wortel', jumlah: 1, satuan: 'buah' }
@@ -111,12 +111,12 @@ describe('StorageService Inventory & Cooking Logic', () => {
   });
 
   test('deleteStokItem removes item by id from any storage section', () => {
-    StorageService.addStok({
+    StorageService.addItemsToStok([{
       id: 'kecap-1',
       nama: 'Kecap Manis',
       jumlah: 1,
       satuan: 'botol'
-    }, 'dapur');
+    }], 'dapur');
 
     assert.equal(StorageService.getStok().dapur.length, 1);
 
