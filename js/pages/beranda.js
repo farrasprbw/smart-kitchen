@@ -411,10 +411,10 @@ export function renderBerandaPage() {
                   `
         }
               <div class="min-w-0 flex-1">
-                <h4 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-950 transition-colors truncate" title="${item.nama}">${item.nama}</h4>
+                <h4 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-950 transition-colors truncate" title="${escapeHtml(item.nama)}">${escapeHtml(item.nama)}</h4>
                 <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md ${item.statusClass || 'bg-slate-100 text-slate-700'}">${item.status || 'Segar'}</span>
-                  ${item.catatan ? `<span class="truncate text-xs text-slate-400" title="${item.catatan}">• ${item.catatan}</span>` : ''}
+                  <span class="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md ${item.statusClass || 'bg-slate-100 text-slate-700'}">${escapeHtml(item.status || 'Segar')}</span>
+                  ${item.catatan ? `<span class="truncate text-xs text-slate-400" title="${escapeHtml(item.catatan)}">• ${escapeHtml(item.catatan)}</span>` : ''}
                 </div>
               </div>
             </div>
