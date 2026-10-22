@@ -67,19 +67,34 @@ export class GeminiService {
 
         const errData = await response.json().catch(() => ({}));
         const msg = errData?.error?.message || '';
+        console.error(`[GeminiService] Error calling model ${model} (HTTP ${response.status}):`, msg || errData);
+
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
+          if (msg.includes('leaked') || msg.toLowerCase().includes('leak')) {
+            throw new Error('API Key diblokir Google karena terdeteksi bocor (leaked). Buat API Key baru di Google AI Studio lalu masukkan di menu Pengaturan.');
+          }
+          if (msg.includes('API_KEY_INVALID') || msg.includes('API key not valid')) {
+            throw new Error('API Key tidak valid. Periksa kembali di menu Pengaturan.');
+          }
+          if (msg.includes('quota') || msg.includes('RESOURCE_EXHAUSTED')) {
+            throw new Error('Kuota API habis atau terlampaui. Periksa batas penggunaan di Google AI Studio.');
+          }
+          throw new Error(`Akses API ditolak (${response.status}): ${msg || 'Periksa API Key di Pengaturan.'}`);
+        }
 
         if (response.status === 429) {
-          throw new Error('Server sedang sibuk, coba lagi sebentar ya.');
-        }
-        if (response.status === 400 || response.status === 401 || response.status === 403) {
-          if (msg.includes('API_KEY_INVALID') || msg.includes('quota')) {
-            throw new Error('API Key tidak valid atau kuota habis. Periksa kembali di Pengaturan.');
-          }
+          lastError = new Error('Server sedang sibuk atau limit tercapai, coba lagi sebentar ya.');
+          continue;
         }
 
-        lastError = new Error(`Server sedang sibuk, coba lagi sebentar ya.`);
+        if (response.status === 404) {
+          lastError = new Error(`Model ${model} tidak ditemukan atau deprecated.`);
+          continue;
+        }
+
+        lastError = new Error(msg || `Server error (HTTP ${response.status})`);
       } catch (err) {
-        if (err.message.includes('Server sedang sibuk') || err.message.includes('API Key') || err.message.includes('Koneksi internet')) {
+        if (err.message.includes('API Key') || err.message.includes('Koneksi internet') || err.message.includes('Akses API ditolak')) {
           throw err;
         }
         if (err.name === 'TypeError' && err.message.includes('fetch')) {
