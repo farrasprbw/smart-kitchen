@@ -6,6 +6,7 @@ import { buildPromptRekomendasiMasak } from '../utils/prompts.js';
 import { renderHeader } from '../components/header.js';
 import { showToast } from '../components/toast.js';
 import { ModalService } from '../components/modal.js';
+import { openRecipeDetailModal as openRecipeDetailModalComponent, confirmCookingModal } from '../components/recipe-modal.js';
 import { store } from '../core/state.js';
 import { escapeHtml } from '../utils/format.js';
 
@@ -553,162 +554,11 @@ export function renderIdeMasakPage() {
   }
 
   function openRecipeDetailModal(recipe) {
-    const modalContent = `
-      <div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
-        <div>
-          <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${recipe.badgeClass || 'bg-emerald-100 text-emerald-800'}">
-            ${recipe.badge || '100% Cocok'}
-          </span>
-          <h2 class="font-headline-sm text-headline-sm text-on-surface mt-1">${recipe.nama}</h2>
-        </div>
-        <button data-close-modal class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant">
-          <span class="material-symbols-outlined text-[18px]">close</span>
-        </button>
-      </div>
-
-      <div class="mt-3.5 space-y-4">
-        <!-- Metrics Bar -->
-        <div class="grid grid-cols-3 gap-2 bg-surface-container rounded-2xl p-2.5 text-center">
-          <div>
-            <span class="text-[10px] text-on-surface-variant block">Waktu</span>
-            <strong class="text-xs text-on-surface font-bold">${recipe.waktu_masak}</strong>
-          </div>
-          <div>
-            <span class="text-[10px] text-on-surface-variant block">Kesulitan</span>
-            <strong class="text-xs text-on-surface font-bold">${recipe.tingkat_kesulitan}</strong>
-          </div>
-          <div>
-            <span class="text-[10px] text-on-surface-variant block">Porsi</span>
-            <strong class="text-xs text-on-surface font-bold">${recipe.porsi}</strong>
-          </div>
-        </div>
-
-        <!-- Bahan Terpakai -->
-        <div>
-          <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Bahan yang Digunakan:</h4>
-          <div class="space-y-1.5">
-            ${(recipe.bahan_terpakai || []).map(b => `
-              <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container text-xs">
-                <span class="font-semibold text-on-surface">✓ ${b.nama}</span>
-                <span class="text-primary font-bold">${b.jumlah} ${b.satuan}</span>
-              </div>
-            `).join('')}
-            ${(recipe.bahan_bumbu || []).map(b => `
-              <div class="flex items-center justify-between px-2 py-1 text-[11px] text-on-surface-variant">
-                <span>• ${b}</span>
-                <span>Bumbu dapur</span>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <!-- Langkah Masak -->
-        <div>
-          <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Langkah Memasak:</h4>
-          <ol class="space-y-2 text-xs text-on-surface leading-relaxed">
-            ${(recipe.langkah || []).map((step, idx) => `
-              <li class="flex items-start gap-2">
-                <span class="w-5 h-5 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center text-[10px] flex-shrink-0 mt-0.5">
-                  ${idx + 1}
-                </span>
-                <span>${step}</span>
-              </li>
-            `).join('')}
-          </ol>
-        </div>
-
-        ${recipe.tips ? `
-          <div class="p-3 rounded-xl bg-amber-50 border border-amber-200/60 text-xs text-amber-900 flex items-start gap-2">
-            <span class="material-symbols-outlined text-amber-600 text-[18px] flex-shrink-0 mt-0.5">lightbulb</span>
-            <div>
-              <strong class="block text-xs">Tips Chef:</strong>
-              ${recipe.tips}
-            </div>
-          </div>
-        ` : ''}
-
-        <!-- Bottom Modal Action: Cook & Share -->
-        <div class="pt-2 space-y-2">
-          <button id="modal-btn-cook" class="w-full h-12 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-md active:scale-95 transition">
-            <span class="material-symbols-outlined text-[18px]">skillet</span>
-            <span>Sudah Masak Menu Ini 🍳</span>
-          </button>
-
-          <button id="modal-btn-share" type="button" class="w-full h-10 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface font-bold text-xs flex items-center justify-center gap-2 active:scale-95 transition">
-            <span class="material-symbols-outlined text-[18px]">share</span>
-            <span>Bagikan Resep (WhatsApp / Salin)</span>
-          </button>
-        </div>
-      </div>
-    `;
-
-    ModalService.open(modalContent);
-
-    document.getElementById('modal-btn-share')?.addEventListener('click', async () => {
-      const shareText = `🍲 Resep ${recipe.nama} (Dapur Pintar)\n⏱️ Waktu: ${recipe.waktu_masak} | Porsi: ${recipe.porsi}\n\n🥗 Bahan yang Digunakan:\n${recipe.bahan_terpakai.map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('\n')}\n\n👨‍🍳 Langkah Memasak:\n${(recipe.langkah || []).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n\n💡 Tips: ${recipe.tips || 'Sajikan selagi hangat!'}`;
-
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: `Resep ${recipe.nama}`,
-            text: shareText
-          });
-        } catch (e) { }
-      } else {
-        await navigator.clipboard.writeText(shareText);
-        showToast('Resep berhasil disalin ke clipboard!', 'success');
-      }
-    });
-
-    document.getElementById('modal-btn-cook')?.addEventListener('click', () => {
-      ModalService.close();
-      confirmCooking(recipe);
-    });
+    openRecipeDetailModalComponent(recipe, () => renderIdeMasakPage());
   }
 
   function confirmCooking(recipe) {
-    const deductList = (recipe.bahan_terpakai || []).map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('<br>');
-
-    ModalService.open(`
-      <div class="text-center py-4 space-y-3">
-        <div class="w-14 h-14 rounded-2xl bg-orange-100 text-orange-600 flex items-center justify-center mx-auto shadow-sm">
-          <span class="material-symbols-outlined text-[32px]">skillet</span>
-        </div>
-        <h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">Selesai Memasak ${recipe.nama}?</h3>
-        <p class="text-xs text-on-surface-variant max-w-xs mx-auto leading-relaxed">
-          Stok bahan berikut akan dikurangi otomatis dari inventaris dapur kamu:
-        </p>
-
-        <div class="bg-surface-container rounded-xl p-3 text-xs text-left font-semibold text-on-surface max-w-xs mx-auto">
-          ${deductList}
-        </div>
-
-        <div class="flex items-center gap-2 pt-2 max-w-xs mx-auto">
-          <button data-close-modal class="flex-1 h-11 rounded-xl bg-surface-container-high text-on-surface font-bold text-xs">
-            Batal
-          </button>
-          <button id="confirm-deduct-btn" class="flex-1 h-11 rounded-xl bg-primary text-white font-bold text-xs shadow-md active:scale-95 transition">
-            Ya, Kurangi Stok
-          </button>
-        </div>
-      </div>
-    `);
-
-    document.getElementById('confirm-deduct-btn')?.addEventListener('click', () => {
-      StorageService.kurangiStokMasak(recipe.bahan_terpakai);
-
-      StorageService.addLogMasak({
-        resep: recipe.nama,
-        waktu_masak: recipe.waktu_masak,
-        tingkat_kesulitan: recipe.tingkat_kesulitan,
-        bahan_terpakai: recipe.bahan_terpakai
-      });
-
-      ModalService.close();
-      showToast(`Selamat makan! Stok ${recipe.nama} telah dikurangi otomatis.`, 'success', 3500);
-
-      renderIdeMasakPage();
-    });
+    confirmCookingModal(recipe, () => renderIdeMasakPage());
   }
 
   renderContent();
