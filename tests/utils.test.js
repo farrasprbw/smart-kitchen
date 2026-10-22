@@ -58,9 +58,9 @@ describe('Format & Sanitization Utilities', () => {
       assert.equal(formatWaktuLalu(null), '');
     });
 
-    test('formats recent timestamp as baru saja', () => {
+    test('formats recent timestamp as Baru saja', () => {
       const now = new Date().toISOString();
-      assert.equal(formatWaktuLalu(now), 'baru saja');
+      assert.equal(formatWaktuLalu(now), 'Baru saja');
     });
   });
 });
