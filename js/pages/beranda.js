@@ -396,26 +396,29 @@ export function renderBerandaPage() {
 
     return items.map(item => {
       const isSelected = selectedItemIds.has(item.id);
+      const durasiInfo = getDurasiSimpanInfo(item.ditambahkan, item.kategori);
       return `
-        <div class="p-4 rounded-2xl bg-white border ${isSelected ? 'border-primary ring-2 ring-primary/20 bg-primary/5' : 'border-slate-200/80 hover:border-emerald-400 hover:shadow-md'} shadow-2xs hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between gap-3.5 group" data-item-id="${item.id}">
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0 flex-1">
+        <div class="group relative p-3 sm:p-4 rounded-2xl bg-white border ${isSelected ? 'border-emerald-600 bg-emerald-50/20' : (durasiInfo.isPrioritas ? 'border-amber-300 bg-amber-50/10' : 'border-slate-200/80')} shadow-xs hover:border-slate-300 hover:shadow-sm transition-all flex flex-col justify-between gap-3 overflow-hidden">
+          <div class="flex items-start justify-between gap-2.5">
+            <div class="flex items-start gap-2.5 min-w-0 flex-1">
               ${isBulkMode
-          ? `
-                    <input type="checkbox" class="bulk-item-checkbox w-5 h-5 rounded text-primary focus:ring-primary cursor-pointer mt-0.5" data-id="${item.id}" ${isSelected ? 'checked' : ''}>
-                  `
-          : `
-                    <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center flex-shrink-0 font-bold text-sm shadow-2xs group-hover:bg-emerald-100 group-hover:scale-105 transition-all">
-                      <span class="material-symbols-outlined text-[22px]">${item.icon || 'kitchen'}</span>
+        ? `
+                    <div class="pt-0.5 flex-shrink-0">
+                      <input type="checkbox" data-id="${item.id}" class="item-checkbox w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer" ${isSelected ? 'checked' : ''}>
                     </div>
                   `
-        }
+        : ''
+      }
               <div class="min-w-0 flex-1">
-                <h4 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-950 transition-colors truncate" title="${escapeHtml(item.nama)}">${escapeHtml(item.nama)}</h4>
-                <div class="flex items-center gap-1.5 mt-0.5">
-                  <span class="text-[11px] sm:text-xs font-semibold px-2 py-0.5 rounded-md ${item.statusClass || 'bg-slate-100 text-slate-700'}">${escapeHtml(item.status || 'Segar')}</span>
+                <div class="flex items-center gap-2">
+                  <h4 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-950 transition-colors truncate" title="${escapeHtml(item.nama)}">${escapeHtml(item.nama)}</h4>
+                </div>
+                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                  <span class="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md ${durasiInfo.badgeClass}">${escapeHtml(durasiInfo.text)}</span>
                   ${item.catatan ? `<span class="truncate text-xs text-slate-400" title="${escapeHtml(item.catatan)}">• ${escapeHtml(item.catatan)}</span>` : ''}
                 </div>
+              </div>
+            </div>
               </div>
             </div>
           </div>

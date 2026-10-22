@@ -50,3 +50,42 @@ export function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 }
+
+/**
+ * Menghitung durasi penyimpanan bahan berdasarkan tanggal ditambahkan
+ * @param {string|Date} ditambahkan
+ * @param {string} kategori
+ * @returns {{ text: string, badgeClass: string, days: number, isPrioritas: boolean }}
+ */
+export function getDurasiSimpanInfo(ditambahkan, kategori = '') {
+  if (!ditambahkan) {
+    return { text: 'Hari ini', badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200', days: 0, isPrioritas: false };
+  }
+
+  const d = new Date(ditambahkan);
+  if (isNaN(d.getTime())) {
+    return { text: 'Hari ini', badgeClass: 'bg-slate-100 text-slate-700 border border-slate-200', days: 0, isPrioritas: false };
+  }
+
+  const now = new Date();
+  const diffMs = now - d;
+  const diffDays = Math.max(0, Math.floor(diffMs / 86400000));
+
+  const kat = String(kategori || '').toLowerCase().trim();
+  const isSegar = ['sayur', 'protein', 'buah', 'dairy'].includes(kat);
+
+  let text = diffDays === 0 ? 'Hari ini' : `Hari ke-${diffDays + 1}`;
+  let badgeClass = 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+  let isPrioritas = false;
+
+  if (isSegar && diffDays >= 3) {
+    text = `${diffDays} hari • Prioritas masak`;
+    badgeClass = 'bg-amber-50 text-amber-900 border border-amber-300 font-bold';
+    isPrioritas = true;
+  } else if (diffDays >= 7) {
+    text = `${diffDays} hari tersimpan`;
+    badgeClass = 'bg-slate-100 text-slate-700 border border-slate-200';
+  }
+
+  return { text, badgeClass, days: diffDays, isPrioritas };
+}

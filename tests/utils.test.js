@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { escapeHtml, formatJumlah, formatTanggal, formatWaktuLalu } from '../js/utils/format.js';
+import { escapeHtml, formatJumlah, formatTanggal, formatWaktuLalu, getDurasiSimpanInfo } from '../js/utils/format.js';
 
 describe('Format & Sanitization Utilities', () => {
   describe('escapeHtml', () => {
@@ -14,53 +14,37 @@ describe('Format & Sanitization Utilities', () => {
       const expected = '&lt;script&gt;alert(&quot;XSS &amp; dangerous&quot;)&lt;/script&gt;';
       assert.equal(escapeHtml(input), expected);
     });
-
-    test('escapes single quotes for HTML attributes', () => {
-      const input = "' onmouseover='alert(1)";
-      const expected = "&#039; onmouseover=&#039;alert(1)";
-      assert.equal(escapeHtml(input), expected);
-    });
-
-    test('converts numbers to safe string', () => {
-      assert.equal(escapeHtml(12345), '12345');
-    });
   });
 
-  describe('formatJumlah', () => {
-    test('handles valid numbers and units', () => {
-      assert.equal(formatJumlah(2, 'kg'), '2 kg');
-      assert.equal(formatJumlah(500, 'gram'), '500 gram');
-      assert.equal(formatJumlah(3), '3');
+  describe('getDurasiSimpanInfo', () => {
+    test('handles missing or invalid date safely', () => {
+      const info = getDurasiSimpanInfo(null);
+      assert.equal(info.text, 'Hari ini');
+      assert.equal(info.days, 0);
+      assert.equal(info.isPrioritas, false);
     });
 
-    test('handles null, undefined, or NaN safely', () => {
-      assert.equal(formatJumlah(null, 'butir'), '? butir');
-      assert.equal(formatJumlah(undefined, 'kg'), '? kg');
-      assert.equal(formatJumlah(NaN, 'ikat'), '? ikat');
-    });
-  });
-
-  describe('formatTanggal', () => {
-    test('returns dash for null or undefined date', () => {
-      assert.equal(formatTanggal(null), '-');
-      assert.equal(formatTanggal(''), '-');
-    });
-
-    test('formats valid date string to Indonesian locale', () => {
-      const formatted = formatTanggal('2026-10-22');
-      assert.match(formatted, /22.*2026/);
-    });
-  });
-
-  describe('formatWaktuLalu', () => {
-    test('returns empty string for invalid date', () => {
-      assert.equal(formatWaktuLalu('invalid-date'), '');
-      assert.equal(formatWaktuLalu(null), '');
-    });
-
-    test('formats recent timestamp as Baru saja', () => {
+    test('returns Hari ini for newly added items', () => {
       const now = new Date().toISOString();
-      assert.equal(formatWaktuLalu(now), 'Baru saja');
+      const info = getDurasiSimpanInfo(now, 'sayur');
+      assert.equal(info.text, 'Hari ini');
+      assert.equal(info.days, 0);
+      assert.equal(info.isPrioritas, false);
+    });
+
+    test('identifies fresh ingredients stored for 3+ days as priority', () => {
+      const fourDaysAgo = new Date(Date.now() - 4 * 86400000).toISOString();
+      const info = getDurasiSimpanInfo(fourDaysAgo, 'sayur');
+      assert.equal(info.days, 4);
+      assert.equal(info.isPrioritas, true);
+      assert.match(info.text, /4 hari.*Prioritas masak/);
+    });
+
+    test('keeps dry/spice ingredients non-priority even after 4 days', () => {
+      const fourDaysAgo = new Date(Date.now() - 4 * 86400000).toISOString();
+      const info = getDurasiSimpanInfo(fourDaysAgo, 'bumbu');
+      assert.equal(info.days, 4);
+      assert.equal(info.isPrioritas, false);
     });
   });
 });

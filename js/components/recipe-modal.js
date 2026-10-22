@@ -13,6 +13,37 @@ import { escapeHtml } from '../utils/format.js';
 export function openRecipeDetailModal(recipe, onCookFinished) {
   if (!recipe) return;
 
+  // Parse base portion (e.g. '2 Porsi' -> 2)
+  const rawPorsiMatch = String(recipe.porsi || '2').match(/\d+/);
+  const basePortion = rawPorsiMatch ? Math.max(1, parseInt(rawPorsiMatch[0], 10)) : 2;
+  let currentPortion = basePortion;
+
+  function getScaledBahan(portion) {
+    const ratio = portion / basePortion;
+    return (recipe.bahan_terpakai || []).map(b => {
+      const baseQty = parseFloat(b.jumlah) || 1;
+      const scaledQty = Math.round((baseQty * ratio) * 10) / 10;
+      return {
+        ...b,
+        jumlah: scaledQty
+      };
+    });
+  }
+
+  function renderBahanList(scaledBahan) {
+    return scaledBahan.map(b => `
+      <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container text-xs">
+        <span class="font-semibold text-on-surface">✓ ${escapeHtml(b.nama)}</span>
+        <span class="text-primary font-bold">${escapeHtml(b.jumlah)} ${escapeHtml(b.satuan)}</span>
+      </div>
+    `).join('') + (recipe.bahan_bumbu || []).map(b => `
+      <div class="flex items-center justify-between px-2 py-1 text-[11px] text-on-surface-variant">
+        <span>• ${escapeHtml(b)}</span>
+        <span>Bumbu dapur</span>
+      </div>
+    `).join('');
+  }
+
   const modalContent = `
     <div class="flex items-center justify-between pb-3 border-b border-outline-variant/30">
       <div>
@@ -27,8 +58,8 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
     </div>
 
     <div class="mt-3.5 space-y-4">
-      <!-- Metrics Bar -->
-      <div class="grid grid-cols-3 gap-2 bg-surface-container rounded-2xl p-2.5 text-center">
+      <!-- Metrics & Portion Control Bar (Point 2D: Scalable Servings) -->
+      <div class="grid grid-cols-3 gap-2 bg-surface-container rounded-2xl p-2.5 text-center items-center">
         <div>
           <span class="text-[10px] text-on-surface-variant block">Waktu</span>
           <strong class="text-xs text-on-surface font-bold">${escapeHtml(recipe.waktu_masak || '15 Menit')}</strong>
@@ -38,27 +69,25 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
           <strong class="text-xs text-on-surface font-bold">${escapeHtml(recipe.tingkat_kesulitan || 'Mudah')}</strong>
         </div>
         <div>
-          <span class="text-[10px] text-on-surface-variant block">Porsi</span>
-          <strong class="text-xs text-on-surface font-bold">${escapeHtml(recipe.porsi || '2 Porsi')}</strong>
+          <span class="text-[10px] text-on-surface-variant block mb-0.5">Atur Porsi</span>
+          <div class="inline-flex items-center gap-1.5 bg-surface rounded-lg px-1.5 py-0.5 border border-outline-variant/40 shadow-xs">
+            <button id="btn-portion-minus" class="w-5 h-5 rounded flex items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 font-bold text-xs">-
+            </button>
+            <strong id="portion-display" class="text-xs text-primary font-bold min-w-[20px]">${currentPortion}</strong>
+            <button id="btn-portion-plus" class="w-5 h-5 rounded flex items-center justify-center text-on-surface-variant hover:text-primary active:scale-90 font-bold text-xs">+
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Bahan Terpakai -->
       <div>
-        <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider mb-2">Bahan yang Digunakan:</h4>
-        <div class="space-y-1.5">
-          ${(recipe.bahan_terpakai || []).map(b => `
-            <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container text-xs">
-              <span class="font-semibold text-on-surface">✓ ${escapeHtml(b.nama)}</span>
-              <span class="text-primary font-bold">${escapeHtml(b.jumlah)} ${escapeHtml(b.satuan)}</span>
-            </div>
-          `).join('')}
-          ${(recipe.bahan_bumbu || []).map(b => `
-            <div class="flex items-center justify-between px-2 py-1 text-[11px] text-on-surface-variant">
-              <span>• ${escapeHtml(b)}</span>
-              <span>Bumbu dapur</span>
-            </div>
-          `).join('')}
+        <div class="flex items-center justify-between mb-2">
+          <h4 class="text-xs font-bold text-on-surface uppercase tracking-wider">Bahan yang Digunakan:</h4>
+          <span id="portion-hint" class="text-[10px] text-slate-400">(Takar untuk ${currentPortion} porsi)</span>
+        </div>
+        <div id="recipe-ingredients-list" class="space-y-1.5">
+          ${renderBahanList(getScaledBahan(currentPortion))}
         </div>
       </div>
 
@@ -102,8 +131,29 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
   ModalService.open({
     content: modalContent,
     onOpen: () => {
+      function updatePortionUI(newPortion) {
+        currentPortion = Math.max(1, Math.min(12, newPortion));
+        const portionDisp = document.getElementById('portion-display');
+        if (portionDisp) portionDisp.textContent = currentPortion;
+        const hintDisp = document.getElementById('portion-hint');
+        if (hintDisp) hintDisp.textContent = `(Takar untuk ${currentPortion} porsi)`;
+        const ingList = document.getElementById('recipe-ingredients-list');
+        if (ingList) {
+          ingList.innerHTML = renderBahanList(getScaledBahan(currentPortion));
+        }
+      }
+
+      document.getElementById('btn-portion-minus')?.addEventListener('click', () => {
+        updatePortionUI(currentPortion - 1);
+      });
+
+      document.getElementById('btn-portion-plus')?.addEventListener('click', () => {
+        updatePortionUI(currentPortion + 1);
+      });
+
       document.getElementById('modal-btn-share')?.addEventListener('click', async () => {
-        const shareText = `🍲 Resep ${recipe.nama} (Dapur Pintar)\n⏱️ Waktu: ${recipe.waktu_masak || '15 Menit'} | Porsi: ${recipe.porsi || '2 Porsi'}\n\n🥗 Bahan yang Digunakan:\n${(recipe.bahan_terpakai || []).map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('\n')}\n\n👨‍🍳 Langkah Memasak:\n${(recipe.langkah || []).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n\n💡 Tips: ${recipe.tips || 'Sajikan selagi hangat!'}`;
+        const scaled = getScaledBahan(currentPortion);
+        const shareText = `🍲 Resep ${recipe.nama} (Dapur Pintar)\n⏱️ Waktu: ${recipe.waktu_masak || '15 Menit'} | Porsi: ${currentPortion} Porsi\n\n🥗 Bahan yang Digunakan:\n${scaled.map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('\n')}\n\n👨‍🍳 Langkah Memasak:\n${(recipe.langkah || []).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n\n💡 Tips: ${recipe.tips || 'Sajikan selagi hangat!'}`;
 
         if (navigator.share) {
           try {
@@ -125,7 +175,12 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
 
       document.getElementById('modal-btn-cook-now')?.addEventListener('click', () => {
         ModalService.close();
-        confirmCookingModal(recipe, onCookFinished);
+        const scaledRecipe = {
+          ...recipe,
+          porsi: `${currentPortion} Porsi`,
+          bahan_terpakai: getScaledBahan(currentPortion)
+        };
+        confirmCookingModal(scaledRecipe, onCookFinished);
       });
     }
   });

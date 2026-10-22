@@ -39,6 +39,80 @@ function getNativePreferences() {
   return null;
 }
 
+/**
+ * Lightweight IndexedDB persistence layer (Point 1C: Offline-first)
+ * Survives browser cache eviction & stores hundreds of MB without bloat
+ */
+const IdbStorage = {
+  _dbPromise: null,
+  getDb() {
+    if (typeof window === 'undefined' || !window.indexedDB) return null;
+    if (!this._dbPromise) {
+      this._dbPromise = new Promise((resolve) => {
+        try {
+          const req = window.indexedDB.open('dapur_pintar_db', 1);
+          req.onupgradeneeded = () => {
+            const db = req.result;
+            if (!db.objectStoreNames.contains('keyval')) {
+              db.createObjectStore('keyval');
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => resolve(null);
+        } catch (e) {
+          resolve(null);
+        }
+      });
+    }
+    return this._dbPromise;
+  },
+  async get(key) {
+    const db = await this.getDb();
+    if (!db) return null;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('keyval', 'readonly');
+        const store = tx.objectStore('keyval');
+        const req = store.get(key);
+        req.onsuccess = () => resolve(req.result ?? null);
+        req.onerror = () => resolve(null);
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  },
+  async set(key, value) {
+    const db = await this.getDb();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('keyval', 'readwrite');
+        const store = tx.objectStore('keyval');
+        store.put(value, key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  },
+  async remove(key) {
+    const db = await this.getDb();
+    if (!db) return;
+    return new Promise((resolve) => {
+      try {
+        const tx = db.transaction('keyval', 'readwrite');
+        const store = tx.objectStore('keyval');
+        store.delete(key);
+        tx.oncomplete = () => resolve(true);
+        tx.onerror = () => resolve(false);
+      } catch (e) {
+        resolve(false);
+      }
+    });
+  }
+};
+
 export class StorageService {
   /**
    * Mengambil data dari cache / native Preferences / fallback localStorage.
@@ -74,6 +148,9 @@ export class StorageService {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(key, serialized);
       }
+
+      // IndexedDB Long-Term Storage (Point 1C: Offline-first)
+      IdbStorage.set(key, value);
 
       // Native Capacitor Preferences API
       const nativePref = getNativePreferences();
