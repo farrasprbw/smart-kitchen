@@ -30,8 +30,8 @@ if (typeof window === 'undefined') {
 const { StorageService } = await import('../js/core/storage.js');
 
 describe('StorageService Inventory & Cooking Logic', () => {
-  beforeEach(() => {
-    globalThis.localStorage.clear();
+  beforeEach(async () => {
+    await StorageService.clearAllData();
   });
 
   test('getStok returns initial structure with kulkas and dapur lists', () => {
