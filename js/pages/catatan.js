@@ -40,7 +40,7 @@ export function renderCatatanPage() {
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-emerald-200/60 max-w-lg">
+            <div class="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-emerald-200/60 w-full">
               <div class="bg-white/80 rounded-xl p-3 backdrop-blur-sm">
                 <span class="text-[10px] sm:text-xs text-slate-500 font-bold block uppercase">Menu Dimasak</span>
                 <span class="text-xl sm:text-2xl font-extrabold text-slate-900">${logMasak.length} Resep</span>
@@ -54,7 +54,7 @@ export function renderCatatanPage() {
         </section>
 
         <!-- Tab Switcher -->
-        <div class="flex p-1.5 bg-slate-100 rounded-2xl gap-1.5 w-full sm:max-w-md shadow-2xs">
+        <div class="flex p-1.5 bg-slate-100 rounded-2xl gap-1.5 w-full shadow-2xs">
           <button id="catatan-tab-masak" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition flex items-center justify-center gap-1.5 cursor-pointer ${activeTab === 'masak' ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'}">
             <span class="material-symbols-outlined text-[18px]">skillet</span>
             <span>Riwayat Masak (${logMasak.length})</span>
@@ -87,10 +87,10 @@ export function renderCatatanPage() {
   function renderLogMasakList(entries) {
     if (entries.length === 0) {
       return `
-        <div class="p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">
-          <span class="material-symbols-outlined text-[32px] text-slate-300">skillet</span>
-          <p class="text-xs mt-2 font-medium">Belum ada riwayat masakan.</p>
-          <a href="#ide-masak" class="mt-3 px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold inline-flex items-center gap-1">
+        <div class="col-span-full w-full p-8 sm:p-12 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">
+          <span class="material-symbols-outlined text-[36px] text-slate-300">skillet</span>
+          <p class="text-xs sm:text-sm mt-2 font-medium">Belum ada riwayat masakan.</p>
+          <a href="#ide-masak" class="mt-3 px-4 py-2 rounded-xl bg-primary text-white text-xs sm:text-sm font-bold inline-flex items-center gap-1 hover:opacity-95 transition">
             Masak Sekarang →
           </a>
         </div>
@@ -131,10 +131,10 @@ export function renderCatatanPage() {
   function renderLogBelanjaList(entries) {
     if (entries.length === 0) {
       return `
-        <div class="p-8 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">
-          <span class="material-symbols-outlined text-[32px] text-slate-300">shopping_bag</span>
-          <p class="text-xs mt-2 font-medium">Belum ada riwayat belanja.</p>
-          <a href="#pindai?type=barcode" class="mt-3 px-3 py-1.5 rounded-xl bg-primary text-white text-xs font-bold inline-flex items-center gap-1">
+        <div class="col-span-full w-full p-8 sm:p-12 text-center bg-white rounded-2xl border border-dashed border-slate-200 text-slate-400">
+          <span class="material-symbols-outlined text-[36px] text-slate-300">shopping_bag</span>
+          <p class="text-xs sm:text-sm mt-2 font-medium">Belum ada riwayat belanja.</p>
+          <a href="#pindai?type=barcode" class="mt-3 px-4 py-2 rounded-xl bg-primary text-white text-xs sm:text-sm font-bold inline-flex items-center gap-1 hover:opacity-95 transition">
             Scan Barcode →
           </a>
         </div>
