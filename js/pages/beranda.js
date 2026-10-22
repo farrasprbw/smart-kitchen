@@ -5,6 +5,7 @@ import { renderHeader } from '../components/header.js';
 import { showToast } from '../components/toast.js';
 import { ModalService } from '../components/modal.js';
 import { store } from '../core/state.js';
+import { escapeHtml } from '../utils/format.js';
 
 let lastDeletedItem = null;
 let undoTimeout = null;

@@ -35,3 +35,18 @@ export function formatJumlah(jumlah, satuan = '') {
   }
   return `${jumlah} ${satuan}`.trim();
 }
+
+/**
+ * Escape HTML string to prevent XSS injection
+ * @param {string} str
+ * @returns {string}
+ */
+export function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}

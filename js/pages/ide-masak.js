@@ -7,6 +7,7 @@ import { renderHeader } from '../components/header.js';
 import { showToast } from '../components/toast.js';
 import { ModalService } from '../components/modal.js';
 import { store } from '../core/state.js';
+import { escapeHtml } from '../utils/format.js';
 
 let isGeneratingRecipes = false;
 let isFetchingMore = false;
@@ -235,8 +236,8 @@ export function renderIdeMasakPage() {
           </div>
 
           <div class="absolute bottom-3 inset-x-3 text-white">
-            <h3 class="text-lg font-bold leading-tight drop-shadow-sm">${recipe.nama}</h3>
-            <p class="text-xs text-white/90 line-clamp-1 mt-0.5">${recipe.alasan}</p>
+            <h3 class="text-lg font-bold leading-tight drop-shadow-sm">${escapeHtml(recipe.nama)}</h3>
+            <p class="text-xs text-white/90 line-clamp-1 mt-0.5">${escapeHtml(recipe.alasan)}</p>
           </div>
         </div>
 
