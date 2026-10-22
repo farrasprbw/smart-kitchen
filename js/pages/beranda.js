@@ -413,12 +413,15 @@ export function renderBerandaPage() {
                 <div class="flex items-center gap-2">
                   <h4 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-emerald-950 transition-colors truncate" title="${escapeHtml(item.nama)}">${escapeHtml(item.nama)}</h4>
                 </div>
-                <div class="flex items-center gap-1.5 mt-1 flex-wrap">
+                <div class="flex items-center gap-1.5 mt-1">
                   <span class="text-[10px] sm:text-[11px] font-semibold px-2 py-0.5 rounded-md ${durasiInfo.badgeClass}">${escapeHtml(durasiInfo.text)}</span>
-                  ${item.catatan ? `<span class="truncate text-xs text-slate-400" title="${escapeHtml(item.catatan)}">• ${escapeHtml(item.catatan)}</span>` : ''}
                 </div>
-              </div>
-            </div>
+                ${item.catatan ? `
+                  <div class="mt-2 flex items-start gap-1.5 text-[11px] text-slate-600 bg-slate-50 border border-slate-200/70 rounded-lg px-2 py-1 max-w-full">
+                    <span class="material-symbols-outlined text-[13px] text-slate-400 flex-shrink-0 mt-0.5">sticky_note_2</span>
+                    <span class="line-clamp-2 leading-snug break-words" title="${escapeHtml(item.catatan)}">${escapeHtml(item.catatan)}</span>
+                  </div>
+                ` : ''}
               </div>
             </div>
           </div>
