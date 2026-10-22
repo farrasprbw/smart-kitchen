@@ -30,11 +30,17 @@ if (typeof window === 'undefined') {
 const { StorageService } = await import('../js/core/storage.js');
 
 describe('StorageService Inventory & Cooking Logic', () => {
-  beforeEach(async () => {
-    await StorageService.clearAllData();
+  beforeEach(() => {
+    StorageService.saveStok({
+      version: 2,
+      lastUpdated: new Date().toISOString(),
+      userId: StorageService.getUserId(),
+      kulkas: [],
+      dapur: []
+    });
   });
 
-  test('getStok returns initial structure with kulkas and dapur lists', () => {
+  test('getStok returns structure with empty kulkas and dapur lists after reset', () => {
     const stok = StorageService.getStok();
     assert.ok(Array.isArray(stok.kulkas));
     assert.ok(Array.isArray(stok.dapur));
