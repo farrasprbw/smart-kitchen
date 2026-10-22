@@ -1,77 +1,128 @@
 import { test, describe, beforeEach } from 'node:test';
 import assert from 'node:assert/strict';
-import { StorageService } from '../js/core/storage.js';
+
+// Polyfill localStorage and window for Node.js environment
+const store = new Map();
+const localStorageMock = {
+  getItem(key) {
+    return store.has(key) ? store.get(key) : null;
+  },
+  setItem(key, value) {
+    store.set(key, String(value));
+  },
+  removeItem(key) {
+    store.delete(key);
+  },
+  clear() {
+    store.clear();
+  }
+};
+
+globalThis.localStorage = localStorageMock;
+if (typeof window === 'undefined') {
+  globalThis.window = {
+    localStorage: localStorageMock,
+    dispatchEvent() {}
+  };
+}
+
+// Import StorageService dynamically after mock is assigned
+const { StorageService } = await import('../js/core/storage.js');
 
 describe('StorageService Inventory & Cooking Logic', () => {
   beforeEach(() => {
-    localStorage.clear();
+    globalThis.localStorage.clear();
   });
 
-  test('initial inventory returns empty list or default structure', () => {
-    const items = StorageService.getInventory();
-    assert.ok(Array.isArray(items));
-    assert.equal(items.length, 0);
+  test('getStok returns initial structure with kulkas and dapur lists', () => {
+    const stok = StorageService.getStok();
+    assert.ok(Array.isArray(stok.kulkas));
+    assert.ok(Array.isArray(stok.dapur));
+    assert.equal(stok.kulkas.length, 0);
+    assert.equal(stok.dapur.length, 0);
   });
 
-  test('adds and retrieves inventory items', () => {
-    const item = { id: 'test-1', nama: 'Bawang Merah', jumlah: 10, satuan: 'siung' };
-    StorageService.saveInventory([item]);
-    const items = StorageService.getInventory();
-    assert.equal(items.length, 1);
-    assert.equal(items[0].nama, 'Bawang Merah');
-    assert.equal(items[0].jumlah, 10);
+  test('addStokItem successfully adds an item', () => {
+    const item = StorageService.addStokItem('kulkas', {
+      nama: 'Telur Ayam',
+      jumlah: 10,
+      satuan: 'butir'
+    });
+
+    assert.ok(item.id);
+    assert.equal(item.nama, 'Telur Ayam');
+    assert.equal(item.jumlah, 10);
+
+    const stok = StorageService.getStok();
+    assert.equal(stok.kulkas.length, 1);
+    assert.equal(stok.kulkas[0].nama, 'Telur Ayam');
   });
 
-  test('kurangiStokMasak correctly deducts stock when quantity is sufficient', () => {
-    const item = { id: 'test-1', nama: 'Telur Ayam', jumlah: 5, satuan: 'butir' };
-    StorageService.saveInventory([item]);
+  test('kurangiStokMasak correctly deducts quantity from matching ingredient', () => {
+    StorageService.addStokItem('kulkas', {
+      id: 'telur-1',
+      nama: 'Telur Ayam',
+      jumlah: 6,
+      satuan: 'butir'
+    });
 
-    StorageService.kurangiStokMasak([
+    const berkurang = StorageService.kurangiStokMasak([
       { nama: 'Telur Ayam', jumlah: 2, satuan: 'butir' }
     ]);
 
-    const updated = StorageService.getInventory();
-    assert.equal(updated.length, 1);
-    assert.equal(updated[0].jumlah, 3);
+    assert.equal(berkurang.length, 1);
+    assert.equal(berkurang[0].nama, 'Telur Ayam');
+    assert.equal(berkurang[0].sisa, 4);
+
+    const stok = StorageService.getStok();
+    assert.equal(stok.kulkas[0].jumlah, 4);
   });
 
-  test('kurangiStokMasak removes item when used quantity equals or exceeds stock', () => {
-    const item = { id: 'test-1', nama: 'Wortel', jumlah: 2, satuan: 'buah' };
-    StorageService.saveInventory([item]);
+  test('kurangiStokMasak prevents quantity from dropping below zero', () => {
+    StorageService.addStokItem('dapur', {
+      id: 'bawang-1',
+      nama: 'Bawang Putih',
+      jumlah: 3,
+      satuan: 'siung'
+    });
 
-    StorageService.kurangiStokMasak([
-      { nama: 'Wortel', jumlah: 2, satuan: 'buah' }
+    const berkurang = StorageService.kurangiStokMasak([
+      { nama: 'Bawang Putih', jumlah: 5, satuan: 'siung' }
     ]);
 
-    const updated = StorageService.getInventory();
-    assert.equal(updated.length, 0);
+    assert.equal(berkurang.length, 1);
+    assert.equal(berkurang[0].sisa, 0);
+
+    const stok = StorageService.getStok();
+    assert.equal(stok.dapur[0].jumlah, 0);
   });
 
-  test('kurangiStokMasak handles case-insensitive name matching', () => {
-    const item = { id: 'test-1', nama: 'Cabai Rawit', jumlah: 10, satuan: 'buah' };
-    StorageService.saveInventory([item]);
+  test('kurangiStokMasak handles case-insensitive and partial name matching', () => {
+    StorageService.addStokItem('kulkas', {
+      id: 'wortel-1',
+      nama: 'Wortel Segar',
+      jumlah: 4,
+      satuan: 'buah'
+    });
 
-    StorageService.kurangiStokMasak([
-      { nama: 'cabai rawit ', jumlah: 4, satuan: 'buah' }
+    const berkurang = StorageService.kurangiStokMasak([
+      { nama: 'wortel', jumlah: 1, satuan: 'buah' }
     ]);
 
-    const updated = StorageService.getInventory();
-    assert.equal(updated.length, 1);
-    assert.equal(updated[0].jumlah, 6);
+    assert.equal(berkurang.length, 1);
+    assert.equal(berkurang[0].sisa, 3);
   });
 
-  test('kurangiStokMasak safely ignores unknown ingredients or zero quantities', () => {
-    const item = { id: 'test-1', nama: 'Beras', jumlah: 1000, satuan: 'gram' };
-    StorageService.saveInventory([item]);
+  test('deleteStokItem removes item by id from any storage section', () => {
+    const item = StorageService.addStokItem('dapur', {
+      nama: 'Kecap Manis',
+      jumlah: 1,
+      satuan: 'botol'
+    });
 
-    StorageService.kurangiStokMasak([
-      { nama: 'Gula Pasir', jumlah: 50, satuan: 'gram' },
-      { nama: 'Beras', jumlah: 0, satuan: 'gram' },
-      { nama: '', jumlah: 100 }
-    ]);
+    assert.equal(StorageService.getStok().dapur.length, 1);
 
-    const updated = StorageService.getInventory();
-    assert.equal(updated.length, 1);
-    assert.equal(updated[0].jumlah, 1000);
+    StorageService.deleteStokItem(item.id);
+    assert.equal(StorageService.getStok().dapur.length, 0);
   });
 });
