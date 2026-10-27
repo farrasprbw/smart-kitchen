@@ -123,23 +123,28 @@ class App {
       }
     });
 
-    // 6. Start Router (UI langsung muncul seketika!)
-    this.router.init();
-
     // 7. Splash Screen Handlers (Web & Native Capacitor)
     const hideAppSplashScreen = () => {
       const splashEl = document.getElementById('app-splash-screen');
       if (splashEl) {
         splashEl.classList.add('opacity-0', 'pointer-events-none');
-        setTimeout(() => splashEl.remove(), 750);
+        setTimeout(() => splashEl.remove(), 500);
       }
-      if (typeof window !== 'undefined' && window.Capacitor?.Plugins?.SplashScreen) {
-        window.Capacitor.Plugins.SplashScreen.hide({ fadeOutDuration: 300 });
+      if (window.Capacitor?.Plugins?.SplashScreen) {
+        window.Capacitor.Plugins.SplashScreen.hide().catch(() => {});
       }
     };
 
-    // Beri waktu 1.6 detik agar splash screen elegan tampil memukau sesuai desain
-    setTimeout(hideAppSplashScreen, 1600);
+    // Selalu jamin splash screen hilang dalam 1 detik baik init lancar maupun ada error
+    setTimeout(hideAppSplashScreen, 1000);
+
+    // 8. Start Router (UI langsung muncul seketika!)
+    try {
+      this.router.init();
+    } catch (routeErr) {
+      console.error('Router initial render error:', routeErr);
+      hideAppSplashScreen();
+    }
 
     // 8. Fetch server config di latar belakang tanpa memblokir tampilan awal
     loadServerConfig().catch(() => { });
