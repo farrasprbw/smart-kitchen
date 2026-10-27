@@ -236,7 +236,7 @@ export class GeminiService {
         dishServingStyle = 'served in a chilled drinking beverage glass with ice cubes and fresh garnish';
       }
 
-      const prompt = `Authentic Indonesian cuisine food photography: ${recipeName}. ${dishServingStyle}. Mouth-watering, realistic appetizing textures, 4k resolution, professional food studio lighting, high-end culinary photography, centered composition, clean background, strictly no text, no labels, no watermark.';
+      const prompt = `Authentic Indonesian cuisine food photography: ${recipeName}. ${dishServingStyle}. Mouth-watering, realistic appetizing textures, 4k resolution, professional food studio lighting, high-end culinary photography, centered composition, clean background, strictly no text, no labels, no watermark.`;
       const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
 
       const controller = new AbortController();
