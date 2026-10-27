@@ -15,6 +15,31 @@ let isFetchingMore = false;
 const BATCH_SIZE = 3;
 let displayedCount = 3;
 
+const CULINARY_IMAGE_MAP = [
+  { keywords: ['sup', 'sop', 'soto', 'kuah', 'sayur asem', 'sayur lodeh', 'rawon', 'bakso', 'gulai', 'kari'], url: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['tumis', 'cah', 'kangkung', 'sawi', 'bayam', 'capcay', 'sayur', 'salad', 'buncis', 'tauge', 'terong'], url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['ayam', 'chicken', 'unggas', 'bebek'], url: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['ikan', 'fish', 'seafood', 'udang', 'cumi', 'tongkol', 'gurame', 'lele', 'nila'], url: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['telur', 'dadar', 'ceplok', 'balado telur', 'egg', 'omelet', 'orik'], url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['tahu', 'tempe', 'tofu'], url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['nasi', 'rice', 'nasi goreng'], url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['mie', 'mi', 'bihun', 'kwetiau', 'noodle', 'pasta', 'spaghetti', 'ramen'], url: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['daging', 'sapi', 'rendang', 'steak', 'beef', 'kambing', 'semur'], url: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80' },
+  { keywords: ['sambal', 'pedas', 'rica'], url: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=600&auto=format&fit=crop&q=80' }
+];
+
+const DEFAULT_RECIPE_IMAGE = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80';
+
+export function getRecipeImage(nama = '', kataKunci = '') {
+  const query = `${nama || ''} ${kataKunci || ''}`.toLowerCase();
+  for (const item of CULINARY_IMAGE_MAP) {
+    if (item.keywords.some(kw => query.includes(kw))) {
+      return item.url;
+    }
+  }
+  return DEFAULT_RECIPE_IMAGE;
+}
+
 export function renderIdeMasakPage() {
   const mainEl = document.getElementById('app-main');
   if (!mainEl) return;

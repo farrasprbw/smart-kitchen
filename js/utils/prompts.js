@@ -85,6 +85,7 @@ Format JSON yang wajib diikuti:
     {
       "id": "resep-1",
       "nama": "Nama Masakan Indonesia (misal: Tumis Sawi Tahu Gurih)",
+      "kata_kunci_gambar": "sayur / ayam / daging / ikan / telur / tahu / sup / mie / nasi / pedas",
       "badge": "100% Bahan Cocok / Cepat & Praktis / Rekomendasi Hemat",
       "alasan": "Alasan singkat (misal: Menggunakan sawi layu & tahu)",
       "waktu_masak": "15 menit",
