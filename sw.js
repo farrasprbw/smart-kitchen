@@ -1,6 +1,6 @@
 // Dapur Pintar Service Worker
 
-const CACHE_NAME = 'dapur-pintar-v20';
+const CACHE_NAME = 'dapur-pintar-v21';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -8,11 +8,15 @@ const ASSETS_TO_CACHE = [
   './manifest.json',
   './assets/fonts/material-symbols.css',
   './assets/fonts/material-symbols-outlined.woff2',
+  './assets/icons/icon-192.png',
+  './assets/icons/icon-512.png',
+  './assets/icons/logo.png',
   './js/app.js',
   './js/config.js',
   './js/core/router.js',
   './js/core/state.js',
   './js/core/storage.js',
+  './js/services/barcode.js',
   './js/services/camera.js',
   './js/services/image.js',
   './js/services/gemini.js',
@@ -31,7 +35,8 @@ const ASSETS_TO_CACHE = [
   './js/utils/format.js',
   './js/utils/prompts.js',
   './js/utils/brightness.js',
-  './js/utils/uuid.js'
+  './js/utils/uuid.js',
+  './js/utils/konfirmasi.js'
 ];
 
 self.addEventListener('message', (event) => {
