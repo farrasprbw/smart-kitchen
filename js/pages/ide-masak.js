@@ -412,9 +412,7 @@ export function renderIdeMasakPage() {
             waktu_masak: r.waktu_masak || '15 Menit',
             tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
             porsi: r.porsi || '2 Porsi',
-            image: idx === 0
-              ? 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80'
-              : 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=80',
+            image: getRecipeImage(r.nama, r.kata_kunci_gambar),
             alasan: r.alasan || 'Dibuat khusus dari bahan yang tersedia.',
             bahan_terpakai: r.bahan_terpakai || [],
             bahan_bumbu: r.bahan_bumbu || ['Garam', 'Minyak goreng'],
