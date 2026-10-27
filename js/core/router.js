@@ -39,7 +39,12 @@ export class Router {
 
     const handler = this.routes[route] || this.routes['beranda'];
     if (handler) {
-      this.currentRoute = route;
+      // Cegah trigger ganda jika route tidak berubah
+    if (this.currentRoute === route && document.getElementById('main-content')?.children?.length > 0) {
+      return;
+    }
+
+    this.currentRoute = route;
       handler(params);
     } else {
       console.warn(`No route handler for: ${route}`);
