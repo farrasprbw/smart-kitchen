@@ -79,8 +79,8 @@ const CULINARY_IMAGE_MAP = [
   // 11. Sambal & Pedas
   {
     category: 'sambal',
-    keywords: ['sambal', 'pedas', 'rica', 'balado'],
-    url: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=600&auto=format&fit=crop&q=80'
+    keywords: ['sambal', 'pedas', 'rica', 'balado', 'chili', 'saus'],
+    url: 'https://images.unsplash.com/photo-1628294895950-9805252327bc?w=600&auto=format&fit=crop&q=80'
   },
   // 12. Tumis Sayur & Sayuran Hijau
   {
