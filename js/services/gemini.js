@@ -199,7 +199,7 @@ export class GeminiService {
     if (!slug) return fallbackUrl;
 
     // 1. Cek memory runtime cache
-    const memKey = `img_recipe_${slug}`;
+    const memKey = `img_recipe_v2_${slug}`;
     if (GeminiService.cache.has(memKey)) {
       return GeminiService.cache.get(memKey);
     }
@@ -207,7 +207,7 @@ export class GeminiService {
     // 2. Cek Global Shared Cache di Cloud Firestore
     try {
       const { FirebaseService } = await import('./firebase.js');
-      const cloudCached = await FirebaseService.getCachedRecipeImage(slug);
+      const cloudCached = await FirebaseService.getCachedRecipeImage(`v2_${slug}`);
       if (cloudCached) {
         GeminiService.cache.set(memKey, cloudCached);
         return cloudCached;
@@ -223,7 +223,20 @@ export class GeminiService {
     }
 
     try {
-      const prompt = `Authentic Indonesian home-cooked food photography: ${recipeName}. Beautifully plated, mouth-watering, vibrant colors, fresh ingredients, 4k resolution, soft natural lighting, high-end food magazine style, centered, no text, no watermark.`;
+      let dishServingStyle = 'plated beautifully on an authentic Indonesian ceramic or earthenware dinner plate, ready to eat, strictly served on a plate or food bowl, never in a drinking cup, glass, jar, or bottle';
+      const lowerName = recipeName.toLowerCase();
+
+      if (lowerName.includes('sambal')) {
+        dishServingStyle = 'served traditionally in a rustic black stone mortar (cobek batu) or small clay condiment saucer, garnished with sliced fresh red bird eye chilies and kaffir lime leaf, glistening chili oil texture, strictly inside a stone cobek or small sauce dish, never in a drinking glass, never in a glass bottle, jar, or tumbler';
+      } else if (lowerName.includes('sup') || lowerName.includes('soto') || lowerName.includes('sayur asem') || lowerName.includes('sayur lodeh') || lowerName.includes('bakso') || lowerName.includes('rawon') || lowerName.includes('kuah')) {
+        dishServingStyle = 'served in a traditional deep ceramic soup bowl with clear steaming broth, garnished with fried shallots and celery, strictly in a food bowl, never in a drinking glass';
+      } else if (lowerName.includes('rujak') || lowerName.includes('asinan') || lowerName.includes('salad buah')) {
+        dishServingStyle = 'sliced fresh tropical fruits neatly arranged on a flat ceramic dish or woven bamboo plate, accompanied by a small bowl of spicy palm sugar dip';
+      } else if (lowerName.includes('jus') || lowerName.includes('es ') || lowerName.includes('smoothie') || lowerName.includes('minuman')) {
+        dishServingStyle = 'served in a chilled drinking beverage glass with ice cubes and fresh garnish';
+      }
+
+      const prompt = `Authentic Indonesian cuisine food photography: ${recipeName}. ${dishServingStyle}. Mouth-watering, realistic appetizing textures, 4k resolution, professional food studio lighting, high-end culinary photography, centered composition, clean background, strictly no text, no labels, no watermark.';
       const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
 
       const controller = new AbortController();
@@ -254,7 +267,7 @@ export class GeminiService {
 
           // Simpan ke Firestore secara asinkron agar pengguna lain hemat kuota
           import('./firebase.js').then(({ FirebaseService }) => {
-            FirebaseService.saveCachedRecipeImage(slug, generatedUrl, recipeName).catch(() => {});
+            FirebaseService.saveCachedRecipeImage(`v2_${slug}`, generatedUrl, recipeName).catch(() => {});
           }).catch(() => {});
 
           return generatedUrl;
