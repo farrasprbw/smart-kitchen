@@ -16,27 +16,105 @@ const BATCH_SIZE = 3;
 let displayedCount = 3;
 
 const CULINARY_IMAGE_MAP = [
-  { keywords: ['sup', 'sop', 'soto', 'kuah', 'sayur asem', 'sayur lodeh', 'rawon', 'bakso', 'gulai', 'kari'], url: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['tumis', 'cah', 'kangkung', 'sawi', 'bayam', 'capcay', 'sayur', 'salad', 'buncis', 'tauge', 'terong'], url: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['ayam', 'chicken', 'unggas', 'bebek'], url: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['ikan', 'fish', 'seafood', 'udang', 'cumi', 'tongkol', 'gurame', 'lele', 'nila'], url: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['telur', 'dadar', 'ceplok', 'balado telur', 'egg', 'omelet', 'orik'], url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['tahu', 'tempe', 'tofu'], url: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['nasi', 'rice', 'nasi goreng'], url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['mie', 'mi', 'bihun', 'kwetiau', 'noodle', 'pasta', 'spaghetti', 'ramen'], url: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['daging', 'sapi', 'rendang', 'steak', 'beef', 'kambing', 'semur'], url: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80' },
-  { keywords: ['sambal', 'pedas', 'rica'], url: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=600&auto=format&fit=crop&q=80' }
+  // 1. Rujak & Buah Segar (Prioritas tinggi untuk olahan buah seperti mangga, rujak, asinan)
+  {
+    category: 'rujak_buah',
+    keywords: ['rujak', 'mangga', 'buah', 'asinan', 'salad buah', 'mango', 'fruit', 'pisang', 'pepaya', 'nanas', 'apel', 'manisan', 'es buah'],
+    url: 'https://images.unsplash.com/photo-1553530666-ba11a7da3888?w=600&auto=format&fit=crop&q=80'
+  },
+  // 2. Minuman & Jus Buah
+  {
+    category: 'minuman_dessert',
+    keywords: ['jus', 'juice', 'smoothie', 'es ', 'minuman', 'dessert', 'puding', 'wedang'],
+    url: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80'
+  },
+  // 3. Nasi / Fried Rice
+  {
+    category: 'nasi_goreng',
+    keywords: ['nasi', 'nasi goreng', 'rice'],
+    url: 'https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=600&auto=format&fit=crop&q=80'
+  },
+  // 4. Mie / Bihun / Kwetiau
+  {
+    category: 'mie_goreng',
+    keywords: ['mie', 'mi ', 'bihun', 'kwetiau', 'noodle', 'pasta', 'spaghetti', 'ramen'],
+    url: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80'
+  },
+  // 5. Sup / Soto / Kuah
+  {
+    category: 'soto_sup',
+    keywords: ['sup', 'sop', 'soto', 'kuah', 'sayur asem', 'sayur lodeh', 'rawon', 'bakso', 'gulai', 'kari', 'kaldu'],
+    url: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=600&auto=format&fit=crop&q=80'
+  },
+  // 6. Ayam & Unggas
+  {
+    category: 'ayam_goreng',
+    keywords: ['ayam', 'chicken', 'unggas', 'bebek'],
+    url: 'https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=600&auto=format&fit=crop&q=80'
+  },
+  // 7. Daging Sapi & Kambing
+  {
+    category: 'daging_sapi',
+    keywords: ['daging', 'sapi', 'rendang', 'steak', 'beef', 'kambing', 'semur', 'bistik'],
+    url: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80'
+  },
+  // 8. Ikan & Seafood
+  {
+    category: 'ikan_seafood',
+    keywords: ['ikan', 'fish', 'seafood', 'udang', 'cumi', 'tongkol', 'gurame', 'lele', 'nila', 'salmon', 'tenggiri'],
+    url: 'https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=600&auto=format&fit=crop&q=80'
+  },
+  // 9. Telur
+  {
+    category: 'telur_dadar',
+    keywords: ['telur', 'dadar', 'ceplok', 'balado telur', 'egg', 'omelet', 'orik'],
+    url: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?w=600&auto=format&fit=crop&q=80'
+  },
+  // 10. Tahu & Tempe
+  {
+    category: 'tahu_tempe',
+    keywords: ['tahu', 'tempe', 'tofu'],
+    url: 'https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=600&auto=format&fit=crop&q=80'
+  },
+  // 11. Sambal & Pedas
+  {
+    category: 'sambal',
+    keywords: ['sambal', 'pedas', 'rica', 'balado'],
+    url: 'https://images.unsplash.com/photo-1588168333986-5078d3ae3976?w=600&auto=format&fit=crop&q=80'
+  },
+  // 12. Tumis Sayur & Sayuran Hijau
+  {
+    category: 'tumis_sayur',
+    keywords: ['tumis', 'cah', 'kangkung', 'sawi', 'bayam', 'capcay', 'sayur', 'salad', 'buncis', 'tauge', 'terong', 'brokoli'],
+    url: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&auto=format&fit=crop&q=80'
+  }
 ];
 
 const DEFAULT_RECIPE_IMAGE = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80';
 
 export function getRecipeImage(nama = '', kataKunci = '') {
-  const query = `${nama || ''} ${kataKunci || ''}`.toLowerCase();
+  const nameStr = (nama || '').toLowerCase();
+  const keyStr = (kataKunci || '').toLowerCase();
+
+  // 1. Cek nama masakan terlebih dahulu (paling spesifik, misal "Rujak Mangga")
   for (const item of CULINARY_IMAGE_MAP) {
-    if (item.keywords.some(kw => query.includes(kw))) {
+    if (item.keywords.some(kw => nameStr.includes(kw))) {
       return item.url;
     }
   }
+
+  // 2. Cek kategori visual eksplisit (misal: "rujak_buah", "tumis_sayur")
+  if (keyStr) {
+    const directCat = CULINARY_IMAGE_MAP.find(item => item.category === keyStr);
+    if (directCat) return directCat.url;
+
+    for (const item of CULINARY_IMAGE_MAP) {
+      if (item.keywords.some(kw => keyStr.includes(kw))) {
+        return item.url;
+      }
+    }
+  }
+
   return DEFAULT_RECIPE_IMAGE;
 }
 
@@ -245,10 +323,10 @@ export function renderIdeMasakPage() {
   function renderHeroCard(recipe) {
     if (!recipe) return '';
     return `
-      <div class="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:border-slate-200 transition group" data-recipe-id="${recipe.id}">
+      <div class="bg-white rounded-3xl overflow-hidden border border-slate-100 shadow-md hover:border-slate-200 hover:shadow-lg transition group cursor-pointer recipe-card" data-recipe-id="${recipe.id}">
         <div class="relative w-full h-44 overflow-hidden bg-slate-900">
           <img src="${recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&auto=format&fit=crop&q=80'}"
-            alt="${recipe.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+            alt="${recipe.nama}" class="w-full h-full object-cover">
           <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-black/30"></div>
 
           <!-- Badges on Image -->
@@ -278,11 +356,14 @@ export function renderIdeMasakPage() {
                   ${b.nama} (${b.jumlah} ${b.satuan})
                 </span>
               `).join('')}
-              ${(recipe.bahan_bumbu || []).slice(0, 3).map(b => `
+              ${(recipe.bahan_bumbu || []).slice(0, 3).map(b => {
+                const bumbuName = typeof b === 'object' && b !== null ? `${b.nama}${b.takaran ? ` (${b.takaran})` : ''}` : b;
+                return `
                 <span class="inline-flex items-center px-2 py-1 rounded-lg bg-slate-50 text-slate-600 text-[11px] font-medium">
-                  + ${b}
+                  + ${bumbuName}
                 </span>
-              `).join('')}
+                `;
+              }).join('')}
             </div>
           </div>
 
@@ -314,10 +395,10 @@ export function renderIdeMasakPage() {
   function renderCompactCard(recipe) {
     if (!recipe) return '';
     return `
-      <div class="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm hover:border-slate-200 transition flex items-start gap-3 group" data-recipe-id="${recipe.id}">
+      <div class="bg-white rounded-2xl p-3.5 border border-slate-100 shadow-sm hover:border-slate-200 hover:shadow-md transition flex items-start gap-3 group cursor-pointer recipe-card" data-recipe-id="${recipe.id}">
         <div class="w-20 h-20 rounded-xl bg-slate-100 overflow-hidden flex-shrink-0 relative">
           <img src="${recipe.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&auto=format&fit=crop&q=80'}"
-            alt="${recipe.nama}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            alt="${recipe.nama}" class="w-full h-full object-cover">
         </div>
 
         <div class="flex-1 min-w-0">
@@ -345,9 +426,24 @@ export function renderIdeMasakPage() {
   }
 
   function setupEvents() {
+    // Click card anywhere opens detail modal
+    mainEl.querySelectorAll('.recipe-card').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (e.target.closest('.btn-quick-cook')) return;
+        const id = card.getAttribute('data-recipe-id');
+        const recipe = currentRecipes.find(r => r.id === id);
+        if (recipe) {
+          activeSelectedRecipe = recipe;
+          updateDockUI();
+          openRecipeDetailModal(recipe);
+        }
+      });
+    });
+
     // Select recipe buttons
     mainEl.querySelectorAll('.btn-select-recipe').forEach(btn => {
       btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const id = e.currentTarget.getAttribute('data-id');
         const recipe = currentRecipes.find(r => r.id === id);
         if (recipe) {
@@ -361,6 +457,7 @@ export function renderIdeMasakPage() {
     // Quick cook / select menu
     mainEl.querySelectorAll('.btn-quick-cook').forEach(btn => {
       btn.addEventListener('click', (e) => {
+        e.stopPropagation();
         const id = e.currentTarget.getAttribute('data-id');
         const recipe = currentRecipes.find(r => r.id === id);
         if (recipe) {
@@ -437,10 +534,10 @@ export function renderIdeMasakPage() {
             waktu_masak: r.waktu_masak || '15 Menit',
             tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
             porsi: r.porsi || '2 Porsi',
-            image: getRecipeImage(r.nama, r.kata_kunci_gambar),
+            image: getRecipeImage(r.nama, r.kategori_visual || r.kata_kunci_gambar),
             alasan: r.alasan || 'Dibuat khusus dari bahan yang tersedia.',
             bahan_terpakai: r.bahan_terpakai || [],
-            bahan_bumbu: r.bahan_bumbu || ['Garam', 'Minyak goreng'],
+            bahan_bumbu: r.bahan_bumbu || [{ nama: 'Garam', takaran: 'Secukupnya' }, { nama: 'Minyak goreng', takaran: '2 sdm' }],
             langkah: r.langkah || ['Siapkan bahan', 'Masak hingga matang', 'Sajikan hangat'],
             tips: r.tips || 'Sajikan selagi hangat.'
           }));
@@ -461,7 +558,7 @@ export function renderIdeMasakPage() {
         ModalService.close();
         isGeneratingRecipes = false;
         console.error('Recipe generation error:', err);
-        showToast(`Gagal meracik menu: ${err.message}`, 'error', 4000);
+        showToast('Gagal meracik rekomendasi menu. Silakan coba beberapa saat lagi.', 'error', 4000);
         if (store.getState().activeTab === 'ide-masak') {
           renderContent();
         }
@@ -502,10 +599,10 @@ export function renderIdeMasakPage() {
               waktu_masak: r.waktu_masak || '20 Menit',
               tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
               porsi: r.porsi || '2 Porsi',
-              image: getRecipeImage(r.nama, r.kata_kunci_gambar),
+              image: getRecipeImage(r.nama, r.kategori_visual || r.kata_kunci_gambar),
               alasan: r.alasan || 'Variasi kreasi baru dari stok bahan yang sama.',
               bahan_terpakai: r.bahan_terpakai || [],
-              bahan_bumbu: r.bahan_bumbu || ['Garam', 'Minyak goreng'],
+              bahan_bumbu: r.bahan_bumbu || [{ nama: 'Garam', takaran: 'Secukupnya' }, { nama: 'Minyak goreng', takaran: '2 sdm' }],
               langkah: r.langkah || ['Siapkan bahan', 'Masak hingga matang', 'Sajikan hangat'],
               tips: r.tips || 'Sajikan selagi hangat.'
             }));

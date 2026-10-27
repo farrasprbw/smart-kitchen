@@ -76,6 +76,24 @@ TUGAS:
 Berikan 3 rekomendasi menu masakan Indonesia lezat yang BISA DIBUAT secara realistis dari bahan utama yang di-scan dan bumbu dapur standar.
 Prioritaskan bahan makanan utama yang mudah layu atau mendekati batas konsumsi. Semua resep praktis (< 30 menit).
 
+ATURAN TAKARAN LENGKAP & VISUAL:
+1. 'bahan_terpakai': Wajib ada nama bahan, jumlah realistis, dan satuan (misal: butir, ikat, buah, potong, gram).
+2. 'bahan_bumbu': WAJIB gunakan array objek { "nama": "...", "takaran": "..." } dengan takaran jelas (misal: "2 siung (cincang)", "1 sdm", "1/2 sdt", "2 sdm", "1 sdt gula aren"). JANGAN HANYA MENYEBUTKAN NAMA BUMBU POLOS!
+3. 'langkah': Dalam setiap langkah memasak, cantumkan bahan dan takarannya (misal: "Panaskan 2 sdm minyak goreng, tumis 2 siung bawang putih hingga harum...").
+4. 'kategori_visual': Pilih tepat 1 kategori yang paling akurat dari daftar ini:
+   - 'rujak_buah' (Wajib untuk semua olahan buah: rujak, asinan, salad buah, mangga, pisang, nanas, buah potong)
+   - 'minuman_dessert' (Untuk jus buah, es, smoothie, puding, minuman)
+   - 'tumis_sayur' (Untuk sayuran hijau, cah, oseng, capcay, salad sayur)
+   - 'nasi_goreng' (Untuk semua olahan nasi)
+   - 'mie_goreng' (Untuk mie, bihun, kwetiau, pasta)
+   - 'ayam_goreng' (Untuk ayam, bebek, unggas)
+   - 'telur_dadar' (Untuk telur dadar, ceplok, orak-arik)
+   - 'tahu_tempe' (Untuk tahu, tempe)
+   - 'soto_sup' (Untuk sup, soto, sayur asem, kuah, bakso)
+   - 'ikan_seafood' (Untuk ikan, udang, cumi, seafood)
+   - 'daging_sapi' (Khusus olahan daging sapi, rendang, semur, kambing)
+   - 'sambal' (Untuk aneka sambal dan olahan balado pedas)
+
 INSTRUKSI KECEPATAN:
 Buat penjelasan padat, ringkas, dan to-the-point. Langkah memasak maksimal 3 langkah singkat per menu, dan alasan cukup 1 kalimat singkat. Hindari kata-kata bertele-tele agar pemrosesan super cepat.
 
@@ -85,23 +103,29 @@ Format JSON yang wajib diikuti:
     {
       "id": "resep-1",
       "nama": "Nama Masakan Indonesia (misal: Tumis Sawi Tahu Gurih)",
-      "kata_kunci_gambar": "sayur / ayam / daging / ikan / telur / tahu / sup / mie / nasi / pedas",
-      "badge": "100% Bahan Cocok / Cepat & Praktis / Rekomendasi Hemat",
+      "kategori_visual": "tumis_sayur",
+      "badge": "100% Cocok / Cepat & Praktis / Rekomendasi Hemat",
       "alasan": "Alasan singkat (misal: Menggunakan sawi layu & tahu)",
       "waktu_masak": "15 menit",
       "tingkat_kesulitan": "Mudah",
-      "porsi": "2-3 porsi",
+      "porsi": "2 porsi",
       "bahan_terpakai": [
-        { "nama": "Sawi", "jumlah": 1, "satuan": "ikat" },
-        { "nama": "Tahu", "jumlah": 2, "satuan": "potong" }
+        { "nama": "Sawi hijau", "jumlah": 1, "satuan": "ikat" },
+        { "nama": "Tahu putih", "jumlah": 2, "satuan": "buah" }
       ],
-      "bahan_bumbu": ["Bawang putih", "Kecap manis", "Garam", "Minyak goreng"],
+      "bahan_bumbu": [
+        { "nama": "Bawang putih", "takaran": "2 siung (cincang)" },
+        { "nama": "Kecap manis", "takaran": "1 sdm" },
+        { "nama": "Saus tiram", "takaran": "1 sdt" },
+        { "nama": "Garam", "takaran": "1/2 sdt" },
+        { "nama": "Minyak goreng", "takaran": "2 sdm" }
+      ],
       "langkah": [
-        "Potong tahu dadu kecil dan bersihkan sawi.",
-        "Tumis bawang putih hingga harum, masukkan tahu dan sawi.",
-        "Bumbui kecap manis dan garam, masak cepat hingga matang."
+        "Potong 2 buah tahu bentuk dadu kecil dan cuci bersih 1 ikat sawi lalu potong sesuai selera.",
+        "Panaskan 2 sdm minyak di wajan, tumis 2 siung bawang putih cincang hingga harum kekuningan.",
+        "Masukkan tahu dan sawi, tambahkan 1 sdm kecap manis, 1 sdt saus tiram, dan 1/2 sdt garam. Masak cepat 3 menit hingga matang."
       ],
-      "tips": "Masak cepat agar sayur tetap renyah."
+      "tips": "Masak dengan api sedang agar sawi tetap renyah."
     }
   ]
 }

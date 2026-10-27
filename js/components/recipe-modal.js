@@ -31,17 +31,70 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
   }
 
   function renderBahanList(scaledBahan) {
-    return scaledBahan.map(b => `
-      <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container text-xs">
-        <span class="font-semibold text-on-surface">✓ ${escapeHtml(b.nama)}</span>
-        <span class="text-primary font-bold">${escapeHtml(b.jumlah)} ${escapeHtml(b.satuan)}</span>
-      </div>
-    `).join('') + (recipe.bahan_bumbu || []).map(b => `
-      <div class="flex items-center justify-between px-2 py-1 text-[11px] text-on-surface-variant">
-        <span>• ${escapeHtml(b)}</span>
-        <span>Bumbu dapur</span>
+    const bahanUtamaHtml = scaledBahan.map(b => `
+      <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container text-xs shadow-2xs">
+        <span class="font-semibold text-on-surface flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-primary text-[15px]">check_circle</span>
+          ${escapeHtml(b.nama)}
+        </span>
+        <span class="text-primary font-bold bg-primary/10 px-2 py-0.5 rounded-md text-[11px]">${escapeHtml(b.jumlah)} ${escapeHtml(b.satuan || '')}</span>
       </div>
     `).join('');
+
+    const bumbuList = recipe.bahan_bumbu || [];
+    const bumbuHtml = bumbuList.map(b => {
+      let nama = '';
+      let takaran = '';
+
+      if (typeof b === 'object' && b !== null) {
+        nama = b.nama || '';
+        takaran = b.takaran || (b.jumlah ? `${b.jumlah} ${b.satuan || ''}`.trim() : 'Secukupnya');
+      } else if (typeof b === 'string') {
+        const str = b.trim();
+        const colonMatch = str.match(/^([^:]+):\s*(.+)$/);
+        const parenMatch = str.match(/^([^(]+)\s*\(([^)]+)\)$/);
+        const leadingNumberMatch = str.match(/^([\d/½¼¾\s]+(?:sdm|sdt|siung|butir|ruas|lembar|batang|buah|gram|gr|ml|ons|ikat|bungkus|cm|secukupnya|sejumput)?)\s+(.+)$/i);
+
+        if (colonMatch) {
+          nama = colonMatch[1].trim();
+          takaran = colonMatch[2].trim();
+        } else if (parenMatch) {
+          nama = parenMatch[1].trim();
+          takaran = parenMatch[2].trim();
+        } else if (leadingNumberMatch) {
+          takaran = leadingNumberMatch[1].trim();
+          nama = leadingNumberMatch[2].trim();
+        } else {
+          nama = str;
+          takaran = 'Secukupnya';
+        }
+      }
+
+      return `
+        <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container/60 text-xs border border-outline-variant/20">
+          <span class="text-on-surface flex items-center gap-1.5 font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+            ${escapeHtml(nama)}
+          </span>
+          <span class="text-on-surface-variant font-semibold bg-surface px-2 py-0.5 rounded border border-outline-variant/30 text-[11px] shadow-2xs">${escapeHtml(takaran)}</span>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="space-y-1.5">
+        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1 mb-1.5">
+          <span>Bahan Utama (dari Stok)</span>
+        </div>
+        ${bahanUtamaHtml || '<p class="text-xs text-slate-400 italic">Tidak ada bahan stok</p>'}
+      </div>
+      <div class="space-y-1.5 mt-3.5 pt-2 border-t border-outline-variant/20">
+        <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1 mb-1.5">
+          <span>Bumbu Dapur & Takaran</span>
+        </div>
+        ${bumbuHtml || '<p class="text-xs text-slate-400 italic">Garam dan minyak goreng secukupnya</p>'}
+      </div>
+    `;
   }
 
   const modalContent = `
@@ -224,24 +277,25 @@ export function confirmCookingModal(recipe, onCookFinished) {
   `;
 
   ModalService.open({
-    content: modalContent
-  });
+    content: modalContent,
+    onOpen: () => {
+      document.getElementById('confirm-deduct-btn')?.addEventListener('click', () => {
+        StorageService.kurangiStokMasak(recipe.bahan_terpakai);
 
-  document.getElementById('confirm-deduct-btn')?.addEventListener('click', () => {
-    StorageService.kurangiStokMasak(recipe.bahan_terpakai);
+        StorageService.addLogMasak({
+          resep: recipe.nama,
+          waktu_masak: recipe.waktu_masak,
+          tingkat_kesulitan: recipe.tingkat_kesulitan,
+          bahan_terpakai: recipe.bahan_terpakai
+        });
 
-    StorageService.addLogMasak({
-      resep: recipe.nama,
-      waktu_masak: recipe.waktu_masak,
-      tingkat_kesulitan: recipe.tingkat_kesulitan,
-      bahan_terpakai: recipe.bahan_terpakai
-    });
+        ModalService.close();
+        showToast(`Selamat makan! Stok ${recipe.nama} telah dikurangi otomatis.`, 'success', 3500);
 
-    ModalService.close();
-    showToast(`Selamat makan! Stok ${recipe.nama} telah dikurangi otomatis.`, 'success', 3500);
-
-    if (typeof onCookFinished === 'function') {
-      onCookFinished(recipe);
+        if (typeof onCookFinished === 'function') {
+          onCookFinished(recipe);
+        }
+      });
     }
   });
 }

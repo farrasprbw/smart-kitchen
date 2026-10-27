@@ -1,9 +1,23 @@
 // Bottom sheet & modal manager with Theme, Export/Import, & Manual Entry
 
 export class ModalService {
-  static open(htmlContent, { onClose = null } = {}) {
+  static open(contentOrOptions, options = {}) {
     const modalEl = document.getElementById('app-modal');
     if (!modalEl) return;
+
+    let htmlContent = '';
+    let onClose = null;
+    let onOpen = null;
+
+    if (typeof contentOrOptions === 'object' && contentOrOptions !== null && !(contentOrOptions instanceof HTMLElement)) {
+      htmlContent = contentOrOptions.content || '';
+      onClose = contentOrOptions.onClose || options.onClose || null;
+      onOpen = contentOrOptions.onOpen || options.onOpen || null;
+    } else {
+      htmlContent = contentOrOptions || '';
+      onClose = options.onClose || null;
+      onOpen = options.onOpen || null;
+    }
 
     modalEl.innerHTML = `
       <div id="modal-backdrop" class="fixed inset-0 bg-inverse-surface/60 backdrop-blur-sm transition-opacity duration-300"></div>
@@ -26,6 +40,14 @@ export class ModalService {
     modalEl.querySelectorAll('[data-close-modal]').forEach(btn => {
       btn.addEventListener('click', closeHandler);
     });
+
+    if (typeof onOpen === 'function') {
+      try {
+        onOpen();
+      } catch (err) {
+        console.error('Error in ModalService onOpen:', err);
+      }
+    }
   }
 
   static close() {
