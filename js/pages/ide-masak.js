@@ -477,7 +477,7 @@ export function renderIdeMasakPage() {
               waktu_masak: r.waktu_masak || '20 Menit',
               tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
               porsi: r.porsi || '2 Porsi',
-              image: 'https://images.unsplash.com/photo-1547592180-85f173990554?w=400&auto=format&fit=crop&q=80',
+              image: getRecipeImage(r.nama, r.kata_kunci_gambar),
               alasan: r.alasan || 'Variasi kreasi baru dari stok bahan yang sama.',
               bahan_terpakai: r.bahan_terpakai || [],
               bahan_bumbu: r.bahan_bumbu || ['Garam', 'Minyak goreng'],
