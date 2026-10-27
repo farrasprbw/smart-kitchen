@@ -525,22 +525,34 @@ export function renderIdeMasakPage() {
         isGeneratingRecipes = false;
 
         if (result.rekomendasi && result.rekomendasi.length > 0) {
-          currentRecipes = result.rekomendasi.map((r, idx) => ({
-            id: `resep-${Date.now()}-${idx + 1}`,
-            nama: r.nama,
-            isHero: idx === 0,
-            badge: r.badge || (idx === 0 ? '100% Cocok' : 'Rekomendasi Cepat'),
-            badgeClass: 'bg-emerald-100 text-emerald-800',
-            waktu_masak: r.waktu_masak || '15 Menit',
-            tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
-            porsi: r.porsi || '2 Porsi',
-            image: getRecipeImage(r.nama, r.kategori_visual || r.kata_kunci_gambar),
-            alasan: r.alasan || 'Dibuat khusus dari bahan yang tersedia.',
-            bahan_terpakai: r.bahan_terpakai || [],
-            bahan_bumbu: r.bahan_bumbu || [{ nama: 'Garam', takaran: 'Secukupnya' }, { nama: 'Minyak goreng', takaran: '2 sdm' }],
-            langkah: r.langkah || ['Siapkan bahan', 'Masak hingga matang', 'Sajikan hangat'],
-            tips: r.tips || 'Sajikan selagi hangat.'
+          const mappedRecipes = await Promise.all(result.rekomendasi.map(async (r, idx) => {
+            const fallbackImg = getRecipeImage(r.nama, r.kategori_visual || r.kata_kunci_gambar);
+            let finalImg = fallbackImg;
+            try {
+              finalImg = await GeminiService.getOrGenerateRecipeImage(r.nama, r.kategori_visual, fallbackImg);
+            } catch (imgErr) {
+              console.warn('Image resolution error, using fallback:', imgErr);
+            }
+
+            return {
+              id: `resep-${Date.now()}-${idx + 1}`,
+              nama: r.nama,
+              isHero: idx === 0,
+              badge: r.badge || (idx === 0 ? '100% Cocok' : 'Rekomendasi Cepat'),
+              badgeClass: 'bg-emerald-100 text-emerald-800',
+              waktu_masak: r.waktu_masak || '15 Menit',
+              tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
+              porsi: r.porsi || '2 Porsi',
+              image: finalImg,
+              alasan: r.alasan || 'Dibuat khusus dari bahan yang tersedia.',
+              bahan_terpakai: r.bahan_terpakai || [],
+              bahan_bumbu: r.bahan_bumbu || [{ nama: 'Garam', takaran: 'Secukupnya' }, { nama: 'Minyak goreng', takaran: '2 sdm' }],
+              langkah: r.langkah || ['Siapkan bahan', 'Masak hingga matang', 'Sajikan hangat'],
+              tips: r.tips || 'Sajikan selagi hangat.'
+            };
           }));
+
+          currentRecipes = mappedRecipes;
           activeSelectedRecipe = currentRecipes[0];
           displayedCount = BATCH_SIZE;
           store.setState({ generatedRecipes: currentRecipes });
@@ -590,21 +602,31 @@ export function renderIdeMasakPage() {
           const freshList = result.rekomendasi.filter(r => !existingLower.has(r.nama.toLowerCase().trim()));
 
           if (freshList.length > 0) {
-            const mappedNew = freshList.map((r, idx) => ({
-              id: `resep-more-${Date.now()}-${idx + 1}`,
-              nama: r.nama,
-              isHero: false,
-              badge: r.badge || 'Variasi Menu Baru',
-              badgeClass: 'bg-emerald-100 text-emerald-800',
-              waktu_masak: r.waktu_masak || '20 Menit',
-              tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
-              porsi: r.porsi || '2 Porsi',
-              image: getRecipeImage(r.nama, r.kategori_visual || r.kata_kunci_gambar),
-              alasan: r.alasan || 'Variasi kreasi baru dari stok bahan yang sama.',
-              bahan_terpakai: r.bahan_terpakai || [],
-              bahan_bumbu: r.bahan_bumbu || [{ nama: 'Garam', takaran: 'Secukupnya' }, { nama: 'Minyak goreng', takaran: '2 sdm' }],
-              langkah: r.langkah || ['Siapkan bahan', 'Masak hingga matang', 'Sajikan hangat'],
-              tips: r.tips || 'Sajikan selagi hangat.'
+            const mappedNew = await Promise.all(freshList.map(async (r, idx) => {
+              const fallbackImg = getRecipeImage(r.nama, r.kategori_visual || r.kata_kunci_gambar);
+              let finalImg = fallbackImg;
+              try {
+                finalImg = await GeminiService.getOrGenerateRecipeImage(r.nama, r.kategori_visual, fallbackImg);
+              } catch (imgErr) {
+                console.warn('Image resolution error, using fallback:', imgErr);
+              }
+
+              return {
+                id: `resep-more-${Date.now()}-${idx + 1}`,
+                nama: r.nama,
+                isHero: false,
+                badge: r.badge || 'Variasi Menu Baru',
+                badgeClass: 'bg-emerald-100 text-emerald-800',
+                waktu_masak: r.waktu_masak || '20 Menit',
+                tingkat_kesulitan: r.tingkat_kesulitan || 'Mudah',
+                porsi: r.porsi || '2 Porsi',
+                image: finalImg,
+                alasan: r.alasan || 'Variasi kreasi baru dari stok bahan yang sama.',
+                bahan_terpakai: r.bahan_terpakai || [],
+                bahan_bumbu: r.bahan_bumbu || [{ nama: 'Garam', takaran: 'Secukupnya' }, { nama: 'Minyak goreng', takaran: '2 sdm' }],
+                langkah: r.langkah || ['Siapkan bahan', 'Masak hingga matang', 'Sajikan hangat'],
+                tips: r.tips || 'Sajikan selagi hangat.'
+              };
             }));
 
             currentRecipes = [...currentRecipes, ...mappedNew];

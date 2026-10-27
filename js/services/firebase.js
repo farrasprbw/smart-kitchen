@@ -172,4 +172,56 @@ export class FirebaseService {
       }
     });
   }
+
+  /**
+   * Mengambil gambar resep dari Global Shared Cache Firestore
+   * @param {string} slug Slug nama resep
+   * @returns {Promise<string|null>}
+   */
+  static async getCachedRecipeImage(slug) {
+    if (!db) await FirebaseService.init();
+    if (!db) return null;
+
+    try {
+      const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js');
+      const docId = `recipe_img_${slug}`;
+      const docRef = doc(db, 'dapur_pintar_data', docId);
+      const snapshot = await getDoc(docRef);
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        return data?.imageUrl || null;
+      }
+      return null;
+    } catch (err) {
+      console.warn('Gagal membaca cache gambar dari Firestore:', err);
+      return null;
+    }
+  }
+
+  /**
+   * Menyimpan gambar resep ke Global Shared Cache Firestore agar user lain hemat kuota
+   * @param {string} slug Slug nama resep
+   * @param {string} imageUrl Data URL atau URL gambar
+   * @param {string} recipeName Nama masakan
+   */
+  static async saveCachedRecipeImage(slug, imageUrl, recipeName = '') {
+    if (!db) await FirebaseService.init();
+    if (!db || !imageUrl) return false;
+
+    try {
+      const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js');
+      const docId = `recipe_img_${slug}`;
+      const docRef = doc(db, 'dapur_pintar_data', docId);
+      await setDoc(docRef, {
+        slug,
+        recipeName,
+        imageUrl,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
+      return true;
+    } catch (err) {
+      console.warn('Gagal menyimpan cache gambar ke Firestore:', err);
+      return false;
+    }
+  }
 }

@@ -176,4 +176,96 @@ export class GeminiService {
     GeminiService.cache.set(cacheKey, result);
     return result;
   }
+
+  /**
+   * Mengambil gambar resep dari Global Shared Cache Firestore atau generate via Google Imagen 3 API
+   * Dilengkapi graceful fallback otomatis ke katalog kuliner
+   * @param {string} recipeName Nama masakan
+   * @param {string} visualCategory Kategori masakan (opsional)
+   * @param {string} fallbackUrl URL gambar katalog fallback jika gagal/limit
+   * @returns {Promise<string>}
+   */
+  static async getOrGenerateRecipeImage(recipeName, visualCategory = '', fallbackUrl = '') {
+    if (!recipeName) return fallbackUrl;
+
+    const slug = String(recipeName)
+      .toLowerCase()
+      .trim()
+      .replace(/^(resep|menu|olahan|kreasi)\s+/i, '')
+      .replace(/[^a-z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .slice(0, 48);
+
+    if (!slug) return fallbackUrl;
+
+    // 1. Cek memory runtime cache
+    const memKey = `img_recipe_${slug}`;
+    if (GeminiService.cache.has(memKey)) {
+      return GeminiService.cache.get(memKey);
+    }
+
+    // 2. Cek Global Shared Cache di Cloud Firestore
+    try {
+      const { FirebaseService } = await import('./firebase.js');
+      const cloudCached = await FirebaseService.getCachedRecipeImage(slug);
+      if (cloudCached) {
+        GeminiService.cache.set(memKey, cloudCached);
+        return cloudCached;
+      }
+    } catch (err) {
+      console.warn('Firestore cache lookup skipped:', err);
+    }
+
+    // 3. Jika belum pernah di-generate, panggil Google Imagen 3 API
+    const apiKey = GeminiService.getApiKey();
+    if (!apiKey) {
+      return fallbackUrl;
+    }
+
+    try {
+      const prompt = `Authentic Indonesian home-cooked food photography: ${recipeName}. Beautifully plated, mouth-watering, vibrant colors, fresh ingredients, 4k resolution, soft natural lighting, high-end food magazine style, centered, no text, no watermark.`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 12000); // Max 12 detik
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        signal: controller.signal,
+        body: JSON.stringify({
+          instances: [{ prompt }],
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: '4:3',
+            outputOptions: { mimeType: 'image/jpeg' }
+          }
+        })
+      });
+
+      clearTimeout(timeoutId);
+
+      if (response.ok) {
+        const data = await response.json();
+        const base64 = data?.predictions?.[0]?.bytesBase64Encoded;
+        if (base64) {
+          const generatedUrl = `data:image/jpeg;base64,${base64}`;
+          GeminiService.cache.set(memKey, generatedUrl);
+
+          // Simpan ke Firestore secara asinkron agar pengguna lain hemat kuota
+          import('./firebase.js').then(({ FirebaseService }) => {
+            FirebaseService.saveCachedRecipeImage(slug, generatedUrl, recipeName).catch(() => {});
+          }).catch(() => {});
+
+          return generatedUrl;
+        }
+      } else {
+        console.warn(`Imagen 3 API status ${response.status}: beralih ke katalog fallback.`);
+      }
+    } catch (err) {
+      console.warn('Imagen 3 API fallback:', err.message);
+    }
+
+    return fallbackUrl;
+  }
 }
