@@ -11,7 +11,7 @@
 - **🍳 Ide Masak Pintar & Infinite Scroll**: Rekomendasi resep masakan rumahan Indonesia yang disesuaikan dengan stok nyata. Dilengkapi sistem *infinite scroll* dan tombol *"Cari Rekomendasi Lainnya"* anti-duplikasi.
 - **📦 Manajemen Stok Nyata**: Mulai dari inventaris bersih, pembagian jelas antara stok kulkas & dapur, serta indikator prioritas bahan yang harus segera dimasak (*zero food waste*).
 - **📋 Log & Riwayat**: Catatan aktivitas memasak dan belanja harian.
-- **📱 Hybrid Mobile & PWA**: Tersedia sebagai Web App (PWA) dan aplikasi **Android Native (.apk)** menggunakan **Capacitor** (~4.2 MB).
+- **📱 Hybrid Mobile & PWA**: Tersedia sebagai Web App (PWA) dan aplikasi **Android Native (.apk)** menggunakan **Capacitor 8** (~4.2 MB) dengan dukungan asset splash screen & adaptive icons.
 
 ---
 
