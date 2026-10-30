@@ -30,7 +30,43 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
     });
   }
 
-  function renderBahanList(scaledBahan) {
+  function getScaledBumbu(portion) {
+    const ratio = portion / basePortion;
+    const bumbuList = recipe.bahan_bumbu || [];
+    return bumbuList.map(b => {
+      let nama = '';
+      let baseTakaran = '';
+
+      if (typeof b === 'object' && b !== null) {
+        nama = b.nama || '';
+        baseTakaran = b.takaran || (b.jumlah ? `${b.jumlah} ${b.satuan || ''}`.trim() : 'Secukupnya');
+      } else if (typeof b === 'string') {
+        const str = b.trim();
+        const colonMatch = str.match(/^([^:]+):\s*(.+)$/);
+        const parenMatch = str.match(/^([^(]+)\s*\(([^)]+)\)$/);
+        const leadingNumberMatch = str.match(/^([\d/½¼¾\s]+(?:sdm|sdt|siung|butir|ruas|lembar|batang|buah|gram|gr|ml|ons|ikat|bungkus|cm|secukupnya|sejumput)?)\s+(.+)$/i);
+
+        if (colonMatch) {
+          nama = colonMatch[1].trim();
+          baseTakaran = colonMatch[2].trim();
+        } else if (parenMatch) {
+          nama = parenMatch[1].trim();
+          baseTakaran = parenMatch[2].trim();
+        } else if (leadingNumberMatch) {
+          baseTakaran = leadingNumberMatch[1].trim();
+          nama = leadingNumberMatch[2].trim();
+        } else {
+          nama = str;
+          baseTakaran = 'Secukupnya';
+        }
+      }
+
+      const takaran = scaleTakaran(baseTakaran, ratio);
+      return { nama, takaran };
+    });
+  }
+
+  function renderBahanList(scaledBahan, scaledBumbu) {
     const bahanUtamaHtml = scaledBahan.map(b => `
       <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-container text-xs shadow-2xs">
         <span class="font-semibold text-on-surface flex items-center gap-1.5">
@@ -41,45 +77,15 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
       </div>
     `).join('');
 
-    const bumbuList = recipe.bahan_bumbu || [];
-    const bumbuHtml = bumbuList.map(b => {
-      let nama = '';
-      let takaran = '';
-
-      if (typeof b === 'object' && b !== null) {
-        nama = b.nama || '';
-        takaran = b.takaran || (b.jumlah ? `${b.jumlah} ${b.satuan || ''}`.trim() : 'Secukupnya');
-      } else if (typeof b === 'string') {
-        const str = b.trim();
-        const colonMatch = str.match(/^([^:]+):\s*(.+)$/);
-        const parenMatch = str.match(/^([^(]+)\s*\(([^)]+)\)$/);
-        const leadingNumberMatch = str.match(/^([\d/½¼¾\s]+(?:sdm|sdt|siung|butir|ruas|lembar|batang|buah|gram|gr|ml|ons|ikat|bungkus|cm|secukupnya|sejumput)?)\s+(.+)$/i);
-
-        if (colonMatch) {
-          nama = colonMatch[1].trim();
-          takaran = colonMatch[2].trim();
-        } else if (parenMatch) {
-          nama = parenMatch[1].trim();
-          takaran = parenMatch[2].trim();
-        } else if (leadingNumberMatch) {
-          takaran = leadingNumberMatch[1].trim();
-          nama = leadingNumberMatch[2].trim();
-        } else {
-          nama = str;
-          takaran = 'Secukupnya';
-        }
-      }
-
-      return `
-        <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container/60 text-xs border border-outline-variant/20">
-          <span class="text-on-surface flex items-center gap-1.5 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
-            ${escapeHtml(nama)}
-          </span>
-          <span class="text-on-surface-variant font-semibold bg-surface px-2 py-0.5 rounded border border-outline-variant/30 text-[11px] shadow-2xs">${escapeHtml(takaran)}</span>
-        </div>
-      `;
-    }).join('');
+    const bumbuHtml = scaledBumbu.map(b => `
+      <div class="flex items-center justify-between p-2 rounded-xl bg-surface-container/60 text-xs border border-outline-variant/20">
+        <span class="text-on-surface flex items-center gap-1.5 font-medium">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0"></span>
+          ${escapeHtml(b.nama)}
+        </span>
+        <span class="text-on-surface-variant font-semibold bg-surface px-2 py-0.5 rounded border border-outline-variant/30 text-[11px] shadow-2xs">${escapeHtml(b.takaran)}</span>
+      </div>
+    `).join('');
 
     return `
       <div class="space-y-1.5">
@@ -140,7 +146,7 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
           <span id="portion-hint" class="text-[10px] text-slate-400">(Takar untuk ${currentPortion} porsi)</span>
         </div>
         <div id="recipe-ingredients-list" class="space-y-1.5">
-          ${renderBahanList(getScaledBahan(currentPortion))}
+          ${renderBahanList(getScaledBahan(currentPortion), getScaledBumbu(currentPortion))}
         </div>
       </div>
 
@@ -192,7 +198,7 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
         if (hintDisp) hintDisp.textContent = `(Takar untuk ${currentPortion} porsi)`;
         const ingList = document.getElementById('recipe-ingredients-list');
         if (ingList) {
-          ingList.innerHTML = renderBahanList(getScaledBahan(currentPortion));
+          ingList.innerHTML = renderBahanList(getScaledBahan(currentPortion), getScaledBumbu(currentPortion));
         }
       }
 
@@ -206,7 +212,11 @@ export function openRecipeDetailModal(recipe, onCookFinished) {
 
       document.getElementById('modal-btn-share')?.addEventListener('click', async () => {
         const scaled = getScaledBahan(currentPortion);
-        const shareText = `🍲 Resep ${recipe.nama} (Dapur Pintar)\n⏱️ Waktu: ${recipe.waktu_masak || '15 Menit'} | Porsi: ${currentPortion} Porsi\n\n🥗 Bahan yang Digunakan:\n${scaled.map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('\n')}\n\n👨‍🍳 Langkah Memasak:\n${(recipe.langkah || []).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n\n💡 Tips: ${recipe.tips || 'Sajikan selagi hangat!'}`;
+        const scaledBumbu = getScaledBumbu(currentPortion);
+        const bumbuText = scaledBumbu.length > 0
+          ? `\n\n🧂 Bumbu Dapur & Takaran:\n${scaledBumbu.map(b => `• ${b.nama}: ${b.takaran}`).join('\n')}`
+          : '';
+        const shareText = `🍲 Resep ${recipe.nama} (Dapur Pintar)\n⏱️ Waktu: ${recipe.waktu_masak || '15 Menit'} | Porsi: ${currentPortion} Porsi\n\n🥗 Bahan Utama (dari Stok):\n${scaled.map(b => `• ${b.nama}: ${b.jumlah} ${b.satuan}`).join('\n')}${bumbuText}\n\n👨🍳 Langkah Memasak:\n${(recipe.langkah || []).map((l, i) => `${i + 1}. ${l}`).join('\n')}\n\n💡 Tips: ${recipe.tips || 'Sajikan selagi hangat!'}`;
 
         if (navigator.share) {
           try {

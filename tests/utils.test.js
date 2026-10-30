@@ -1,6 +1,6 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { escapeHtml, formatJumlah, formatTanggal, formatWaktuLalu, getDurasiSimpanInfo } from '../js/utils/format.js';
+import { escapeHtml, formatJumlah, formatTanggal, formatWaktuLalu, getDurasiSimpanInfo, scaleTakaran } from '../js/utils/format.js';
 
 describe('Format & Sanitization Utilities', () => {
   describe('escapeHtml', () => {
@@ -45,6 +45,33 @@ describe('Format & Sanitization Utilities', () => {
       const info = getDurasiSimpanInfo(fourDaysAgo, 'bumbu');
       assert.equal(info.days, 4);
       assert.equal(info.isPrioritas, false);
+    });
+  });
+
+  describe('scaleTakaran (Portion Adjustment)', () => {
+    test('scales whole numbers and preserves notes', () => {
+      assert.equal(scaleTakaran('3 buah (haluskan)', 4), '12 buah (haluskan)');
+      assert.equal(scaleTakaran('2 buah (iris tipis)', 6), '12 buah (iris tipis)');
+      assert.equal(scaleTakaran('3 sdm', 6), '18 sdm');
+      assert.equal(scaleTakaran('200 ml', 6), '1200 ml');
+    });
+
+    test('scales fractions properly into culinary measures', () => {
+      assert.equal(scaleTakaran('1/2 sdt', 6), '3 sdt');
+      assert.equal(scaleTakaran('½ sdt', 6), '3 sdt');
+      assert.equal(scaleTakaran('1/2 sdt garam', 0.5), '1/4 sdt garam');
+      assert.equal(scaleTakaran('1 sdm', 1.5), '1 1/2 sdm');
+      assert.equal(scaleTakaran('1 1/2 sdm', 2), '3 sdm');
+    });
+
+    test('scales ranges accurately', () => {
+      assert.equal(scaleTakaran('2-3 siung', 3), '6-9 siung');
+    });
+
+    test('keeps non-quantifiable terms untouched', () => {
+      assert.equal(scaleTakaran('Secukupnya', 5), 'Secukupnya');
+      assert.equal(scaleTakaran('Sejumput garam', 2), 'Sejumput garam');
+      assert.equal(scaleTakaran('', 2), 'Secukupnya');
     });
   });
 });
