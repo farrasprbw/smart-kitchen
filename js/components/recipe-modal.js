@@ -3,7 +3,7 @@
 import { ModalService } from './modal.js';
 import { showToast } from './toast.js';
 import { StorageService } from '../core/storage.js';
-import { escapeHtml } from '../utils/format.js';
+import { escapeHtml, scaleTakaran } from '../utils/format.js';
 
 /**
  * Buka modal detail lengkap resep masakan
